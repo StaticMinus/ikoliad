@@ -1,0 +1,10 @@
+{
+  "name": "ikoliad",
+  "private": true,
+  "version": "1.0.0",
+  "scripts": {
+    "dev": "npm --prefix ikoli-era-site run dev",
+    "build": "npm --prefix ikoli-era-site run build",
+    "preview": "npm --prefix ikoli-era-site run preview"
+  }
+}
