@@ -1,5 +1,0 @@
-{
-  "buildCommand": "cd ikoli-era-site && npm install && npm run build",
-  "outputDirectory": "ikoli-era-site/dist",
-  "framework": "vite"
-}
