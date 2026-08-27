@@ -210,10 +210,10 @@ export const CinematicHeroFrame: React.FC<CinematicHeroFrameProps> = ({
       className="relative w-full h-[420vh] bg-transparent"
     >
       {/* Pinned Viewport Container (Sticky 100vh) */}
-      <div className="sticky top-0 w-full h-screen flex flex-col justify-between p-2 sm:p-4 md:p-6 pb-3 pt-2 select-none overflow-hidden bg-[#FBFBFD] max-w-[1600px] mx-auto">
+      <div className="sticky top-0 w-full h-screen flex flex-col justify-between px-3 sm:px-6 md:px-8 pb-4 sm:pb-6 select-none overflow-hidden bg-[#FBFBFD] max-w-[1600px] mx-auto">
         
-        {/* Top Header Text Section with Clean Dark Typography */}
-        <div className="text-center pt-1 sm:pt-2 space-y-0.5 shrink-0">
+        {/* Top Header Text Section with Clean Dark Typography and Generous Spacing */}
+        <div className="text-center pt-16 sm:pt-20 md:pt-24 pb-3 sm:pb-5 space-y-1.5 shrink-0">
           <h2 className="font-display font-black text-2xl sm:text-4xl md:text-5xl lg:text-6xl tracking-tight uppercase text-[#1D1D1F]">
             YOUR HEALTH, OUR MISSION
           </h2>
@@ -225,7 +225,7 @@ export const CinematicHeroFrame: React.FC<CinematicHeroFrameProps> = ({
         {/* Middle Canvas Card Container (Expanded Full-Width Immersion Hero) */}
         <div
           ref={containerRef}
-          className="relative w-full flex-1 my-2 sm:my-3 rounded-2xl sm:rounded-[32px] overflow-hidden shadow-2xl border border-black/10 bg-[#0B0D13] flex items-center justify-center min-h-[340px] sm:min-h-[460px] md:min-h-[520px] max-h-[76vh]"
+          className="relative w-full flex-1 my-1 sm:my-2 rounded-2xl sm:rounded-[32px] overflow-hidden shadow-2xl border border-black/10 bg-[#0B0D13] flex items-center justify-center min-h-[360px] sm:min-h-[480px] md:min-h-[560px] max-h-[84vh]"
         >
           {/* HTML5 High-Performance 2D Canvas */}
           <canvas
@@ -238,10 +238,8 @@ export const CinematicHeroFrame: React.FC<CinematicHeroFrameProps> = ({
             <div className="absolute inset-0 bg-[#0B0D13] flex items-center justify-center z-30 pointer-events-none">
               <div className="w-full h-full relative overflow-hidden bg-white/[0.04]">
                 <div
-                  className="absolute inset-0 -translate-x-full animate-[shimmer_1.5s_infinite]"
-                  style={{
-                    backgroundImage: 'linear-gradient(90deg, transparent 0%, rgba(255,255,255,0.08) 50%, transparent 100%)',
-                  }}
+                  className="absolute inset-0 -translate-x-full bg-gradient-to-r from-transparent via-white/10 to-transparent"
+                  style={{ animation: 'shimmer 1.5s infinite' }}
                 />
               </div>
             </div>
@@ -354,55 +352,6 @@ export const CinematicHeroFrame: React.FC<CinematicHeroFrameProps> = ({
           )}
         </div>
 
-        {/* Bottom 3 Bento Metric Cards Grid */}
-        <div className="grid grid-cols-1 md:grid-cols-12 gap-2 sm:gap-3 md:gap-4 shrink-0 pt-0.5">
-          
-          {/* Card 1: 312+ Total Sentinel PHCs */}
-          <div className="md:col-span-4 bg-[#EBEBEF] rounded-2xl p-3.5 sm:p-4.5 flex flex-col justify-between gap-1.5 border border-black/5 shadow-xs group hover:shadow-md transition-all">
-            <div className="flex items-center justify-between">
-              <span className="text-2xl sm:text-3xl md:text-4xl font-black font-mono text-[#1D1D1F] tracking-tight">
-                312+
-              </span>
-              <div className="w-6.5 h-6.5 sm:w-7 sm:h-7 rounded-full bg-[#0071E3] text-white flex items-center justify-center group-hover:scale-110 shadow-xs transition-transform">
-                <ArrowUpRight className="w-3.5 h-3.5 stroke-[2.5]" />
-              </div>
-            </div>
-            <span className="text-[10px] sm:text-[11px] font-bold text-gray-500 uppercase tracking-wider font-mono">
-              TOTAL SENTINEL PHCs • 36 STATES
-            </span>
-          </div>
-
-          {/* Card 2: 89.2% WHO MDT Completion Rate */}
-          <div className="md:col-span-4 bg-[#EBEBEF] rounded-2xl p-3.5 sm:p-4.5 flex flex-col justify-between gap-1.5 border border-black/5 shadow-xs group hover:shadow-md transition-all">
-            <div className="flex items-center justify-between">
-              <span className="text-2xl sm:text-3xl md:text-4xl font-black font-mono text-[#1D1D1F] tracking-tight">
-                89.2%
-              </span>
-              <div className="w-6.5 h-6.5 sm:w-7 sm:h-7 rounded-full bg-[#10B981] text-white flex items-center justify-center group-hover:scale-110 shadow-xs transition-transform">
-                <ArrowUpRight className="w-3.5 h-3.5 stroke-[2.5]" />
-              </div>
-            </div>
-            <span className="text-[10px] sm:text-[11px] font-bold text-gray-500 uppercase tracking-wider font-mono">
-              WHO MDT 12-MO COMPLETION RATE
-            </span>
-          </div>
-
-          {/* Card 3: 4.8 Days PCR Confirmation Turnaround */}
-          <div className="md:col-span-4 bg-[#EBEBEF] rounded-2xl p-3.5 sm:p-4.5 flex flex-col justify-between gap-1.5 border border-black/5 shadow-xs group hover:shadow-md transition-all">
-            <div className="flex items-center justify-between">
-              <span className="text-2xl sm:text-3xl md:text-4xl font-black font-mono text-[#1D1D1F] tracking-tight">
-                4.8d
-              </span>
-              <div className="w-6.5 h-6.5 sm:w-7 sm:h-7 rounded-full bg-[#0071E3] text-white flex items-center justify-center group-hover:scale-110 shadow-xs transition-transform">
-                <ArrowUpRight className="w-3.5 h-3.5 stroke-[2.5]" />
-              </div>
-            </div>
-            <span className="text-[10px] sm:text-[11px] font-bold text-gray-500 uppercase tracking-wider font-mono">
-              AVG PCR IS2404 TURNAROUND (MILE 4 LAB)
-            </span>
-          </div>
-
-        </div>
 
       </div>
     </div>
