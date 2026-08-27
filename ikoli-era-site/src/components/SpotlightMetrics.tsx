@@ -1,5 +1,6 @@
 import React, { useRef } from 'react';
 import { motion, useScroll, useTransform } from 'framer-motion';
+import { BlobVideo } from './ui/BlobVideo';
 
 const STATEMENT = "An intelligent multimodal AI engine that detects, verifies, and stages. Automating anomaly detection, differential screening, and national reporting with zero patient data exposure.";
 
@@ -46,7 +47,7 @@ export const SpotlightMetrics: React.FC = () => {
         {/* Left Column: Rounded Clinical Profile Video Card (Clean, Pill Removed) */}
         <div className="w-full lg:w-5/12 flex justify-center">
           <div className="relative w-full max-w-[420px] aspect-[4/3] rounded-[24px] sm:rounded-[32px] overflow-hidden shadow-2xl border border-gray-100 group bg-black">
-            <video
+            <BlobVideo
               autoPlay
               loop
               muted

@@ -1,11 +1,20 @@
 import React, { useState } from 'react';
-import { LogoIcon } from './LogoIcon';
-import { Sparkles, Menu, X, ChevronRight, ShieldCheck } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
+import {
+  Home,
+  LayoutDashboard,
+  Shield,
+  Info,
+  ArrowUpRight,
+  Menu,
+  X,
+  ChevronRight,
+  Sparkles,
+} from 'lucide-react';
 
 interface NavbarProps {
-  currentPage?: 'home' | 'dashboard' | 'diseases' | 'ask';
-  onNavigate?: (page: 'home' | 'dashboard' | 'diseases' | 'ask') => void;
+  currentPage?: 'home' | 'dashboard' | 'diseases' | 'ask' | 'about' | 'styles';
+  onNavigate?: (page: 'home' | 'dashboard' | 'diseases' | 'ask' | 'about' | 'styles') => void;
 }
 
 export const Navbar: React.FC<NavbarProps> = ({
@@ -14,182 +23,207 @@ export const Navbar: React.FC<NavbarProps> = ({
 }) => {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
-  const handleNavClick = (page: 'home' | 'dashboard' | 'diseases' | 'ask') => {
-    onNavigate?.(page);
+  const handleNavClick = (pageId: string) => {
+    onNavigate?.(pageId as 'home' | 'dashboard' | 'diseases' | 'ask' | 'about' | 'styles');
     setMobileMenuOpen(false);
   };
 
+  const navItems = [
+    {
+      id: 'home',
+      label: 'Home',
+      title: 'Home Overview',
+      icon: Home,
+    },
+    {
+      id: 'dashboard',
+      label: 'Dashboard',
+      title: 'Surveillance Dashboard',
+      icon: LayoutDashboard,
+    },
+    {
+      id: 'diseases',
+      label: 'Diseases',
+      title: 'Target Diseases Registry',
+      icon: Shield,
+    },
+    {
+      id: 'about',
+      label: 'About Us',
+      title: 'About & Governance',
+      icon: Info,
+    },
+  ];
+
   return (
-    <header className="w-full pt-4 sm:pt-6 pb-4 px-4 sm:px-8 md:px-16 z-40 relative max-w-7xl mx-auto">
-      <div className="flex items-center justify-between">
+    <header className="sticky top-3 sm:top-5 z-50 w-full px-3 sm:px-6 max-w-7xl mx-auto select-none pointer-events-none">
+      <div className="flex items-center justify-center w-full">
         
-        {/* ── Brand Logo: IKOLI AI ─────────────────── */}
-        <div
-          onClick={() => handleNavClick('home')}
-          className="flex items-center gap-2.5 sm:gap-3 cursor-pointer group"
-        >
-          <LogoIcon className="w-8 h-8 sm:w-9 sm:h-9 group-hover:scale-105 transition-transform duration-300 drop-shadow-md" />
-          <div className="flex flex-col text-left">
-            <span className="font-display font-black text-lg sm:text-xl tracking-tight text-[#0A0C10] leading-none group-hover:text-[#0082FF] transition-colors">
-              IKOLI AI
-            </span>
-            <span className="font-mono text-[8px] sm:text-[9px] font-bold text-[#0082FF] tracking-widest uppercase">
-              Clinical Vision
+        {/* ── Apple Clean / Spatial Minimalist Frosted Light Glass Capsule Dock ────── */}
+        <div className="pointer-events-auto bg-white/85 backdrop-blur-2xl border border-black/5 rounded-full p-1.5 sm:p-2 shadow-[0_12px_40px_rgba(0,0,0,0.06)] flex items-center justify-between gap-2 sm:gap-4 w-full max-w-4xl transition-all duration-300">
+          
+          {/* 1. Left: Hardware-Grade Typographic Logo Mark */}
+          <div
+            onClick={() => handleNavClick('home')}
+            className="flex items-center cursor-pointer group shrink-0 pl-3 pr-1 py-1"
+          >
+            <span className="font-display font-black text-base sm:text-lg tracking-tight text-[#1D1D1F] group-hover:text-[#0071E3] transition-colors flex items-center gap-1">
+              <span>IKOLI</span>
+              <span className="text-[#0071E3]">AI</span>
             </span>
           </div>
-        </div>
 
-        {/* ── Desktop Navigation Links (md+) ───────────────────── */}
-        <nav className="hidden md:flex items-center gap-8 lg:gap-10 text-xs font-bold uppercase tracking-wider text-[#0A0C10]/80">
-          <button
-            onClick={() => handleNavClick('dashboard')}
-            className={`hover:text-[#0082FF] transition-colors py-1 cursor-pointer ${
-              currentPage === 'dashboard'
-                ? 'text-[#0082FF] border-b-2 border-[#0082FF]'
-                : 'text-[#0A0C10]/80'
-            }`}
-          >
-            Dashboard
-          </button>
+          {/* 2. Center: Segmented Apple-Style Glass Pill Navigation Tabs (md+) */}
+          <nav className="hidden md:flex items-center gap-1 bg-black/[0.04] p-1 rounded-full border border-black/[0.04] font-sans">
+            {navItems.map((item) => {
+              const isActive = currentPage === item.id;
 
-          <button
-            onClick={() => handleNavClick('diseases')}
-            className={`hover:text-[#0082FF] transition-colors py-1 cursor-pointer ${
-              currentPage === 'diseases'
-                ? 'text-[#0082FF] border-b-2 border-[#0082FF]'
-                : 'text-[#0A0C10]/80'
-            }`}
-          >
-            Diseases
-          </button>
+              return (
+                <button
+                  key={item.id}
+                  onClick={() => handleNavClick(item.id)}
+                  className={`px-4 py-1.5 rounded-full text-xs font-semibold transition-all duration-200 cursor-pointer ${
+                    isActive
+                      ? 'bg-white text-[#1D1D1F] shadow-xs font-bold'
+                      : 'text-[#1D1D1F]/70 hover:text-[#1D1D1F] hover:bg-white/60'
+                  }`}
+                >
+                  {item.label}
+                </button>
+              );
+            })}
+          </nav>
 
-          <a
-            href="#about"
-            className="hover:text-[#0082FF] transition-colors py-1 hover:border-b-2 hover:border-[#0082FF]"
-          >
-            About Us
-          </a>
-        </nav>
+          {/* 3. Right: Apple Blue CTA Pill ("Ask Ikoli ↗") + Mobile Toggle */}
+          <div className="flex items-center gap-2 shrink-0 pr-0.5">
+            
+            {/* Action CTA Pill with White Circular Arrow Badge */}
+            <button
+              onClick={() => handleNavClick('ask')}
+              className={`bg-[#0071E3] hover:bg-[#0077ED] text-white font-bold text-xs rounded-full pl-3.5 sm:pl-4 pr-1 sm:pr-1.5 py-1 sm:py-1.5 flex items-center gap-2 sm:gap-2.5 shadow-md shadow-[#0071E3]/25 transition-all hover:scale-105 cursor-pointer group ${
+                currentPage === 'ask' ? 'ring-2 ring-[#0071E3]/50' : ''
+              }`}
+            >
+              <span className="tracking-tight font-semibold">Ask Ikoli</span>
+              <div className="w-6 h-6 sm:w-6.5 sm:h-6.5 rounded-full bg-white text-[#0071E3] flex items-center justify-center shadow-xs group-hover:translate-x-0.5 group-hover:-translate-y-0.5 transition-transform duration-200">
+                <ArrowUpRight className="w-3.5 h-3.5 stroke-[2.5]" />
+              </div>
+            </button>
 
-        {/* ── Right Actions: Desktop Button + Mobile Hamburger Toggle ── */}
-        <div className="flex items-center gap-2 sm:gap-3">
-          
-          {/* Desktop "Ask Ikoli" Button */}
-          <button
-            onClick={() => handleNavClick('ask')}
-            className={`hidden sm:inline-flex px-5 sm:px-6 py-2 sm:py-2.5 rounded-full text-xs font-extrabold uppercase tracking-wider transition-all hover:scale-105 shadow-md items-center gap-2 group cursor-pointer ${
-              currentPage === 'ask'
-                ? 'bg-[#0082FF] text-white ring-2 ring-[#0082FF]/30'
-                : 'bg-[#0A0C10] hover:bg-[#0082FF] text-white'
-            }`}
-          >
-            <Sparkles className="w-3.5 h-3.5 text-[#00D2FF] group-hover:text-white transition-colors" />
-            <span>Ask Ikoli</span>
-          </button>
+            {/* Mobile Hamburger Toggle (< md) */}
+            <button
+              onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
+              className="md:hidden w-8 h-8 rounded-full bg-black/5 hover:bg-black/10 border border-black/5 flex items-center justify-center text-[#1D1D1F] transition-all cursor-pointer"
+              aria-label="Toggle navigation menu"
+            >
+              {mobileMenuOpen ? <X className="w-4 h-4 text-[#0071E3]" /> : <Menu className="w-4 h-4 text-[#1D1D1F]" />}
+            </button>
 
-          {/* Mobile "Ask Ikoli" Compact Pill (< sm) */}
-          <button
-            onClick={() => handleNavClick('ask')}
-            className="sm:hidden bg-[#0082FF] text-white p-2 rounded-full shadow-md flex items-center justify-center cursor-pointer"
-            aria-label="Ask Ikoli AI"
-          >
-            <Sparkles className="w-4 h-4 text-white" />
-          </button>
-
-          {/* Mobile Menu Hamburger Button (< md) */}
-          <button
-            onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-            className="md:hidden w-9 h-9 rounded-xl bg-white/80 border border-black/10 flex items-center justify-center text-[#0A0C10] shadow-sm hover:bg-white transition-all cursor-pointer"
-            aria-label="Toggle navigation menu"
-          >
-            {mobileMenuOpen ? <X className="w-5 h-5" /> : <Menu className="w-5 h-5" />}
-          </button>
+          </div>
 
         </div>
 
       </div>
 
-      {/* ── Mobile Glassmorphic Navigation Drawer ──────────────── */}
+      {/* ── Apple Clean Bottom Sheet Drawer for Mobile ──────────────────────── */}
       <AnimatePresence>
         {mobileMenuOpen && (
-          <motion.div
-            initial={{ opacity: 0, y: -10, scale: 0.98 }}
-            animate={{ opacity: 1, y: 0, scale: 1 }}
-            exit={{ opacity: 0, y: -10, scale: 0.98 }}
-            transition={{ duration: 0.2 }}
-            className="md:hidden absolute top-full left-4 right-4 mt-2 bg-white/95 backdrop-blur-xl rounded-3xl p-5 border border-black/10 shadow-2xl z-50 space-y-4"
-          >
-            <div className="flex flex-col space-y-1 text-sm font-bold uppercase tracking-wider font-sans">
-              <button
-                onClick={() => handleNavClick('home')}
-                className={`flex items-center justify-between p-3 rounded-xl transition-all ${
-                  currentPage === 'home'
-                    ? 'bg-[#EFF6FC] text-[#0082FF]'
-                    : 'text-[#0A0C10] hover:bg-gray-50'
-                }`}
-              >
-                <span>Home Landing</span>
-                <ChevronRight className="w-4 h-4 text-gray-400" />
-              </button>
+          <>
+            {/* Backdrop Dimmer */}
+            <motion.div
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              onClick={() => setMobileMenuOpen(false)}
+              className="md:hidden fixed inset-0 bg-black/40 backdrop-blur-sm z-40 pointer-events-auto"
+            />
 
-              <button
-                onClick={() => handleNavClick('dashboard')}
-                className={`flex items-center justify-between p-3 rounded-xl transition-all ${
-                  currentPage === 'dashboard'
-                    ? 'bg-[#EFF6FC] text-[#0082FF]'
-                    : 'text-[#0A0C10] hover:bg-gray-50'
-                }`}
-              >
-                <span>Surveillance Dashboard</span>
-                <ChevronRight className="w-4 h-4 text-gray-400" />
-              </button>
+            {/* Bottom Sheet Modal */}
+            <motion.div
+              initial={{ y: '100%' }}
+              animate={{ y: 0 }}
+              exit={{ y: '100%' }}
+              transition={{ duration: 0.32, ease: [0.16, 1, 0.3, 1] }}
+              className="md:hidden fixed bottom-0 left-0 right-0 bg-white/98 backdrop-blur-3xl text-[#1D1D1F] rounded-t-[32px] p-5 pt-3 border-t border-black/10 shadow-[0_-20px_60px_rgba(0,0,0,0.18)] z-50 pointer-events-auto pb-9 space-y-4 max-h-[85vh] overflow-y-auto"
+            >
+              {/* Drag Pill Handle */}
+              <div className="w-10 h-1 bg-black/20 rounded-full mx-auto mb-2" />
 
-              <button
-                onClick={() => handleNavClick('diseases')}
-                className={`flex items-center justify-between p-3 rounded-xl transition-all ${
-                  currentPage === 'diseases'
-                    ? 'bg-[#EFF6FC] text-[#0082FF]'
-                    : 'text-[#0A0C10] hover:bg-gray-50'
-                }`}
-              >
-                <span>Target Diseases Registry</span>
-                <ChevronRight className="w-4 h-4 text-gray-400" />
-              </button>
-
-              <button
-                onClick={() => handleNavClick('ask')}
-                className={`flex items-center justify-between p-3 rounded-xl transition-all ${
-                  currentPage === 'ask'
-                    ? 'bg-[#EFF6FC] text-[#0082FF]'
-                    : 'text-[#0A0C10] hover:bg-gray-50'
-                }`}
-              >
-                <div className="flex items-center gap-2">
-                  <Sparkles className="w-4 h-4 text-[#0082FF]" />
-                  <span>Ask Ikoli AI</span>
+              {/* Minimal Sheet Header */}
+              <div className="flex items-center justify-between border-b border-black/5 pb-3">
+                <div className="flex items-center gap-1.5">
+                  <span className="font-display font-black text-base tracking-tight text-[#1D1D1F] flex items-center gap-1">
+                    <span>IKOLI</span>
+                    <span className="text-[#0071E3]">AI</span>
+                  </span>
+                  <span className="text-[10px] font-mono font-bold text-gray-400 bg-black/5 px-2 py-0.5 rounded-full">
+                    v1.1
+                  </span>
                 </div>
-                <ChevronRight className="w-4 h-4 text-gray-400" />
-              </button>
 
-              <a
-                href="#about"
-                onClick={() => setMobileMenuOpen(false)}
-                className="flex items-center justify-between p-3 rounded-xl text-[#0A0C10] hover:bg-gray-50 transition-all"
-              >
-                <span>About & Governance</span>
-                <ChevronRight className="w-4 h-4 text-gray-400" />
-              </a>
-            </div>
-
-            {/* Mobile Footer Status Badge */}
-            <div className="pt-3 border-t border-gray-100 flex items-center justify-between text-[11px] font-mono text-gray-500">
-              <div className="flex items-center gap-1.5 text-emerald-600 font-bold">
-                <ShieldCheck className="w-3.5 h-3.5" />
-                <span>Zero-PII Secure</span>
+                <button
+                  onClick={() => setMobileMenuOpen(false)}
+                  className="w-7 h-7 rounded-full bg-black/5 flex items-center justify-center text-gray-600 hover:bg-black/10 transition-colors"
+                >
+                  <X className="w-3.5 h-3.5" />
+                </button>
               </div>
-              <span>v2.6 Live</span>
-            </div>
-          </motion.div>
+
+              {/* Clean Minimal Navigation Item List */}
+              <div className="space-y-1.5">
+                {navItems.map((item) => {
+                  const isActive = currentPage === item.id;
+                  const Icon = item.icon;
+
+                  return (
+                    <button
+                      key={item.id}
+                      onClick={() => handleNavClick(item.id)}
+                      className={`w-full flex items-center justify-between p-3 rounded-2xl transition-all border text-left cursor-pointer ${
+                        isActive
+                          ? 'bg-[#0071E3]/10 border-[#0071E3]/30 text-[#0071E3] font-bold shadow-xs'
+                          : 'bg-[#F5F5F7] hover:bg-[#EBEBEF] border-black/5 text-[#1D1D1F] font-semibold'
+                      }`}
+                    >
+                      <div className="flex items-center gap-3">
+                        <div
+                          className={`w-8 h-8 rounded-xl flex items-center justify-center shadow-xs border ${
+                            isActive
+                              ? 'bg-[#0071E3] text-white border-[#0071E3]'
+                              : 'bg-white text-[#1D1D1F] border-black/5'
+                          }`}
+                        >
+                          <Icon className="w-4 h-4" />
+                        </div>
+                        <span className="text-xs">{item.title}</span>
+                      </div>
+                      <ChevronRight
+                        className={`w-4 h-4 shrink-0 ${
+                          isActive ? 'text-[#0071E3]' : 'text-gray-400'
+                        }`}
+                      />
+                    </button>
+                  );
+                })}
+              </div>
+
+              {/* Action CTA: Ask Ikoli Clinical Assistant Pill */}
+              <div className="pt-2">
+                <button
+                  onClick={() => handleNavClick('ask')}
+                  className="w-full bg-[#0071E3] hover:bg-[#0077ED] active:scale-95 text-white py-3 px-4 rounded-2xl text-xs font-bold shadow-md shadow-[#0071E3]/25 flex items-center justify-between transition-all cursor-pointer group"
+                >
+                  <div className="flex items-center gap-2">
+                    <Sparkles className="w-3.5 h-3.5 text-white" />
+                    <span>Launch Ask Ikoli Clinical Assistant</span>
+                  </div>
+                  <div className="w-5 h-5 rounded-full bg-white text-[#0071E3] flex items-center justify-center font-bold shadow-xs group-hover:translate-x-0.5 group-hover:-translate-y-0.5 transition-transform">
+                    <ArrowUpRight className="w-3 h-3 stroke-[2.5]" />
+                  </div>
+                </button>
+              </div>
+            </motion.div>
+          </>
         )}
       </AnimatePresence>
 

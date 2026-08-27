@@ -1,0 +1,408 @@
+import React, { useEffect, useRef, useState, useCallback } from 'react';
+import { ArrowUpRight, ChevronDown } from 'lucide-react';
+
+interface CinematicHeroFrameProps {
+  onExplore?: () => void;
+}
+
+const TOTAL_FRAMES = 300;
+
+const getFrameUrl = (index: number) => {
+  const padded = String(index + 1).padStart(3, '0');
+  return `/hero-frames/ezgif-frame-${padded}.jpg`;
+};
+
+export const CinematicHeroFrame: React.FC<CinematicHeroFrameProps> = ({
+  onExplore,
+}) => {
+  const outerTrackRef = useRef<HTMLDivElement>(null);
+  const canvasRef = useRef<HTMLCanvasElement>(null);
+  const containerRef = useRef<HTMLDivElement>(null);
+  const imagesRef = useRef<HTMLImageElement[]>([]);
+  const currentFrameRef = useRef<number>(0);
+  const targetFrameRef = useRef<number>(0);
+  const animationFrameIdRef = useRef<number | null>(null);
+
+  const [isReady, setIsReady] = useState<boolean>(false);
+  const [scrollProgress, setScrollProgress] = useState<number>(0);
+
+  // ── 1. Draw Frame with Object-Fit: Cover Math & Nearest-Frame Fallback ──
+  const drawFrame = useCallback((frameIndex: number) => {
+    const canvas = canvasRef.current;
+    if (!canvas) return;
+    const ctx = canvas.getContext('2d');
+    if (!ctx) return;
+
+    // Find target frame or nearest loaded frame
+    let img = imagesRef.current[frameIndex];
+    if (!img || !img.complete || img.naturalWidth === 0) {
+      // Look for closest loaded frame to prevent blank canvas
+      for (let offset = 1; offset < 40; offset++) {
+        const prevImg = imagesRef.current[frameIndex - offset];
+        if (prevImg && prevImg.complete && prevImg.naturalWidth > 0) {
+          img = prevImg;
+          break;
+        }
+        const nextImg = imagesRef.current[frameIndex + offset];
+        if (nextImg && nextImg.complete && nextImg.naturalWidth > 0) {
+          img = nextImg;
+          break;
+        }
+      }
+    }
+
+    if (!img || !img.complete || img.naturalWidth === 0) return;
+
+    const canvasWidth = canvas.width;
+    const canvasHeight = canvas.height;
+
+    const imgRatio = img.naturalWidth / img.naturalHeight;
+    const canvasRatio = canvasWidth / canvasHeight;
+
+    let renderWidth = canvasWidth;
+    let renderHeight = canvasHeight;
+    let offsetX = 0;
+    let offsetY = 0;
+
+    if (canvasRatio > imgRatio) {
+      renderHeight = canvasWidth / imgRatio;
+      offsetY = (canvasHeight - renderHeight) / 2;
+    } else {
+      renderWidth = canvasHeight * imgRatio;
+      offsetX = (canvasWidth - renderWidth) / 2;
+    }
+
+    ctx.clearRect(0, 0, canvasWidth, canvasHeight);
+    ctx.imageSmoothingEnabled = true;
+    ctx.imageSmoothingQuality = 'high';
+    ctx.drawImage(img, offsetX, offsetY, renderWidth, renderHeight);
+  }, []);
+
+  // ── 2. Resize Canvas with Device Pixel Ratio ───────────────────────
+  const resizeCanvas = useCallback(() => {
+    const canvas = canvasRef.current;
+    const container = containerRef.current;
+    if (!canvas || !container) return;
+
+    const rect = container.getBoundingClientRect();
+    const dpr = Math.min(window.devicePixelRatio || 1, 2);
+
+    canvas.width = rect.width * dpr;
+    canvas.height = rect.height * dpr;
+
+    drawFrame(Math.round(currentFrameRef.current));
+  }, [drawFrame]);
+
+  // ── 3. Instant Frame 0 Decode & Background Chunk Preloading ────────
+  useEffect(() => {
+    let isMounted = true;
+    const loadedImages: HTMLImageElement[] = new Array(TOTAL_FRAMES);
+
+    // 1. Immediately decode frame 0 for instant render
+    const initialImg = new Image();
+    initialImg.src = getFrameUrl(0);
+    initialImg.onload = () => {
+      if (!isMounted) return;
+      loadedImages[0] = initialImg;
+      setIsReady(true);
+      resizeCanvas();
+      drawFrame(0);
+    };
+    loadedImages[0] = initialImg;
+
+    // 2. Progressively preload remaining frames in background idle chunks
+    const preloadChunk = (startIdx: number, chunkSize = 20) => {
+      if (!isMounted || startIdx >= TOTAL_FRAMES) return;
+
+      for (let i = startIdx; i < Math.min(startIdx + chunkSize, TOTAL_FRAMES); i++) {
+        if (i === 0) continue;
+        const img = new Image();
+        img.src = getFrameUrl(i);
+        loadedImages[i] = img;
+      }
+
+      // Schedule next chunk asynchronously
+      if (startIdx + chunkSize < TOTAL_FRAMES) {
+        if ('requestIdleCallback' in window) {
+          // eslint-disable-next-line @typescript-eslint/no-explicit-any
+          (window as any).requestIdleCallback(() => preloadChunk(startIdx + chunkSize, chunkSize), { timeout: 250 });
+        } else {
+          setTimeout(() => preloadChunk(startIdx + chunkSize, chunkSize), 40);
+        }
+      }
+    };
+
+    preloadChunk(1, 25);
+    imagesRef.current = loadedImages;
+
+    return () => {
+      isMounted = false;
+    };
+  }, [drawFrame, resizeCanvas]);
+
+  useEffect(() => {
+    resizeCanvas();
+    window.addEventListener('resize', resizeCanvas);
+    return () => window.removeEventListener('resize', resizeCanvas);
+  }, [resizeCanvas, isReady]);
+
+  // ── 4. Smooth 60fps Lerp Animation Loop ─────────────────────────────
+  useEffect(() => {
+    const renderLoop = () => {
+      const diff = targetFrameRef.current - currentFrameRef.current;
+
+      if (Math.abs(diff) > 0.01) {
+        currentFrameRef.current += diff * 0.16; // Fluid lerp interpolation
+        const frameToDraw = Math.min(
+          Math.max(Math.round(currentFrameRef.current), 0),
+          TOTAL_FRAMES - 1
+        );
+        drawFrame(frameToDraw);
+      }
+
+      animationFrameIdRef.current = requestAnimationFrame(renderLoop);
+    };
+
+    animationFrameIdRef.current = requestAnimationFrame(renderLoop);
+
+    return () => {
+      if (animationFrameIdRef.current) {
+        cancelAnimationFrame(animationFrameIdRef.current);
+      }
+    };
+  }, [drawFrame]);
+
+  // ── 5. Pinned Scroll-Linked Engine ─────────────────────────────────
+  useEffect(() => {
+    const handleScroll = () => {
+      const outer = outerTrackRef.current;
+      if (!outer) return;
+
+      const rect = outer.getBoundingClientRect();
+      const scrollableDistance = outer.offsetHeight - window.innerHeight;
+
+      if (scrollableDistance <= 0) return;
+
+      const scrolledAmount = -rect.top;
+      const rawProgress = scrolledAmount / scrollableDistance;
+      const progress = Math.min(Math.max(rawProgress, 0), 1);
+
+      setScrollProgress(progress);
+      targetFrameRef.current = progress * (TOTAL_FRAMES - 1);
+    };
+
+    window.addEventListener('scroll', handleScroll, { passive: true });
+    handleScroll();
+
+    return () => window.removeEventListener('scroll', handleScroll);
+  }, []);
+
+  // Synchronized stage brackets with sleek lerp transitions
+  const isStage1 = scrollProgress < 0.25;
+  const isStage2 = scrollProgress >= 0.25 && scrollProgress < 0.50;
+  const isStage3 = scrollProgress >= 0.50 && scrollProgress < 0.75;
+  const isStage4 = scrollProgress >= 0.75;
+
+  return (
+    <div
+      ref={outerTrackRef}
+      className="relative w-full h-[420vh] bg-transparent"
+    >
+      {/* Pinned Viewport Container (Sticky 100vh) */}
+      <div className="sticky top-0 w-full h-screen flex flex-col justify-between p-2 sm:p-4 md:p-6 pb-3 pt-2 select-none overflow-hidden bg-[#FBFBFD] max-w-[1600px] mx-auto">
+        
+        {/* Top Header Text Section with Clean Dark Typography */}
+        <div className="text-center pt-1 sm:pt-2 space-y-0.5 shrink-0">
+          <h2 className="font-display font-black text-2xl sm:text-4xl md:text-5xl lg:text-6xl tracking-tight uppercase text-[#1D1D1F]">
+            YOUR HEALTH, OUR MISSION
+          </h2>
+          <p className="text-xs sm:text-sm text-gray-500 font-medium">
+            Eliminating neglected tropical skin diseases across Nigeria with frontline clinical AI
+          </p>
+        </div>
+
+        {/* Middle Canvas Card Container (Expanded Full-Width Immersion Hero) */}
+        <div
+          ref={containerRef}
+          className="relative w-full flex-1 my-2 sm:my-3 rounded-2xl sm:rounded-[32px] overflow-hidden shadow-2xl border border-black/10 bg-[#0B0D13] flex items-center justify-center min-h-[340px] sm:min-h-[460px] md:min-h-[520px] max-h-[76vh]"
+        >
+          {/* HTML5 High-Performance 2D Canvas */}
+          <canvas
+            ref={canvasRef}
+            className="w-full h-full block object-cover"
+          />
+
+          {/* Shimmering Skeleton Loader while Initial Frame Decodes */}
+          {!isReady && (
+            <div className="absolute inset-0 bg-[#0B0D13] flex items-center justify-center z-30 pointer-events-none">
+              <div className="w-full h-full relative overflow-hidden bg-white/[0.04]">
+                <div
+                  className="absolute inset-0 -translate-x-full animate-[shimmer_1.5s_infinite]"
+                  style={{
+                    backgroundImage: 'linear-gradient(90deg, transparent 0%, rgba(255,255,255,0.08) 50%, transparent 100%)',
+                  }}
+                />
+              </div>
+            </div>
+          )}
+
+          {/* ── Dynamic Narrative Overlay 1 (Stage 1: Positioned at Bottom-Left) ── */}
+          <div
+            className={`absolute bottom-6 sm:bottom-8 left-4 sm:left-10 z-20 transition-all duration-500 transform ${
+              isStage1
+                ? 'opacity-100 translate-y-0 scale-100'
+                : 'opacity-0 translate-y-3 scale-95 pointer-events-none'
+            }`}
+          >
+            <div className="max-w-md sm:max-w-lg bg-black/65 backdrop-blur-2xl p-4 sm:p-5 rounded-2xl border border-white/15 space-y-1.5 text-left shadow-2xl">
+              <span className="bg-white/20 text-white text-[10px] font-mono font-bold px-2.5 py-0.5 rounded-full uppercase tracking-wider">
+                Precision Health Surveillance
+              </span>
+              <h3 className="font-bold text-base sm:text-xl md:text-2xl text-white tracking-tight leading-snug">
+                Empowering Nigeria’s frontline health workers with computer vision.
+              </h3>
+              <p className="text-xs sm:text-sm text-gray-300 font-normal leading-relaxed">
+                Scroll to explore real-time AI lesion screening and sentinel clinical telemetry.
+              </p>
+            </div>
+          </div>
+
+          {/* ── Dynamic Narrative Overlay 2 (Stage 2: Positioned at Top-Right) ─── */}
+          <div
+            className={`absolute top-6 sm:top-8 right-4 sm:right-10 z-20 transition-all duration-500 transform ${
+              isStage2
+                ? 'opacity-100 translate-y-0 scale-100'
+                : 'opacity-0 -translate-y-3 scale-95 pointer-events-none'
+            }`}
+          >
+            <div className="max-w-md bg-black/65 backdrop-blur-2xl p-4 sm:p-5 rounded-2xl border border-white/15 space-y-1.5 text-left shadow-2xl">
+              <span className="bg-[#0071E3] text-white text-[10px] font-mono font-bold px-2.5 py-0.5 rounded-full uppercase tracking-wider">
+                Zero-PII Volumetric Processing
+              </span>
+              <h3 className="font-bold text-base sm:text-xl md:text-2xl text-white tracking-tight leading-snug">
+                Sub-millimeter margin analysis for Hansen’s & Buruli Ulcers.
+              </h3>
+              <p className="text-xs sm:text-sm text-gray-300 font-normal leading-relaxed">
+                Continuous optical validation preserves peripheral nerve integrity before permanent disability occurs.
+              </p>
+            </div>
+          </div>
+
+          {/* ── Dynamic Narrative Overlay 3 (Stage 3: Positioned at Top-Left) ──── */}
+          <div
+            className={`absolute top-6 sm:top-8 left-4 sm:left-10 z-20 transition-all duration-500 transform ${
+              isStage3
+                ? 'opacity-100 translate-y-0 scale-100'
+                : 'opacity-0 -translate-y-3 scale-95 pointer-events-none'
+            }`}
+          >
+            <div className="max-w-md sm:max-w-lg bg-black/65 backdrop-blur-2xl p-4 sm:p-5 rounded-2xl border border-white/15 space-y-1.5 text-left shadow-2xl">
+              <span className="bg-emerald-500 text-white text-[10px] font-mono font-bold px-2.5 py-0.5 rounded-full uppercase tracking-wider">
+                National Logistics Integration
+              </span>
+              <h3 className="font-bold text-base sm:text-xl md:text-2xl text-white tracking-tight leading-snug">
+                Instant treatment dispatch & WHO MDT blister packs.
+              </h3>
+              <p className="text-xs sm:text-sm text-gray-300 font-normal leading-relaxed">
+                Direct automated supply chain alerts to 312+ sentinel facilities across the federation.
+              </p>
+            </div>
+          </div>
+
+          {/* ── Dynamic Narrative Overlay 4 (Stage 4: Positioned at Bottom Action Card) ── */}
+          <div
+            className={`absolute inset-x-3 sm:inset-x-8 bottom-5 sm:bottom-6 z-20 bg-black/80 backdrop-blur-3xl p-4 sm:p-5 rounded-2xl border border-white/20 flex items-center justify-between gap-4 transition-all duration-500 transform ${
+              isStage4
+                ? 'opacity-100 translate-y-0 scale-100'
+                : 'opacity-0 translate-y-3 scale-95 pointer-events-none'
+            }`}
+          >
+            <div className="space-y-1 max-w-2xl text-left">
+              <div className="flex items-center gap-2">
+                <span className="bg-white/20 text-white text-[10px] font-mono font-bold px-2.5 py-0.5 rounded-full uppercase tracking-wider">
+                  National Health Mission
+                </span>
+                <span className="text-[10px] font-mono text-gray-300 hidden sm:inline">
+                  36 States Telemetry
+                </span>
+              </div>
+              <h3 className="font-bold text-sm sm:text-base md:text-lg text-white leading-tight">
+                Leaders in frontline disease surveillance & AI diagnostics
+              </h3>
+              <p className="text-xs sm:text-sm text-white/80 leading-relaxed hidden sm:block font-normal">
+                Bringing modern AI tools, reliable treatments, and patient-first health monitoring to every primary healthcare center in Nigeria.
+              </p>
+            </div>
+
+            <button
+              onClick={onExplore}
+              className="w-10 h-10 sm:w-12 sm:h-12 rounded-full bg-white text-[#1D1D1F] flex items-center justify-center shadow-lg hover:scale-105 active:scale-95 transition-all shrink-0 cursor-pointer group/btn"
+              aria-label="Explore diseases"
+            >
+              <ArrowUpRight className="w-5 h-5 stroke-[2.5] group-hover/btn:translate-x-0.5 group-hover/btn:-translate-y-0.5 transition-transform" />
+            </button>
+          </div>
+
+          {/* Subtle Bottom Scroll Cue Indicator */}
+          {isStage1 && (
+            <div className="absolute bottom-2.5 left-1/2 -translate-x-1/2 z-20 flex items-center gap-1.5 text-[10px] font-mono text-white/60 animate-bounce pointer-events-none">
+              <span>Scroll to navigate</span>
+              <ChevronDown className="w-3.5 h-3.5" />
+            </div>
+          )}
+        </div>
+
+        {/* Bottom 3 Bento Metric Cards Grid */}
+        <div className="grid grid-cols-1 md:grid-cols-12 gap-2 sm:gap-3 md:gap-4 shrink-0 pt-0.5">
+          
+          {/* Card 1: 312+ Total Sentinel PHCs */}
+          <div className="md:col-span-4 bg-[#EBEBEF] rounded-2xl p-3.5 sm:p-4.5 flex flex-col justify-between gap-1.5 border border-black/5 shadow-xs group hover:shadow-md transition-all">
+            <div className="flex items-center justify-between">
+              <span className="text-2xl sm:text-3xl md:text-4xl font-black font-mono text-[#1D1D1F] tracking-tight">
+                312+
+              </span>
+              <div className="w-6.5 h-6.5 sm:w-7 sm:h-7 rounded-full bg-[#0071E3] text-white flex items-center justify-center group-hover:scale-110 shadow-xs transition-transform">
+                <ArrowUpRight className="w-3.5 h-3.5 stroke-[2.5]" />
+              </div>
+            </div>
+            <span className="text-[10px] sm:text-[11px] font-bold text-gray-500 uppercase tracking-wider font-mono">
+              TOTAL SENTINEL PHCs • 36 STATES
+            </span>
+          </div>
+
+          {/* Card 2: 89.2% WHO MDT Completion Rate */}
+          <div className="md:col-span-4 bg-[#EBEBEF] rounded-2xl p-3.5 sm:p-4.5 flex flex-col justify-between gap-1.5 border border-black/5 shadow-xs group hover:shadow-md transition-all">
+            <div className="flex items-center justify-between">
+              <span className="text-2xl sm:text-3xl md:text-4xl font-black font-mono text-[#1D1D1F] tracking-tight">
+                89.2%
+              </span>
+              <div className="w-6.5 h-6.5 sm:w-7 sm:h-7 rounded-full bg-[#10B981] text-white flex items-center justify-center group-hover:scale-110 shadow-xs transition-transform">
+                <ArrowUpRight className="w-3.5 h-3.5 stroke-[2.5]" />
+              </div>
+            </div>
+            <span className="text-[10px] sm:text-[11px] font-bold text-gray-500 uppercase tracking-wider font-mono">
+              WHO MDT 12-MO COMPLETION RATE
+            </span>
+          </div>
+
+          {/* Card 3: 4.8 Days PCR Confirmation Turnaround */}
+          <div className="md:col-span-4 bg-[#EBEBEF] rounded-2xl p-3.5 sm:p-4.5 flex flex-col justify-between gap-1.5 border border-black/5 shadow-xs group hover:shadow-md transition-all">
+            <div className="flex items-center justify-between">
+              <span className="text-2xl sm:text-3xl md:text-4xl font-black font-mono text-[#1D1D1F] tracking-tight">
+                4.8d
+              </span>
+              <div className="w-6.5 h-6.5 sm:w-7 sm:h-7 rounded-full bg-[#0071E3] text-white flex items-center justify-center group-hover:scale-110 shadow-xs transition-transform">
+                <ArrowUpRight className="w-3.5 h-3.5 stroke-[2.5]" />
+              </div>
+            </div>
+            <span className="text-[10px] sm:text-[11px] font-bold text-gray-500 uppercase tracking-wider font-mono">
+              AVG PCR IS2404 TURNAROUND (MILE 4 LAB)
+            </span>
+          </div>
+
+        </div>
+
+      </div>
+    </div>
+  );
+};

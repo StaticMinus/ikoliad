@@ -1,570 +1,663 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { Navbar } from '../components/Navbar';
 import { Footer } from '../components/Footer';
-import { ContainerScroll } from '../components/ui/container-scroll-animation';
+import {
+  queryGeminiClinicalAI,
+  type GeminiAttachment,
+} from '../services/geminiService';
+import { ClinicalMarkdown } from '../components/ui/ClinicalMarkdown';
 import {
   Sparkles,
-  ShieldCheck,
-  Send,
-  Bot,
+  Plus,
+  Mic,
+  MicOff,
+  ArrowUp,
   User,
-  Image as ImageIcon,
-  RotateCcw,
-  CheckCircle2,
-  AlertCircle,
-  HelpCircle,
   Copy,
   Check,
-  ChevronRight,
-  Mic,
-  Cpu,
+  X,
+  FileText,
+  Sun,
+  Moon,
+  Volume2,
+  RotateCcw,
 } from 'lucide-react';
 
 interface AskIkoliPageProps {
-  onNavigate: (page: 'home' | 'dashboard' | 'diseases' | 'ask') => void;
+  onNavigate: (page: 'home' | 'dashboard' | 'diseases' | 'ask' | 'about' | 'styles') => void;
 }
 
-interface Message {
+interface ChatMessage {
   id: string;
   sender: 'user' | 'ai';
   text: string;
   timestamp: string;
   category?: string;
-  protocolBadge?: string;
-  confidence?: number;
-  suggestions?: string[];
+  dimensions?: string[];
+  followUpPrompt?: string;
+  attachment?: GeminiAttachment;
+  source?: 'omniroute-live' | 'gemini-live' | 'openrouter-live' | 'clinical-knowledge-base';
 }
 
-const INITIAL_MESSAGES: Message[] = [
+const INITIAL_CONVERSATION: ChatMessage[] = [
   {
     id: 'msg-1',
+    sender: 'user',
+    text: 'Should we initiate MDT for a patient presenting with hypopigmented macules and sensory loss in Oji River LGA?',
+    timestamp: '10:14 AM',
+  },
+  {
+    id: 'msg-2',
     sender: 'ai',
-    text: "Hello! I am IKOLI AI, Nigeria's autonomous Clinical Vision & Skin NTD diagnostic assistant. You can ask me regarding clinical staging for Leprosy (PB/MB), Buruli Ulcer Category I/II/III, Yaws treponemal protocols, or Zero-PII data workflows.",
-    timestamp: 'Just now',
-    category: 'Clinical Staging',
-    suggestions: [
-      'How to stage Category I Buruli Ulcer?',
-      'What are early signs of PB Leprosy?',
-      'How is Yaws confirmed and treated?',
-      'Explain Zero-PII cryptographic anonymization',
+    text: "Under Nigeria NTBLCP guidelines, here is the immediate clinical evaluation protocol for this case:\n\n1. **Sensory Deficit Confirmation:** Documented loss of thermal or light touch sensation over hypopigmented skin patches confirms Hansen's disease.\n2. **Lesion Classification:** Count the active lesions: 1 to 5 lesions classifies as **Paucibacillary (PB)**; 6 or more lesions or multiple enlarged nerve trunks classifies as **Multibacillary (MB)**.\n3. **Voluntary Muscle Testing (VMT):** Perform baseline motor and sensory mapping on ulnar and common peroneal nerves to prevent Grade-2 Disability (G2D).\n4. **Treatment Dispatch:** Initiate standard WHO Blister Pack (PB: 6 months; MB: 12 months).\n\nWhich clinical parameter would you like to verify next?",
+    timestamp: '10:14 AM',
+    category: 'Leprosy MDT Protocol',
+    dimensions: [
+      'PB Blister Pack: 6 months daily Dapsone + monthly Rifampicin.',
+      'MB Blister Pack: 12 months daily Dapsone + Clofazimine + monthly Rifampicin.',
+      'Disability Prevention: Keep national Grade-2 Disability rate under 4.8%.',
+      'Zero-PII Notification: Case hashed with SHA-256 HMAC for state epidemiological dashboard.',
     ],
+    followUpPrompt: 'Review 6-Month PB Blister Pack vs 12-Month MB Regimen',
+    source: 'gemini-live',
   },
 ];
 
 export const AskIkoliPage: React.FC<AskIkoliPageProps> = ({ onNavigate }) => {
-  const [messages, setMessages] = useState<Message[]>(INITIAL_MESSAGES);
-  const [inputText, setInputText] = useState('');
+  const [theme, setTheme] = useState<'dark' | 'light'>('light');
+  const [messages, setMessages] = useState<ChatMessage[]>(INITIAL_CONVERSATION);
+  const [inputQuery, setInputQuery] = useState('');
   const [isTyping, setIsTyping] = useState(false);
-  const [activeProtocol, setActiveProtocol] = useState<string>('all');
   const [copiedId, setCopiedId] = useState<string | null>(null);
-  const chatBottomRef = useRef<HTMLDivElement>(null);
 
-  // Auto scroll to bottom of chat when new messages arrive
+  // Attachments state
+  const [attachedFile, setAttachedFile] = useState<GeminiAttachment | null>(null);
+  const fileInputRef = useRef<HTMLInputElement>(null);
+
+  // Voice recording state
+  const [isListening, setIsListening] = useState(false);
+  const [recognitionError, setRecognitionError] = useState<string | null>(null);
+
+  const messagesEndRef = useRef<HTMLDivElement>(null);
+  const isDark = theme === 'dark';
+
+  // Smoothly scroll only message feed container when messages change
   useEffect(() => {
-    chatBottomRef.current?.scrollIntoView({ behavior: 'smooth' });
+    messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
   }, [messages, isTyping]);
 
-  const handleSendMessage = (textToSend?: string) => {
-    const text = (textToSend || inputText).trim();
-    if (!text) return;
+  // Voice Recognition Handler using Web Speech API
+  const handleToggleVoice = () => {
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const windowObj = window as any;
+    const SpeechRecognition = windowObj.SpeechRecognition || windowObj.webkitSpeechRecognition;
 
-    const userMsg: Message = {
+    if (!SpeechRecognition) {
+      setRecognitionError('Speech recognition is not supported in this browser. Please type your query.');
+      setTimeout(() => setRecognitionError(null), 3500);
+      return;
+    }
+
+    if (isListening) {
+      setIsListening(false);
+      return;
+    }
+
+    try {
+      const recognition = new SpeechRecognition();
+      recognition.continuous = false;
+      recognition.interimResults = true;
+      recognition.lang = 'en-US';
+
+      recognition.onstart = () => {
+        setIsListening(true);
+        setRecognitionError(null);
+      };
+
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      recognition.onresult = (event: any) => {
+        const transcript = Array.from(event.results as ArrayLike<any>)
+          .map((result: any) => result[0].transcript)
+          .join('');
+        setInputQuery(transcript);
+      };
+
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      recognition.onerror = (event: any) => {
+        console.warn('Speech recognition error:', event.error);
+        setIsListening(false);
+        if (event.error !== 'no-speech') {
+          setRecognitionError(`Microphone error: ${event.error}`);
+          setTimeout(() => setRecognitionError(null), 3000);
+        }
+      };
+
+      recognition.onend = () => {
+        setIsListening(false);
+      };
+
+      recognition.start();
+    } catch (err) {
+      console.error('Speech recognition exception:', err);
+      setIsListening(false);
+    }
+  };
+
+  // File Upload Handler (Images, PDFs, documents)
+  const handleFileUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    const reader = new FileReader();
+    reader.onload = (event) => {
+      const base64 = event.target?.result as string;
+      const isImg = file.type.startsWith('image/');
+
+      setAttachedFile({
+        name: file.name,
+        type: file.type || 'application/octet-stream',
+        size: file.size,
+        base64: base64,
+        previewUrl: isImg ? base64 : undefined,
+      });
+    };
+
+    reader.readAsDataURL(file);
+  };
+
+  const handleRemoveAttachment = () => {
+    setAttachedFile(null);
+    if (fileInputRef.current) {
+      fileInputRef.current.value = '';
+    }
+  };
+
+  // Main Query Submission Handler with Gemini AI & OmniRoute
+  const handleSend = async (textToSend: string) => {
+    const query = textToSend.trim();
+    if (!query && !attachedFile) return;
+
+    const currentAttachment = attachedFile;
+    const userMsg: ChatMessage = {
       id: `usr-${Date.now()}`,
       sender: 'user',
-      text,
+      text: query || `[Uploaded file: ${currentAttachment?.name}]`,
       timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
+      attachment: currentAttachment || undefined,
     };
 
     setMessages((prev) => [...prev, userMsg]);
-    setInputText('');
+    setInputQuery('');
+    setAttachedFile(null);
+    if (fileInputRef.current) fileInputRef.current.value = '';
     setIsTyping(true);
 
-    // Dynamic AI response generation simulation based on clinical knowledge base
-    setTimeout(() => {
+    try {
+      const result = await queryGeminiClinicalAI(
+        query || 'Analyze this attached clinical skin NTD file/image according to NTBLCP guidelines.',
+        currentAttachment
+      );
+
       setIsTyping(false);
-      const lower = text.toLowerCase();
-      let reply = '';
-      let category = 'Differential Diagnosis';
-      let protocolBadge = 'WHO 2030 Standard';
-      let confidence = 98.6;
-      let suggestions: string[] = [];
 
-      if (lower.includes('buruli') || lower.includes('ulcer') || lower.includes('cat')) {
-        category = 'Buruli Ulcer Protocol';
-        protocolBadge = 'IS2404 PCR & Oral Regimen';
-        confidence = 99.4;
-        reply = `**Buruli Ulcer (Mycobacterium ulcerans) Clinical Protocol:**\n\n- **Category I:** Single lesion < 5 cm diameter. Primary field regimen is 8 consecutive weeks (56 days) of oral **Rifampicin (10 mg/kg)** + **Clarithromycin (7.5 mg/kg)** daily.\n- **Category II:** Single lesion 5–15 cm.\n- **Category III:** Single lesion > 15 cm or multiple lesions/osteomyelitis.\n\n*Laboratory Confirmation:* Field swabs or fine-needle aspirates (FNA) should be verified via IS2404 real-time PCR at state reference laboratories. >95% cure achieved without debridement when caught in Category I.`;
-        suggestions = [
-          'What is the pediatric dosing for Rifampicin?',
-          'How to differentiate Buruli from venous stasis?',
-          'What are the sentinel PCR labs in Anambra & Enugu?',
-        ];
-      } else if (lower.includes('leprosy') || lower.includes('pb') || lower.includes('mb') || lower.includes('hansen')) {
-        category = 'Leprosy MDT Protocol';
-        protocolBadge = 'MDT Blister Pack Guidelines';
-        confidence = 98.9;
-        reply = `**Leprosy (Hansen's Disease) Staging & Management:**\n\n- **Paucibacillary (PB):** 1 to 5 hypopigmented or erythematous skin lesions with definite loss of thermal/light touch sensation, and ≤1 affected nerve trunk. Treatment: **6-month WHO Blister Pack** (Rifampicin + Dapsone).\n- **Multibacillary (MB):** >5 skin lesions, nodular infiltrations, or >1 enlarged nerve trunk. Treatment: **12-month WHO Blister Pack** (Rifampicin + Clofazimine + Dapsone).\n\n*Disability Prevention:* Routine voluntary muscle testing (VMT) and sensory testing (ST) prevent Grade-2 irreversible nerve clawing.`;
-        suggestions = [
-          'How to manage Type 1 Lepra Reaction in the field?',
-          'What is the WHO definition of Grade-2 Disability (G2D)?',
-          'How does Dapsone hypersensitivity present?',
-        ];
-      } else if (lower.includes('yaws') || lower.includes('azithromycin') || lower.includes('papule')) {
-        category = 'Yaws Eradication Protocol';
-        protocolBadge = 'Morgenthaler TCT Framework';
-        confidence = 99.1;
-        reply = `**Yaws (Treponema pallidum pertenue) Clinical Protocol:**\n\n- **Primary Stage:** Solitary painless erythematous papule/ulcer ("Mother Yaw") on lower extremities.\n- **Secondary Stage:** Generalized cutaneous papillomata and osteoperiostitis.\n- **First-Line Field Regimen:** Single-dose oral **Azithromycin (30 mg/kg, max 2g)**.\n- **Second-Line:** Intramuscular Benzathine Penicillin (0.6M units <10 yrs, 1.2M units ≥10 yrs).\n\n*Diagnostics:* Confirmed on-site via point-of-care Dual Path Platform (DPP) treponemal/non-treponemal rapid assays.`;
-        suggestions = [
-          'What is the protocol for Total Community Treatment (TCT)?',
-          'How to differentiate secondary Yaws from fungal lesions?',
-          'What are the exclusion criteria for Azithromycin?',
-        ];
-      } else if (lower.includes('pii') || lower.includes('privacy') || lower.includes('zero') || lower.includes('anonym')) {
-        category = 'Zero-PII Security Architecture';
-        protocolBadge = 'NDPR & WHO Ethical Compliance';
-        confidence = 99.9;
-        reply = `**Zero-PII Cryptographic Pipeline Architecture:**\n\n1. **On-Device Ephemeral Processing:** Patient images are processed entirely within volatile Android tablet memory; raw photos are never written to unencrypted disks.\n2. **Biometric Scrubbing:** Facial contours, background identifiers, and metadata landmarks are stripped via neural bounding masks.\n3. **Feature Vector Tokenization:** Only non-reversible high-dimensional latent vectors (SHA-256 HMAC) are transmitted to the federal DHIS2 endpoint for aggregate epidemiological mapping.`;
-        suggestions = [
-          'Is IKOLI AI NDPR certified in Nigeria?',
-          'Can field health workers operate fully offline?',
-          'How does DHIS2 aggregate synchronization work?',
-        ];
-      } else {
-        reply = `Thank you for your inquiry on **"${text}"**.\n\nIKOLI AI synthesizes clinical records from Nigeria's National TB, Buruli Ulcer & Leprosy Control Programme (NTBLCP) and WHO 2030 Skin NTD Roadmap.\n\nFor verified differentials, please specify whether you are screening for:\n- **Leprosy** (Macular/Plaque lesion with sensory deficit)\n- **Buruli Ulcer** (Painless indurated nodule, plaque, or undermined ulcer)\n- **Yaws** (Papilloma, ulcus, or bone tenderness)\n- **Field Telemetry / Zero-PII Compliance**`;
-        suggestions = [
-          'How to stage Category I Buruli Ulcer?',
-          'What are early signs of PB Leprosy?',
-          'Explain Zero-PII cryptographic anonymization',
-        ];
-      }
-
-      const aiMsg: Message = {
+      const aiMsg: ChatMessage = {
         id: `ai-${Date.now()}`,
         sender: 'ai',
-        text: reply,
+        text: result.text,
         timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
-        category,
-        protocolBadge,
-        confidence,
-        suggestions,
+        category: result.category,
+        dimensions: result.dimensions,
+        followUpPrompt: result.followUpPrompt,
+        source: result.source,
       };
 
       setMessages((prev) => [...prev, aiMsg]);
-    }, 900);
+    } catch (err) {
+      console.error('Send error:', err);
+      setIsTyping(false);
+    }
   };
 
-  const handleCopyMessage = (id: string, text: string) => {
+  const handleCopy = (id: string, text: string) => {
     navigator.clipboard.writeText(text);
     setCopiedId(id);
     setTimeout(() => setCopiedId(null), 2000);
   };
 
-  const handleClearChat = () => {
-    setMessages(INITIAL_MESSAGES);
+  // Text to Speech
+  const handleSpeak = (text: string) => {
+    if ('speechSynthesis' in window) {
+      window.speechSynthesis.cancel();
+      // Remove raw asterisks for clean speech
+      const cleanText = text.replace(/\*\*/g, '').replace(/•/g, '');
+      const utterance = new SpeechSynthesisUtterance(cleanText);
+      utterance.rate = 1.0;
+      utterance.pitch = 1.0;
+      window.speechSynthesis.speak(utterance);
+    }
+  };
+
+  const handleResetConsultation = () => {
+    setMessages([]);
+    setInputQuery('');
+    setAttachedFile(null);
   };
 
   return (
-    <main className="w-full min-h-screen bg-[#06080E] text-white font-sans selection:bg-[#0082FF] selection:text-white">
-      
-      {/* ── Navbar ───────────────────────────────────────────── */}
-      <div className="relative z-50 bg-[#06080E]/90 backdrop-blur-md border-b border-white/10">
-        <Navbar
-          currentPage="ask"
-          onNavigate={onNavigate}
-        />
-      </div>
+    <main
+      className={`w-full min-h-screen font-sans selection:bg-[#0071E3] selection:text-white flex flex-col transition-colors duration-300 ${
+        isDark ? 'bg-[#0C0C0C] text-white' : 'bg-[#FBFBFD] text-[#1D1D1F]'
+      }`}
+    >
+      {/* ── Fixed Clean Navbar ─────────────────────────────────── */}
+      <Navbar currentPage="ask" onNavigate={onNavigate} />
 
-      {/* ── 3D Container Scroll Hero & Interactive Chat Interface ── */}
-      <section className="relative w-full overflow-hidden bg-gradient-to-b from-[#06080E] via-[#0A0F1D] to-[#06080E] pt-4 sm:pt-8 pb-12">
+      {/* Hidden File Input */}
+      <input
+        type="file"
+        ref={fileInputRef}
+        onChange={handleFileUpload}
+        accept="image/*,.pdf,.doc,.docx"
+        className="hidden"
+      />
+
+      {/* ══════════════════════════════════════════════════════════════════════
+          MAIN REFINED CLINICAL INTELLIGENCE WORKSPACE (SINGLE INTEGRATED VIEW)
+      ══════════════════════════════════════════════════════════════════════ */}
+      <section className={`relative w-full pt-28 pb-16 px-4 sm:px-6 md:px-8 overflow-hidden transition-colors duration-300 flex-1 flex flex-col items-center ${
+        isDark ? 'bg-[#0C0C0C]' : 'bg-[#FBFBFD]'
+      }`}>
         
-        {/* Ambient Neural Backlight */}
-        <div className="absolute top-1/4 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[600px] bg-radial from-[#0082FF]/20 via-transparent to-transparent blur-3xl pointer-events-none" />
+        {/* Subtle Ambient Lighting Glow */}
+        <div className={`absolute top-1/4 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[780px] h-[520px] blur-3xl pointer-events-none ${
+          isDark
+            ? 'bg-gradient-to-b from-[#0071E3]/15 via-[#10B981]/10 to-transparent'
+            : 'bg-gradient-to-b from-[#0071E3]/10 via-[#10B981]/8 to-transparent'
+        }`} />
 
-        <ContainerScroll
-          titleComponent={
-            <div className="space-y-4 max-w-4xl mx-auto">
-              <div className="inline-flex items-center gap-2 bg-[#0082FF]/15 text-[#0082FF] px-4 py-1.5 rounded-full font-mono text-xs font-bold border border-[#0082FF]/30 shadow-xs">
-                <Sparkles className="w-3.5 h-3.5 text-[#00D2FF]" />
-                <span>AUTONOMOUS CLINICAL INTELLIGENCE • IKOLI AI</span>
-              </div>
-
-              <h1 className="font-display font-black text-4xl sm:text-6xl md:text-7xl text-white tracking-tight leading-[1.05]">
-                Conversational AI for <br />
-                <span className="text-transparent bg-clip-text bg-gradient-to-r from-[#0082FF] via-[#45a6ff] to-[#9fff00]">
-                  Skin NTD Diagnostics
-                </span>
-              </h1>
-
-              <p className="text-xs sm:text-sm text-gray-400 max-w-2xl mx-auto font-sans leading-relaxed">
-                Query Nigeria NTBLCP clinical protocols, WHO 2030 Skin NTD staging guidelines, pharmaceutical MDT regimens, or zero-PII cryptographic pipelines in natural language.
-              </p>
-            </div>
-          }
-        >
-          {/* ── Embedded Full Interactive Clinical AI Chat Console ── */}
-          <div className="w-full h-full flex flex-col justify-between bg-[#0B101D] text-left select-text relative">
+        <div className="w-full max-w-4xl mx-auto flex flex-col items-center text-center relative z-10 space-y-6">
+          
+          {/* Top Status Header Bar */}
+          <div className="w-full flex items-center justify-between gap-3 border-b pb-4 pt-1 transition-colors duration-300 border-black/5 dark:border-white/10">
             
-            {/* ── Top Chat Header & Protocol Selector Bar ─────────── */}
-            <div className="px-4 sm:px-6 py-3.5 bg-[#0E1526] border-b border-white/10 flex flex-wrap items-center justify-between gap-3 shrink-0">
-              
-              {/* Left: AI Status */}
-              <div className="flex items-center gap-3">
-                <div className="w-8 h-8 rounded-xl bg-[#0082FF]/20 border border-[#0082FF]/40 flex items-center justify-center text-[#0082FF] shadow-xs">
-                  <Bot className="w-4 h-4" />
-                </div>
-                <div>
-                  <div className="flex items-center gap-2">
-                    <span className="text-xs font-bold text-white font-mono">IKOLI Clinical AI</span>
-                    <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse" />
-                  </div>
-                  <span className="text-[10px] text-gray-400 font-mono">v2.6 • 99.2% Sensitivity • Zero-PII</span>
-                </div>
+            {/* Left: Mode Badge */}
+            <div className="flex items-center gap-2.5">
+              <div className={`px-3.5 py-1.5 rounded-full flex items-center gap-2 border text-xs font-mono font-medium backdrop-blur-xl ${
+                isDark ? 'bg-white/5 border-white/10 text-gray-200' : 'bg-white border-black/10 text-gray-800 shadow-xs'
+              }`}>
+                <span className="w-2 h-2 rounded-full bg-[#10B981] shadow-[0_0_8px_#10B981]" />
+                <span className="font-bold tracking-tight">IKOLI version 1.1 • Clinical Diagnostic Workspace</span>
               </div>
+            </div>
 
-              {/* Center: Protocol Filter Chips */}
-              <div className="hidden md:flex items-center gap-1.5 bg-[#080C16] p-1 rounded-xl border border-white/5 font-mono text-[11px]">
+            {/* Right: Reset & Theme Toggle */}
+            <div className="flex items-center gap-2">
+              {messages.length > 0 && (
                 <button
-                  onClick={() => setActiveProtocol('all')}
-                  className={`px-3 py-1 rounded-lg font-bold transition-all cursor-pointer ${
-                    activeProtocol === 'all'
-                      ? 'bg-[#0082FF] text-white shadow-xs'
-                      : 'text-gray-400 hover:text-white'
+                  onClick={handleResetConsultation}
+                  className={`px-3 py-1.5 rounded-full border text-xs font-medium transition-all cursor-pointer flex items-center gap-1.5 ${
+                    isDark ? 'bg-white/5 border-white/10 text-gray-300 hover:bg-white/10 hover:text-white' : 'bg-white border-black/10 text-gray-700 hover:bg-gray-100 shadow-xs'
                   }`}
-                >
-                  All NTDs
-                </button>
-                <button
-                  onClick={() => setActiveProtocol('buruli')}
-                  className={`px-3 py-1 rounded-lg font-bold transition-all cursor-pointer ${
-                    activeProtocol === 'buruli'
-                      ? 'bg-[#0082FF] text-white shadow-xs'
-                      : 'text-gray-400 hover:text-white'
-                  }`}
-                >
-                  Buruli Ulcer
-                </button>
-                <button
-                  onClick={() => setActiveProtocol('leprosy')}
-                  className={`px-3 py-1 rounded-lg font-bold transition-all cursor-pointer ${
-                    activeProtocol === 'leprosy'
-                      ? 'bg-[#0082FF] text-white shadow-xs'
-                      : 'text-gray-400 hover:text-white'
-                  }`}
-                >
-                  Leprosy MDT
-                </button>
-                <button
-                  onClick={() => setActiveProtocol('yaws')}
-                  className={`px-3 py-1 rounded-lg font-bold transition-all cursor-pointer ${
-                    activeProtocol === 'yaws'
-                      ? 'bg-[#0082FF] text-white shadow-xs'
-                      : 'text-gray-400 hover:text-white'
-                  }`}
-                >
-                  Yaws
-                </button>
-              </div>
-
-              {/* Right: Actions */}
-              <div className="flex items-center gap-2">
-                <button
-                  onClick={handleClearChat}
-                  title="Reset conversation"
-                  className="px-2.5 py-1.5 rounded-lg bg-white/5 hover:bg-white/10 text-gray-400 hover:text-white text-xs font-mono flex items-center gap-1.5 border border-white/10 transition-colors cursor-pointer"
+                  title="Clear history and start fresh"
                 >
                   <RotateCcw className="w-3 h-3" />
-                  <span className="hidden sm:inline">Reset</span>
+                  <span className="hidden sm:inline">New Screening</span>
                 </button>
-              </div>
+              )}
 
+              {/* Theme Switcher Button */}
+              <button
+                onClick={() => setTheme(isDark ? 'light' : 'dark')}
+                className={`p-1.5 px-3 rounded-full border transition-all cursor-pointer flex items-center gap-1.5 text-xs ${
+                  isDark
+                    ? 'bg-white/5 border-white/10 text-yellow-300 hover:bg-white/10'
+                    : 'bg-white border-black/10 text-gray-700 hover:bg-black/5 shadow-xs'
+                }`}
+                title={isDark ? 'Switch to Light Theme' : 'Switch to Dark Theme'}
+              >
+                {isDark ? <Sun className="w-3.5 h-3.5" /> : <Moon className="w-3.5 h-3.5" />}
+                <span className="text-[11px] font-sans font-medium">
+                  {isDark ? 'Light' : 'Dark'}
+                </span>
+              </button>
             </div>
 
-            {/* ── Middle Chat Messages Stream ───────────────────── */}
-            <div className="flex-1 overflow-y-auto p-4 sm:p-6 space-y-5 scrollbar-thin scrollbar-thumb-white/10">
+          </div>
+
+          {/* Masked Hero Headline */}
+          <div className="space-y-2 text-center">
+            <h1 className={`font-semibold text-3xl sm:text-5xl md:text-6xl tracking-tight leading-[1.08] ${
+              isDark ? 'text-white' : 'text-[#1D1D1F]'
+            }`}>
+              Think clearly. Diagnose confidently.
+            </h1>
+            <p className={`text-xs sm:text-sm md:text-base max-w-xl mx-auto leading-relaxed ${
+              isDark ? 'text-gray-400' : 'text-gray-600'
+            }`}>
+              Nigeria's frontline clinical intelligence engine for Leprosy, Buruli Ulcer & Yaws differential staging.
+            </p>
+          </div>
+
+          {/* ══════════════════════════════════════════════════════════════════
+              CONVERSATION & CLINICAL REASONING STREAM (PLACED ABOVE THE INPUT BOX)
+          ══════════════════════════════════════════════════════════════════ */}
+          {messages.length > 0 && (
+            <div className="w-full space-y-5 pt-2 text-left">
               
               {messages.map((msg) => (
                 <div
                   key={msg.id}
-                  className={`flex gap-3 sm:gap-4 ${
+                  className={`flex items-start gap-3.5 ${
                     msg.sender === 'user' ? 'justify-end' : 'justify-start'
                   }`}
                 >
-                  {/* AI Avatar */}
+                  {/* Clean Apple-style Clinical AI Avatar */}
                   {msg.sender === 'ai' && (
-                    <div className="w-8 h-8 rounded-full bg-[#0082FF] text-white flex items-center justify-center shrink-0 shadow-md">
-                      <Bot className="w-4 h-4" />
+                    <div className={`w-9 h-9 rounded-full flex items-center justify-center shrink-0 border shadow-sm ${
+                      isDark ? 'bg-[#181818] border-white/15 text-[#00D2FF]' : 'bg-white border-black/10 text-[#0071E3]'
+                    }`}>
+                      <Sparkles className="w-4 h-4" />
                     </div>
                   )}
 
-                  {/* Message Bubble Content */}
+                  {/* Message Card Container */}
                   <div
-                    className={`max-w-xl sm:max-w-2xl rounded-2xl p-4 sm:p-5 space-y-3 ${
+                    className={`rounded-[22px] p-5 sm:p-6 text-sm sm:text-base leading-relaxed max-w-[92%] sm:max-w-[85%] border shadow-xl transition-all ${
                       msg.sender === 'user'
-                        ? 'bg-[#0082FF] text-white rounded-tr-xs shadow-md'
-                        : 'bg-[#121A2E] text-gray-100 border border-white/10 rounded-tl-xs shadow-lg'
+                        ? isDark ? 'bg-[#1C1C1C] text-[#EFEFEF] border-white/10' : 'bg-white text-[#1D1D1F] border-black/10 shadow-sm'
+                        : isDark ? 'bg-[#141414] text-[#EFEFEF] border-white/15' : 'bg-white text-[#1D1D1F] border-black/10 shadow-md'
                     }`}
                   >
-                    {/* Header Badges for AI Replies */}
-                    {msg.sender === 'ai' && msg.category && (
-                      <div className="flex flex-wrap items-center justify-between gap-2 border-b border-white/10 pb-2.5">
-                        <div className="flex items-center gap-2">
-                          <span className="text-[11px] font-mono font-bold text-[#00D2FF] uppercase">
-                            {msg.category}
-                          </span>
-                          {msg.protocolBadge && (
-                            <span className="bg-[#0082FF]/20 text-[#00D2FF] px-2 py-0.5 rounded-md text-[10px] font-mono border border-[#0082FF]/30">
-                              {msg.protocolBadge}
-                            </span>
-                          )}
-                        </div>
-
-                        {msg.confidence && (
-                          <span className="text-[10px] font-mono font-bold text-emerald-400 bg-emerald-950/60 px-2 py-0.5 rounded-full border border-emerald-500/30">
-                            {msg.confidence}% Confidence
-                          </span>
+                    {/* Attached media preview in bubble */}
+                    {msg.attachment && (
+                      <div className={`mb-3 p-2.5 rounded-xl border flex items-center gap-3 ${
+                        isDark ? 'bg-black/40 border-white/10' : 'bg-gray-50 border-gray-200'
+                      }`}>
+                        {msg.attachment.previewUrl ? (
+                          <img src={msg.attachment.previewUrl} alt="Attached" className="w-12 h-12 rounded-lg object-cover" />
+                        ) : (
+                          <FileText className="w-6 h-6 text-[#0071E3]" />
                         )}
-                      </div>
-                    )}
-
-                    {/* Formatted Markdown Body */}
-                    <div className="text-xs sm:text-sm font-sans leading-relaxed whitespace-pre-line">
-                      {msg.text}
-                    </div>
-
-                    {/* Footer Actions for AI Replies */}
-                    {msg.sender === 'ai' && (
-                      <div className="flex items-center justify-between pt-1 border-t border-white/5 text-[10px] font-mono text-gray-400">
-                        <span>{msg.timestamp}</span>
-                        
-                        <button
-                          onClick={() => handleCopyMessage(msg.id, msg.text)}
-                          className="flex items-center gap-1 hover:text-white transition-colors cursor-pointer"
-                        >
-                          {copiedId === msg.id ? (
-                            <>
-                              <Check className="w-3 h-3 text-emerald-400" />
-                              <span className="text-emerald-400">Copied</span>
-                            </>
-                          ) : (
-                            <>
-                              <Copy className="w-3 h-3" />
-                              <span>Copy Protocol</span>
-                            </>
-                          )}
-                        </button>
-                      </div>
-                    )}
-
-                    {/* Interactive Suggested Follow-Up Prompts */}
-                    {msg.suggestions && msg.suggestions.length > 0 && (
-                      <div className="pt-2 space-y-1.5">
-                        <span className="text-[10px] font-mono text-gray-400 font-bold uppercase block">
-                          Suggested Inquiries:
-                        </span>
-                        <div className="flex flex-wrap gap-1.5">
-                          {msg.suggestions.map((sug, i) => (
-                            <button
-                              key={i}
-                              onClick={() => handleSendMessage(sug)}
-                              className="text-[11px] font-sans bg-white/5 hover:bg-[#0082FF]/20 text-gray-300 hover:text-white px-3 py-1.5 rounded-lg border border-white/10 hover:border-[#0082FF]/40 transition-all text-left cursor-pointer flex items-center gap-1.5"
-                            >
-                              <span>{sug}</span>
-                              <ChevronRight className="w-3 h-3 text-gray-500" />
-                            </button>
-                          ))}
+                        <div className="truncate text-xs">
+                          <p className="font-bold truncate">{msg.attachment.name}</p>
+                          <p className="text-[10px] text-gray-400">Attached clinical evidence file</p>
                         </div>
                       </div>
+                    )}
+
+                    {/* AI Response Header with Category & Actions */}
+                    {msg.sender === 'ai' && (
+                      <div className={`flex items-center justify-between gap-2 mb-3 pb-2.5 border-b ${
+                        isDark ? 'border-white/10' : 'border-black/5'
+                      }`}>
+                        <div className="flex items-center gap-2">
+                          <span className="text-[11px] font-mono font-bold uppercase tracking-wider text-[#10B981]">
+                            {msg.category || 'Clinical Reasoning'}
+                          </span>
+                        </div>
+                        
+                        <div className="flex items-center gap-2">
+                          <button
+                            onClick={() => handleSpeak(msg.text)}
+                            className="p-1 text-gray-400 hover:text-white transition-colors cursor-pointer text-xs"
+                            title="Listen to clinical guidance"
+                          >
+                            <Volume2 className="w-3.5 h-3.5" />
+                          </button>
+                          <button
+                            onClick={() => handleCopy(msg.id, msg.text)}
+                            className="p-1 text-gray-400 hover:text-white transition-colors cursor-pointer text-xs"
+                            title="Copy response"
+                          >
+                            {copiedId === msg.id ? <Check className="w-3.5 h-3.5 text-emerald-400" /> : <Copy className="w-3.5 h-3.5" />}
+                          </button>
+                        </div>
+                      </div>
+                    )}
+
+                    {/* Formatted Markdown Content (No Raw Asterisks) with Clickable Interactive Options */}
+                    <ClinicalMarkdown 
+                      content={msg.text} 
+                      onSelectOption={(optionText) => handleSend(optionText)}
+                      isDark={isDark} 
+                    />
+
+                    {/* Structured Dimensions (Bullet Points) */}
+                    {msg.dimensions && msg.dimensions.length > 0 && (
+                      <ul className={`mt-3 space-y-2 pt-3 border-t text-xs sm:text-sm ${
+                        isDark ? 'border-white/10 text-gray-300' : 'border-black/5 text-gray-700'
+                      }`}>
+                        {msg.dimensions.map((dim, idx) => (
+                          <li key={idx} className="flex items-start gap-2">
+                            <span className="text-[#10B981] font-bold shrink-0 mt-0.5">•</span>
+                            <div className="flex-1">
+                              <ClinicalMarkdown
+                                content={dim}
+                                onSelectOption={(opt) => handleSend(opt)}
+                                isDark={isDark}
+                              />
+                            </div>
+                          </li>
+                        ))}
+                      </ul>
+                    )}
+
+                    {/* Interactive Follow-up Action Chip */}
+                    {msg.followUpPrompt && (
+                      <button
+                        onClick={() => handleSend(msg.followUpPrompt!)}
+                        className={`mt-3.5 w-full p-2.5 rounded-xl border text-xs font-medium transition-all cursor-pointer flex items-center justify-between gap-2 text-left group ${
+                          isDark
+                            ? 'bg-[#0071E3]/10 hover:bg-[#0071E3]/20 border-[#0071E3]/30 text-[#00D2FF]'
+                            : 'bg-blue-50 hover:bg-blue-100 border-blue-200 text-[#0071E3]'
+                        }`}
+                      >
+                        <div className="flex items-center gap-2">
+                          <Sparkles className="w-3.5 h-3.5 shrink-0" />
+                          <span>Suggested Next Step: {msg.followUpPrompt}</span>
+                        </div>
+                        <ArrowUp className="w-3.5 h-3.5 rotate-45 group-hover:translate-x-0.5 group-hover:-translate-y-0.5 transition-transform shrink-0" />
+                      </button>
                     )}
                   </div>
 
                   {/* User Avatar */}
                   {msg.sender === 'user' && (
-                    <div className="w-8 h-8 rounded-full bg-[#1A2333] text-gray-300 flex items-center justify-center shrink-0 border border-white/20">
+                    <div className={`w-9 h-9 rounded-full border flex items-center justify-center shrink-0 shadow-sm ${
+                      isDark ? 'bg-[#222222] border-white/10 text-gray-300' : 'bg-gray-200 border-black/10 text-gray-700'
+                    }`}>
                       <User className="w-4 h-4" />
                     </div>
                   )}
                 </div>
               ))}
 
-              {/* Typing Indicator */}
+              {/* Live Typing / Evaluation State ("Ikoli is thinking…") */}
               {isTyping && (
-                <div className="flex gap-3 items-center">
-                  <div className="w-8 h-8 rounded-full bg-[#0082FF] text-white flex items-center justify-center shrink-0">
-                    <Bot className="w-4 h-4" />
+                <div className="flex items-center gap-3.5">
+                  <div className={`w-9 h-9 rounded-full flex items-center justify-center shrink-0 border shadow-sm ${
+                    isDark ? 'bg-[#181818] border-white/15 text-[#00D2FF]' : 'bg-white border-black/10 text-[#0071E3]'
+                  }`}>
+                    <Sparkles className="w-4 h-4 animate-spin" />
                   </div>
-                  <div className="bg-[#121A2E] p-4 rounded-2xl border border-white/10 flex items-center gap-2 text-xs font-mono text-[#00D2FF]">
-                    <div className="flex gap-1">
-                      <span className="w-2 h-2 rounded-full bg-[#0082FF] animate-bounce" />
-                      <span className="w-2 h-2 rounded-full bg-[#0082FF] animate-bounce [animation-delay:0.2s]" />
-                      <span className="w-2 h-2 rounded-full bg-[#0082FF] animate-bounce [animation-delay:0.4s]" />
-                    </div>
-                    <span>Synthesizing NTBLCP Diagnostic Protocol...</span>
+                  <div className={`rounded-2xl px-4 py-2.5 text-xs flex items-center gap-2 border shadow-sm ${
+                    isDark ? 'bg-[#141414] border-white/10 text-gray-300' : 'bg-white border-black/10 text-gray-700'
+                  }`}>
+                    <span className="w-2 h-2 rounded-full bg-[#10B981] animate-ping" />
+                    <span>Ikoli is thinking…</span>
                   </div>
                 </div>
               )}
 
-              <div ref={chatBottomRef} />
+              <div ref={messagesEndRef} />
             </div>
+          )}
 
-            {/* ── Bottom Interactive Chat Input & Action Bar ───── */}
-            <div className="p-3 sm:p-4 bg-[#0E1526] border-t border-white/10 shrink-0 space-y-2.5">
-              
-              {/* Quick Prompt Pills */}
-              <div className="flex items-center gap-1.5 overflow-x-auto pb-1 text-[11px] font-sans text-gray-300 no-scrollbar">
-                <span className="text-[10px] font-mono text-gray-500 font-bold uppercase shrink-0 mr-1 flex items-center gap-1">
-                  <HelpCircle className="w-3 h-3 text-[#0082FF]" /> Presets:
-                </span>
-                <button
-                  onClick={() => handleSendMessage('What is the difference between PB and MB Leprosy?')}
-                  className="whitespace-nowrap px-3 py-1 rounded-full bg-white/5 hover:bg-white/10 border border-white/10 transition-colors cursor-pointer"
-                >
-                  PB vs MB Leprosy
-                </button>
-                <button
-                  onClick={() => handleSendMessage('How to stage Category I Buruli Ulcer?')}
-                  className="whitespace-nowrap px-3 py-1 rounded-full bg-white/5 hover:bg-white/10 border border-white/10 transition-colors cursor-pointer"
-                >
-                  Category I Buruli
-                </button>
-                <button
-                  onClick={() => handleSendMessage('What is the single-dose Azithromycin regimen for Yaws?')}
-                  className="whitespace-nowrap px-3 py-1 rounded-full bg-white/5 hover:bg-white/10 border border-white/10 transition-colors cursor-pointer"
-                >
-                  Yaws DPP & Dosing
-                </button>
-                <button
-                  onClick={() => handleSendMessage('How does Zero-PII protect patient photos?')}
-                  className="whitespace-nowrap px-3 py-1 rounded-full bg-white/5 hover:bg-white/10 border border-white/10 transition-colors cursor-pointer"
-                >
-                  Zero-PII Privacy
-                </button>
-              </div>
-
-              {/* Form Input */}
-              <form
-                onSubmit={(e) => {
-                  e.preventDefault();
-                  handleSendMessage();
-                }}
-                className="flex items-center gap-2 bg-[#080C16] p-1.5 sm:p-2 rounded-2xl border border-white/15 focus-within:border-[#0082FF] transition-all shadow-inner"
-              >
-                <button
-                  type="button"
-                  onClick={() => handleSendMessage('Evaluate uploaded clinical photo: Hypopigmented macule with sensory deficit on forearm.')}
-                  title="Simulate Lesion Image Screening"
-                  className="p-2 sm:p-2.5 rounded-xl bg-white/5 hover:bg-white/10 text-gray-400 hover:text-white transition-colors cursor-pointer"
-                >
-                  <ImageIcon className="w-4 h-4 text-[#0082FF]" />
-                </button>
-
-                <input
-                  type="text"
-                  value={inputText}
-                  onChange={(e) => setInputText(e.target.value)}
-                  placeholder="Ask about Buruli staging, Leprosy MDT, Yaws DPP, or Zero-PII..."
-                  className="flex-1 bg-transparent px-2 sm:px-3 py-2 text-xs sm:text-sm text-white placeholder-gray-500 focus:outline-none font-sans"
-                />
-
-                <button
-                  type="button"
-                  onClick={() => handleSendMessage('Simulating audio consultation: Tell me about Leprosy Grade-2 Disability prevention.')}
-                  title="Voice Consultation"
-                  className="hidden sm:inline-flex p-2 rounded-xl bg-white/5 hover:bg-white/10 text-gray-400 hover:text-white transition-colors cursor-pointer"
-                >
-                  <Mic className="w-4 h-4" />
-                </button>
-
-                <button
-                  type="submit"
-                  disabled={!inputText.trim()}
-                  className={`p-2 sm:px-5 sm:py-2.5 rounded-xl text-xs font-mono font-bold uppercase tracking-wider inline-flex items-center gap-1.5 transition-all shadow-md cursor-pointer ${
-                    inputText.trim()
-                      ? 'bg-[#0082FF] hover:bg-[#0066CC] text-white hover:scale-105'
-                      : 'bg-white/10 text-gray-500 cursor-not-allowed'
-                  }`}
-                >
-                  <Send className="w-3.5 h-3.5" />
-                  <span className="hidden sm:inline">Consult AI</span>
-                </button>
-              </form>
-
-            </div>
-
-          </div>
-        </ContainerScroll>
-
-      </section>
-
-      {/* ── 4 Pillars Bento Section Below ────────────────────── */}
-      <section className="w-full bg-[#080B14] py-20 px-4 sm:px-8 md:px-12 border-t border-white/10 relative z-20">
-        <div className="max-w-6xl mx-auto space-y-12">
-          
-          <div className="text-center space-y-3">
-            <div className="inline-flex items-center gap-2 bg-emerald-500/10 text-emerald-400 px-3.5 py-1.5 rounded-full text-xs font-mono font-bold border border-emerald-500/20">
-              <ShieldCheck className="w-3.5 h-3.5" />
-              <span>ETHICAL CLINICAL ARCHITECTURE</span>
-            </div>
-            <h2 className="font-display font-extrabold text-3xl sm:text-4xl text-white tracking-tight">
-              Four Pillars of Autonomous Surveillance
-            </h2>
-            <p className="text-xs sm:text-sm text-gray-400 max-w-xl mx-auto font-sans leading-relaxed">
-              Designed in partnership with RedAid Nigeria and the Federal Ministry of Health to eliminate diagnostic disparities.
-            </p>
-          </div>
-
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 text-left">
+          {/* ══════════════════════════════════════════════════════════════════
+              PRIMARY CLINICAL COMPOSER CARD (POSITIONED BELOW THE CONVERSATION)
+          ══════════════════════════════════════════════════════════════════ */}
+          <div className="w-full relative group text-left pt-2">
             
-            {/* Pillar 1 */}
-            <div className="bg-[#0D1322] p-6 rounded-2xl border border-white/10 space-y-3 shadow-md hover:border-[#0082FF] transition-colors group">
-              <div className="w-10 h-10 rounded-xl bg-[#0082FF]/20 flex items-center justify-center text-[#0082FF]">
-                <Cpu className="w-5 h-5" />
+            {/* Elegant Ambient Elevation Glow */}
+            <div 
+              className="absolute -inset-0.5 rounded-[24px] opacity-80 blur-[2px] transition-all group-hover:opacity-100 -z-10"
+              style={{
+                background: isDark
+                  ? 'linear-gradient(90deg, #0071E3 0%, #10B981 50%, #00D2FF 100%)'
+                  : 'linear-gradient(90deg, #0071E3 0%, #10B981 50%, #0082FF 100%)',
+              }}
+            />
+
+            {/* Composer Card Body */}
+            <div className={`w-full rounded-[22px] p-4 sm:p-6 shadow-2xl flex flex-col justify-between min-h-[160px] border transition-colors duration-300 ${
+              isDark
+                ? 'bg-[#111111] border-white/10 text-white'
+                : 'bg-white border-black/10 text-[#1D1D1F]'
+            }`}>
+              
+              {/* Attachment Preview Banner if File Selected */}
+              {attachedFile && (
+                <div className={`mb-3 p-2.5 rounded-xl border flex items-center justify-between gap-3 ${
+                  isDark ? 'bg-white/5 border-white/10' : 'bg-gray-50 border-gray-200'
+                }`}>
+                  <div className="flex items-center gap-3 overflow-hidden">
+                    {attachedFile.previewUrl ? (
+                      <img
+                        src={attachedFile.previewUrl}
+                        alt="Attachment preview"
+                        className="w-10 h-10 rounded-lg object-cover border border-white/10 shrink-0"
+                      />
+                    ) : (
+                      <div className="w-10 h-10 rounded-lg bg-[#0071E3]/20 flex items-center justify-center text-[#0071E3] shrink-0">
+                        <FileText className="w-5 h-5" />
+                      </div>
+                    )}
+                    <div className="truncate">
+                      <p className="text-xs font-bold truncate">{attachedFile.name}</p>
+                      <p className="text-[10px] text-gray-400">{(attachedFile.size / 1024).toFixed(1)} KB • Attached Evidence</p>
+                    </div>
+                  </div>
+                  <button
+                    onClick={handleRemoveAttachment}
+                    className="p-1 rounded-full text-gray-400 hover:text-red-400 transition-colors cursor-pointer"
+                  >
+                    <X className="w-4 h-4" />
+                  </button>
+                </div>
+              )}
+
+              {/* Voice Listening Feedback Alert */}
+              {isListening && (
+                <div className="mb-2 p-2 rounded-xl bg-red-500/10 border border-red-500/20 text-red-400 flex items-center gap-2 text-xs font-mono animate-pulse">
+                  <span className="w-2 h-2 rounded-full bg-red-500" />
+                  <span>Listening for clinical voice dictation… speak now</span>
+                </div>
+              )}
+
+              {recognitionError && (
+                <div className="mb-2 p-2 rounded-xl bg-amber-500/10 border border-amber-500/20 text-amber-400 text-xs font-mono">
+                  {recognitionError}
+                </div>
+              )}
+
+              {/* Interactive Input Area */}
+              <div className="w-full">
+                <textarea
+                  value={inputQuery}
+                  onChange={(e) => setInputQuery(e.target.value)}
+                  onKeyDown={(e) => {
+                    if (e.key === 'Enter' && !e.shiftKey) {
+                      e.preventDefault();
+                      handleSend(inputQuery);
+                    }
+                  }}
+                  placeholder="Describe patient symptoms, lesion size, sensory loss, or ask a clinical protocol question…"
+                  className={`w-full bg-transparent text-sm sm:text-base outline-none resize-none min-h-[75px] font-sans leading-relaxed ${
+                    isDark ? 'text-white placeholder-gray-500' : 'text-[#1D1D1F] placeholder-gray-400'
+                  }`}
+                />
               </div>
-              <h3 className="font-display font-bold text-lg text-white">Offline Edge Vision</h3>
-              <p className="text-xs text-gray-400 font-sans leading-relaxed">
-                120ms local neural inference runs directly on field Android tablets without requiring internet connectivity in remote villages.
-              </p>
+
+              {/* Controls Row */}
+              <div className={`flex items-center justify-between gap-3 pt-3 border-t ${
+                isDark ? 'border-white/5' : 'border-black/5'
+              }`}>
+                
+                <div className="flex items-center gap-2">
+                  {/* Round + Attachment Button */}
+                  <button
+                    onClick={() => fileInputRef.current?.click()}
+                    title="Upload skin lesion photo, PDF, or document"
+                    className={`h-9 px-3.5 rounded-full border flex items-center gap-1.5 text-xs font-medium transition-all active:scale-95 cursor-pointer ${
+                      isDark
+                        ? 'bg-white/5 hover:bg-white/10 border-white/15 text-gray-200'
+                        : 'bg-gray-100 hover:bg-gray-200 border-black/10 text-gray-800'
+                    }`}
+                  >
+                    <Plus className="w-3.5 h-3.5" />
+                    <span>Attach File</span>
+                  </button>
+                </div>
+
+                <div className="flex items-center gap-2.5">
+                  {/* Voice Dictation Mic Button */}
+                  <button 
+                    onClick={handleToggleVoice}
+                    title={isListening ? 'Stop listening' : 'Start voice dictation'}
+                    className={`p-2 transition-all cursor-pointer rounded-full ${
+                      isListening
+                        ? 'bg-red-500 text-white animate-pulse'
+                        : isDark ? 'text-gray-400 hover:text-white' : 'text-gray-500 hover:text-black'
+                    }`}
+                  >
+                    {isListening ? <MicOff className="w-4 h-4" /> : <Mic className="w-4 h-4" />}
+                  </button>
+
+                  {/* Send Button */}
+                  <button
+                    onClick={() => handleSend(inputQuery)}
+                    disabled={!inputQuery.trim() && !attachedFile}
+                    className="w-9 h-9 rounded-full bg-[#0071E3] hover:bg-[#0077ED] text-white flex items-center justify-center transition-transform hover:scale-105 active:scale-95 disabled:opacity-30 disabled:cursor-not-allowed cursor-pointer shadow-md shadow-[#0071E3]/20"
+                  >
+                    <ArrowUp className="w-4 h-4 stroke-[2.5]" />
+                  </button>
+                </div>
+
+              </div>
+
             </div>
 
-            {/* Pillar 2 */}
-            <div className="bg-[#0D1322] p-6 rounded-2xl border border-white/10 space-y-3 shadow-md hover:border-emerald-400 transition-colors group">
-              <div className="w-10 h-10 rounded-xl bg-emerald-500/20 flex items-center justify-center text-emerald-400">
-                <ShieldCheck className="w-5 h-5" />
-              </div>
-              <h3 className="font-display font-bold text-lg text-white">Zero-PII Anonymization</h3>
-              <p className="text-xs text-gray-400 font-sans leading-relaxed">
-                Visual vectors are tokenized with SHA-256 HMAC in volatile memory; zero recognizable facial landmarks or patient names are stored.
-              </p>
-            </div>
+          </div>
 
-            {/* Pillar 3 */}
-            <div className="bg-[#0D1322] p-6 rounded-2xl border border-white/10 space-y-3 shadow-md hover:border-purple-400 transition-colors group">
-              <div className="w-10 h-10 rounded-xl bg-purple-500/20 flex items-center justify-center text-purple-400">
-                <CheckCircle2 className="w-5 h-5" />
-              </div>
-              <h3 className="font-display font-bold text-lg text-white">Laboratory Verified</h3>
-              <p className="text-xs text-gray-400 font-sans leading-relaxed">
-                Differential screenings are backed by IS2404 PCR assays and slit-skin smear correlation across 6 South-East reference laboratories.
-              </p>
-            </div>
-
-            {/* Pillar 4 */}
-            <div className="bg-[#0D1322] p-6 rounded-2xl border border-white/10 space-y-3 shadow-md hover:border-[#9fff00] transition-colors group">
-              <div className="w-10 h-10 rounded-xl bg-[#9fff00]/20 flex items-center justify-center text-[#9fff00]">
-                <AlertCircle className="w-5 h-5" />
-              </div>
-              <h3 className="font-display font-bold text-lg text-white">DHIS2 Auto-Sync</h3>
-              <p className="text-xs text-gray-400 font-sans leading-relaxed">
-                Verified cases synchronize seamlessly with the Federal Health Information System to drive targeted drug supplies and MDT logistics.
-              </p>
-            </div>
-
+          {/* Quick Preset Diagnostic Suggestions */}
+          <div className="flex flex-wrap items-center justify-center gap-2 pt-1 text-xs">
+            <span className={isDark ? 'text-gray-500' : 'text-gray-400'}>Suggested differentials:</span>
+            {[
+              'Staging Buruli Category I vs II',
+              'Leprosy PB vs MB MDT pack',
+              'Yaws Azithromycin dosing',
+              'Mile 4 Lab PCR turnaround',
+            ].map((p, idx) => (
+              <button
+                key={idx}
+                onClick={() => handleSend(p)}
+                className={`px-3 py-1 rounded-full border transition-all cursor-pointer ${
+                  isDark
+                    ? 'bg-white/5 border-white/10 text-gray-300 hover:bg-white/10 hover:text-white'
+                    : 'bg-white border-black/10 text-gray-700 hover:bg-gray-100 hover:text-black shadow-xs'
+                }`}
+              >
+                {p}
+              </button>
+            ))}
           </div>
 
         </div>
+
       </section>
 
-      {/* ── Footer ───────────────────────────────────────────── */}
-      <Footer onNavigate={onNavigate} />
+      {/* ── Completely Static, Non-Moving Footer (Prop isStatic={true}) ── */}
+      <Footer onNavigate={onNavigate} isStatic={true} />
 
     </main>
   );

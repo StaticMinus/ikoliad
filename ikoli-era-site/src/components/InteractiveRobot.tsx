@@ -1,5 +1,6 @@
 import React, { useEffect, useRef, useState } from 'react';
 import { motion } from 'framer-motion';
+import { BlobVideo } from './ui/BlobVideo';
 
 export const InteractiveRobot: React.FC = () => {
   const containerRef = useRef<HTMLDivElement>(null);
@@ -67,7 +68,7 @@ export const InteractiveRobot: React.FC = () => {
               'radial-gradient(ellipse 70% 75% at 50% 50%, black 45%, rgba(0,0,0,0.85) 65%, transparent 95%), linear-gradient(to bottom, black 85%, transparent 100%)',
           }}
         >
-          <video
+          <BlobVideo
             autoPlay
             loop
             muted

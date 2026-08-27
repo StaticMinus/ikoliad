@@ -1,5 +1,6 @@
 import React, { useRef, useState, useCallback } from 'react';
 import { motion, useScroll, useTransform, useSpring, useMotionValue, useInView } from 'framer-motion';
+import { BlobVideo } from './ui/BlobVideo';
 
 // --- SVG Icons for Marquee ---
 const CodeIcon: React.FC = () => (
@@ -60,16 +61,16 @@ const PlusIcon: React.FC = () => (
   </svg>
 );
 
-// --- Marquee Logos Data ---
+// --- Marquee Logos Data (Institutional Partners & Frameworks) ---
 const MARQUEE_LOGOS = [
-  { name: 'Codecraft_', icon: <CodeIcon /> },
-  { name: 'ennLabs', icon: <DotsIcon /> },
-  { name: 'GlobalBank', icon: <CircleRingIcon /> },
-  { name: '45 Degrees°', icon: <ArrowIcon /> },
-  { name: 'AlphaWave', icon: <WaveCircleIcon /> },
-  { name: 'Biosynthesis', icon: <LinesIcon /> },
-  { name: 'Boltshift', icon: <BoltIcon /> },
-  { name: 'Clandestine', icon: <PlusIcon /> },
+  { name: 'RedAid Nigeria', icon: <PlusIcon /> },
+  { name: 'FMoHSW Nigeria', icon: <CircleRingIcon /> },
+  { name: 'NTBLCP Programme', icon: <LinesIcon /> },
+  { name: 'Circles AI', icon: <DotsIcon /> },
+  { name: 'DHIS2 Integrated', icon: <CodeIcon /> },
+  { name: 'DAHW Relief', icon: <WaveCircleIcon /> },
+  { name: 'WHO 2030 NTD Target', icon: <ArrowIcon /> },
+  { name: 'Zero-PII Vault', icon: <BoltIcon /> },
 ];
 
 // --- Case Studies Data ---
@@ -78,17 +79,17 @@ interface CaseStudy {
   title: string;
   category: string;
   year: string;
-  image: string;
+  video: string;
   magneticSquares: { x: number; y: number; size: number }[];
 }
 
 const CASE_STUDIES: CaseStudy[] = [
   {
-    id: 'heartx',
-    title: 'HeartX',
-    category: 'Brand Strategy & Product Design',
+    id: 'redaid-staging',
+    title: 'RedAid NTD Staging',
+    category: 'National Buruli Ulcer & Leprosy Clinical Screening',
     year: '2026',
-    image: 'https://images.pexels.com/photos/7691249/pexels-photo-7691249.jpeg?auto=compress&cs=tinysrgb&w=800',
+    video: '/media/clinical-exam.mp4',
     magneticSquares: [
       { x: 5, y: 30, size: 16 },
       { x: 10, y: 42, size: 10 },
@@ -99,11 +100,11 @@ const CASE_STUDIES: CaseStudy[] = [
     ],
   },
   {
-    id: 'swave',
-    title: 'Swave®',
-    category: 'Web Design & Identity',
-    year: '2025',
-    image: 'https://images.pexels.com/photos/2559941/pexels-photo-2559941.jpeg?auto=compress&cs=tinysrgb&w=800',
+    id: 'zero-pii-vault',
+    title: 'Zero-PII Protocol',
+    category: 'Cryptographic Patient Anonymization & Security Standard',
+    year: '2026',
+    video: '/media/patient-consult.mp4',
     magneticSquares: [
       { x: 82, y: 55, size: 16 },
       { x: 88, y: 68, size: 10 },
@@ -113,11 +114,11 @@ const CASE_STUDIES: CaseStudy[] = [
     ],
   },
   {
-    id: 'eduspark',
-    title: 'EduSpark',
-    category: 'Brand Strategy & Web Design',
-    year: '2023',
-    image: 'https://images.pexels.com/photos/5428003/pexels-photo-5428003.jpeg?auto=compress&cs=tinysrgb&w=800',
+    id: 'fmohsw-telemetry',
+    title: 'FMoHSW Telemetry',
+    category: 'Integrated NTBLCP & DHIS2 Surveillance Network',
+    year: '2025',
+    video: '/media/community-worker.mp4',
     magneticSquares: [
       { x: 4, y: 24, size: 16 },
       { x: 10, y: 36, size: 10 },
@@ -127,11 +128,11 @@ const CASE_STUDIES: CaseStudy[] = [
     ],
   },
   {
-    id: 'greenergy',
-    title: 'Greenergy',
-    category: 'Brand Strategy & Web Design',
-    year: '2022',
-    image: 'https://images.pexels.com/photos/2800832/pexels-photo-2800832.jpeg?auto=compress&cs=tinysrgb&w=800',
+    id: 'circles-ai-vision',
+    title: 'Circles AI Vision',
+    category: 'Deep Learning Skin Lesion Anomaly Detection',
+    year: '2026',
+    video: '/media/Hero.mp4',
     magneticSquares: [
       { x: 82, y: 26, size: 14 },
       { x: 88, y: 38, size: 10 },
@@ -161,8 +162,8 @@ const FloatingSquare: React.FC<{
   size: number;
   scrollYProgress: any;
 }> = ({ index, x, y, size, scrollYProgress }) => {
-  const rawY = useTransform(scrollYProgress, [0, 1], [0, -(80 + index * 30)]);
-  const springY = useSpring(rawY, { stiffness: 40, damping: 20 });
+  const speed = (index % 3 + 1) * 35 * (index % 2 === 0 ? 1 : -1);
+  const yOffset = useTransform(scrollYProgress, [0, 1], [0, speed]);
 
   return (
     <motion.div
@@ -171,46 +172,25 @@ const FloatingSquare: React.FC<{
         top: `${y}%`,
         width: `${size}px`,
         height: `${size}px`,
-        y: springY,
+        y: yOffset,
       }}
-      className="absolute pointer-events-none"
-    >
-      <motion.div
-        animate={{
-          y: [0, -10, 0],
-        }}
-        transition={{
-          duration: 3 + index * 0.4,
-          ease: 'easeInOut',
-          repeat: Infinity,
-          delay: index * 0.3,
-        }}
-        style={{
-          width: '100%',
-          height: '100%',
-        }}
-        className="bg-black"
-      />
-    </motion.div>
+      className="absolute bg-black pointer-events-none z-0 opacity-80"
+    />
   );
 };
 
-// --- Case Study Card with Pixel-Block & Magnetic Squares ---
-const CaseStudyCard: React.FC<{
-  card: CaseStudy;
-  index: number;
-}> = ({ card, index }) => {
-  const [isHovered, setIsHovered] = useState(false);
+// --- Single Case Study Card ---
+const CaseStudyCard: React.FC<{ card: CaseStudy; index: number }> = ({ card, index }) => {
   const cardRef = useRef<HTMLDivElement>(null);
+  const [isHovered, setIsHovered] = useState(false);
 
+  // Magnetic Squares cursor tracking
   const mouseX = useMotionValue(0.5);
   const mouseY = useMotionValue(0.5);
 
-  const shiftX = useTransform(mouseX, [0, 1], [-20, 20]);
-  const shiftY = useTransform(mouseY, [0, 1], [-20, 20]);
-
-  const springShiftX = useSpring(shiftX, { stiffness: 80, damping: 18, mass: 0.6 });
-  const springShiftY = useSpring(shiftY, { stiffness: 80, damping: 18, mass: 0.6 });
+  const springConfig = { damping: 25, stiffness: 200, mass: 0.5 };
+  const springShiftX = useSpring(useTransform(mouseX, [0, 1], [-8, 8]), springConfig);
+  const springShiftY = useSpring(useTransform(mouseY, [0, 1], [-8, 8]), springConfig);
 
   const handleMouseMove = useCallback((e: React.MouseEvent<HTMLDivElement>) => {
     if (!cardRef.current) return;
@@ -244,14 +224,20 @@ const CaseStudyCard: React.FC<{
       onMouseEnter={() => setIsHovered(true)}
       onMouseMove={handleMouseMove}
       onMouseLeave={handleMouseLeave}
-      className="group relative aspect-[4/3] w-full overflow-hidden cursor-pointer bg-[#fcfcfc] shadow-xs"
+      className="group relative aspect-[4/3] w-full overflow-hidden cursor-pointer bg-[#0A0D14] shadow-xs"
     >
-      {/* 1. Background Image */}
-      <img
-        src={card.image}
-        alt={card.title}
+      {/* 1. Background Video (AutoPlay, Loop, Muted, Object-Cover) */}
+      <BlobVideo
+        src={card.video}
+        autoPlay
+        muted
+        loop
+        playsInline
         className="absolute inset-0 h-full w-full object-cover transition-transform duration-700 ease-[cubic-bezier(0.22,1,0.36,1)] group-hover:scale-105"
       />
+
+      {/* Subtle blend vignette & top/bottom shadow */}
+      <div className="absolute inset-0 bg-gradient-to-t from-black/50 via-black/10 to-black/30 pointer-events-none z-5" />
 
       {/* 2. Pixel-Block Hover Overlay Grid (12 cols x 8 rows) */}
       <div className="absolute inset-0 grid grid-cols-12 grid-rows-8 pointer-events-none z-10">
@@ -421,16 +407,16 @@ export const ProjectsCaseStudiesSection: React.FC = () => {
             </div>
 
             {/* Paragraph */}
-            <p className="text-[14px] leading-[1.7] text-black/60 font-sans">
-              We partner with ambitious brands that are ready to move beyond fragmented visuals and shallow quick fixes -- turning their identity, website, and messaging into one focused engine for growth.
+            <p className="text-[14px] leading-[1.7] text-black/70 font-sans font-normal">
+              We partner with the Federal Ministry of Health, RedAid Nigeria, and NTBLCP to replace fragmented paper surveillance with unified, AI-driven zero-PII clinical intelligence across all 36 states.
             </p>
 
             {/* CTA Button */}
             <div className="mt-6">
               <button className="group flex items-end cursor-pointer">
                 {/* Main Label */}
-                <span className="inline-flex items-center gap-[10px] border border-black/20 bg-black px-3 py-2 text-base font-medium text-white transition-colors hover:bg-black/85">
-                  Let's work together
+                <span className="inline-flex items-center gap-[10px] border border-black/20 bg-black px-4 py-2.5 text-xs font-bold uppercase tracking-wider text-white transition-colors hover:bg-black/85">
+                  Surveillance Data Hub
                 </span>
 
                 {/* Arrow Badge (shifts up mb-6 -> mb-9 on hover) */}

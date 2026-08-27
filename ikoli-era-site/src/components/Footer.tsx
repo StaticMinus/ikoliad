@@ -1,201 +1,215 @@
-import React from 'react';
-import { Sparkles, ShieldCheck, ExternalLink } from 'lucide-react';
+import React, { useState, useEffect } from 'react';
+import { ArrowUpRight, ShieldCheck, SunMedium } from 'lucide-react';
 import { StickyRevealFooter } from './StickyRevealFooter';
-import { LogoIcon } from './LogoIcon';
 
 interface FooterProps {
-  onNavigate?: (page: 'home' | 'dashboard' | 'diseases' | 'ask') => void;
+  onNavigate?: (page: 'home' | 'dashboard' | 'diseases' | 'ask' | 'about' | 'styles') => void;
+  isStatic?: boolean;
 }
 
-export const Footer: React.FC<FooterProps> = ({ onNavigate }) => {
-  return (
-    <StickyRevealFooter>
-      <footer
-        id="about"
-        className="w-full bg-[#0A0C10] text-white pt-14 sm:pt-20 pb-10 sm:pb-12 px-4 sm:px-8 md:px-12 border-t border-white/10 relative overflow-hidden select-none"
-      >
-        {/* Giant Watermark Background Typography */}
-        <div className="absolute -bottom-6 sm:-bottom-10 right-0 left-0 flex justify-center pointer-events-none opacity-[0.03] select-none overflow-hidden">
-          <span className="font-display font-black text-[100px] sm:text-[180px] md:text-[240px] lg:text-[320px] leading-none tracking-tighter text-white whitespace-nowrap">
-            IKOLI AI
+export const Footer: React.FC<FooterProps> = ({ onNavigate, isStatic = false }) => {
+  const [watTime, setWatTime] = useState<string>('');
+
+  useEffect(() => {
+    const updateTime = () => {
+      try {
+        const timeStr = new Intl.DateTimeFormat('en-US', {
+          timeZone: 'Africa/Lagos',
+          hour: 'numeric',
+          minute: '2-digit',
+          hour12: true,
+        }).format(new Date());
+        setWatTime(timeStr);
+      } catch {
+        setWatTime('4:40 PM');
+      }
+    };
+
+    updateTime();
+    const interval = setInterval(updateTime, 10000);
+    return () => clearInterval(interval);
+  }, []);
+
+  const footerContent = (
+    <footer className="w-full bg-[#F5F5F7] text-[#1D1D1F] pt-14 sm:pt-20 pb-8 px-5 sm:px-10 md:px-16 border-t border-black/5 rounded-t-[36px] sm:rounded-t-[48px] relative overflow-hidden select-none shadow-[0_-20px_60px_rgba(0,0,0,0.03)]">
+      <div className="max-w-7xl mx-auto space-y-12 sm:space-y-16 relative z-10">
+        
+        {/* ── Top 4-Column Directory Grid ───────────────────────────── */}
+        <div className="grid grid-cols-1 md:grid-cols-12 gap-8 lg:gap-12">
+          
+          {/* Col 1: Bio & Mission Statement (Span 4) */}
+          <div className="md:col-span-4 space-y-3">
+            <h3 className="font-display font-bold text-xl sm:text-2xl text-[#1D1D1F] tracking-tight leading-snug">
+              IKOLI is Nigeria's national Skin NTD clinical intelligence & autonomous vision diagnostic system.
+            </h3>
+            <p className="text-xs sm:text-sm text-gray-500 leading-relaxed font-sans font-medium">
+              Developed in partnership with RedAid Nigeria, FMoHSW, NTBLCP, and DAHW to eliminate Leprosy, Buruli Ulcer, and Yaws.
+            </p>
+          </div>
+
+          {/* Col 2: Explore Navigation Links (Span 2) */}
+          <div className="md:col-span-2 space-y-3">
+            <span className="font-sans text-xs text-gray-400 font-semibold block tracking-wide">
+              Explore
+            </span>
+            <ul className="space-y-2 text-xs font-medium text-gray-600">
+              <li>
+                <button
+                  onClick={() => onNavigate?.('home')}
+                  className="hover:text-[#0071E3] transition-colors cursor-pointer text-left"
+                >
+                  Home
+                </button>
+              </li>
+              <li>
+                <button
+                  onClick={() => onNavigate?.('dashboard')}
+                  className="hover:text-[#0071E3] transition-colors cursor-pointer text-left"
+                >
+                  Dashboard
+                </button>
+              </li>
+              <li>
+                <button
+                  onClick={() => onNavigate?.('diseases')}
+                  className="hover:text-[#0071E3] transition-colors cursor-pointer text-left"
+                >
+                  Diseases
+                </button>
+              </li>
+              <li>
+                <button
+                  onClick={() => onNavigate?.('ask')}
+                  className="hover:text-[#0071E3] transition-colors cursor-pointer text-left"
+                >
+                  Ask Ikoli AI
+                </button>
+              </li>
+              <li>
+                <button
+                  onClick={() => onNavigate?.('about')}
+                  className="hover:text-[#0071E3] transition-colors cursor-pointer text-left"
+                >
+                  About & Governance
+                </button>
+              </li>
+            </ul>
+          </div>
+
+          {/* Col 3: Follow & Governance Partners Pill Badges (Span 3) */}
+          <div className="md:col-span-3 space-y-3">
+            <span className="font-sans text-xs text-gray-400 font-semibold block tracking-wide">
+              Governance & Partners
+            </span>
+            <div className="flex flex-wrap gap-2 pt-0.5">
+              <span className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-white border border-black/5 text-[11px] font-medium text-gray-700 shadow-xs hover:border-black/15 transition-all">
+                <span className="w-2 h-2 rounded-full bg-[#DE322D]" />
+                <span>RedAid Nigeria</span>
+              </span>
+
+              <span className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-white border border-black/5 text-[11px] font-medium text-gray-700 shadow-xs hover:border-black/15 transition-all">
+                <span className="w-2 h-2 rounded-full bg-[#0082FF]" />
+                <span>FMoHSW Nigeria</span>
+              </span>
+
+              <span className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-white border border-black/5 text-[11px] font-medium text-gray-700 shadow-xs hover:border-black/15 transition-all">
+                <span className="w-2 h-2 rounded-full bg-[#10B981]" />
+                <span>NTBLCP Programme</span>
+              </span>
+
+              <span className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-white border border-black/5 text-[11px] font-medium text-gray-700 shadow-xs hover:border-black/15 transition-all">
+                <span className="w-2 h-2 rounded-full bg-amber-500" />
+                <span>DAHW Relief</span>
+              </span>
+
+              <span className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-white border border-black/5 text-[11px] font-medium text-gray-700 shadow-xs hover:border-black/15 transition-all">
+                <ShieldCheck className="w-3 h-3 text-[#0071E3]" />
+                <span>Zero-PII Vault</span>
+              </span>
+            </div>
+          </div>
+
+          {/* Col 4: Action CTAs (Span 3) */}
+          <div className="md:col-span-3 space-y-5 flex flex-col justify-start">
+            {/* CTA 1: Ask Ikoli (Red/Orange Accent) */}
+            <div
+              onClick={() => onNavigate?.('ask')}
+              className="group cursor-pointer space-y-0.5"
+            >
+              <div className="flex items-center gap-2 text-[#DE322D] font-bold text-base sm:text-lg group-hover:text-[#c42823] transition-colors">
+                <span>Ask Ikoli AI</span>
+                <div className="w-5 h-5 rounded-full bg-[#DE322D] text-white flex items-center justify-center shadow-xs group-hover:translate-x-0.5 group-hover:-translate-y-0.5 transition-transform">
+                  <ArrowUpRight className="w-3 h-3 stroke-[2.5]" />
+                </div>
+              </div>
+              <span className="text-xs text-gray-500 block font-normal">
+                Clinical diagnostic assistant
+              </span>
+            </div>
+
+            {/* CTA 2: Guidelines & Tools */}
+            <div
+              onClick={() => onNavigate?.('diseases')}
+              className="group cursor-pointer space-y-0.5"
+            >
+              <div className="flex items-center gap-2 text-[#1D1D1F] font-bold text-base sm:text-lg group-hover:text-[#0071E3] transition-colors">
+                <span>Guidelines & Protocols</span>
+                <div className="w-5 h-5 rounded-full bg-[#1D1D1F] text-white flex items-center justify-center shadow-xs group-hover:translate-x-0.5 group-hover:-translate-y-0.5 transition-transform">
+                  <ArrowUpRight className="w-3 h-3 stroke-[2.5]" />
+                </div>
+              </div>
+              <span className="text-xs text-gray-500 block font-normal">
+                WHO MDT & clinical staging tools
+              </span>
+            </div>
+          </div>
+
+        </div>
+
+        {/* ── Giant Typographic Kinetic Wordmark (Like 'faizur' in reference) ── */}
+        <div className="w-full flex justify-center items-end pointer-events-none pt-4 sm:pt-8 overflow-hidden select-none -mb-6 sm:-mb-10">
+          <span className="font-display font-black text-[130px] sm:text-[220px] md:text-[280px] lg:text-[360px] leading-[0.76] tracking-tighter text-[#1D1D1F] text-center w-full block lowercase">
+            ikoli
           </span>
         </div>
 
-        <div className="max-w-6xl mx-auto space-y-12 sm:space-y-16 relative z-10">
-          
-          {/* Top Row: Brand, Tagline, and Ask Ikoli Pill */}
-          <div className="flex flex-col md:flex-row md:items-center justify-between gap-6 sm:gap-8 border-b border-white/10 pb-8 sm:pb-12">
-            
-            {/* Brand Identity */}
-            <div className="space-y-3">
-              <div
-                onClick={() => onNavigate?.('home')}
-                className="flex items-center gap-3 cursor-pointer group w-fit"
-              >
-                <LogoIcon className="w-9 h-9 sm:w-10 sm:h-10 group-hover:scale-105 transition-transform" />
-                <div className="flex flex-col text-left">
-                  <span className="font-display font-black text-2xl sm:text-3xl tracking-tight text-white group-hover:text-[#0082FF] transition-colors">
-                    IKOLI AI
-                  </span>
-                  <span className="font-mono text-[9px] sm:text-[10px] font-bold text-[#0082FF] tracking-widest uppercase">
-                    Autonomous NTD Surveillance
-                  </span>
-                </div>
-              </div>
-              <p className="text-xs sm:text-sm text-gray-400 max-w-md font-sans leading-relaxed">
-                Autonomous Skin NTD Surveillance & Multimodal Clinical Telemetry for Nigeria. Eliminating Leprosy, Buruli Ulcer, and Yaws with zero patient data exposure.
-              </p>
-            </div>
-
-            {/* Quick Consultation CTA -> Navigates to Ask Ikoli Page */}
-            <div className="flex items-center gap-4">
-              <button
-                onClick={() => onNavigate?.('ask')}
-                className="w-full sm:w-auto bg-[#0082FF] hover:bg-[#0066CC] text-white px-6 sm:px-7 py-3 rounded-full text-xs font-extrabold uppercase font-mono tracking-wider transition-all hover:scale-105 shadow-xl inline-flex items-center justify-center gap-2.5 group cursor-pointer"
-              >
-                <Sparkles className="w-4 h-4 text-[#00D2FF]" />
-                <span>Launch Ask Ikoli AI</span>
-              </button>
-            </div>
-
+        {/* ── Sub-Footer Bottom Bar ───────────────────────────────── */}
+        <div className="flex flex-col sm:flex-row items-center justify-between gap-3 pt-6 border-t border-black/5 text-[11px] sm:text-xs text-gray-500 font-medium">
+          {/* Left Copyright & Privacy */}
+          <div className="flex items-center gap-3">
+            <span>Ikoli AI © 2026</span>
+            <span>•</span>
+            <button
+              onClick={() => onNavigate?.('about')}
+              className="hover:text-[#1D1D1F] transition-colors cursor-pointer"
+            >
+              Privacy Policy
+            </button>
+            <span>•</span>
+            <span className="text-emerald-600 font-semibold flex items-center gap-1">
+              <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" />
+              <span>Zero-PII Protocol</span>
+            </span>
           </div>
 
-          {/* Middle Row: 4 Column Navigation & Institutional Governance (Responsive Grid) */}
-          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-8 text-xs font-sans">
-            
-            {/* Col 1: Platform */}
-            <div className="space-y-3">
-              <span className="font-mono text-[11px] text-gray-400 font-bold uppercase tracking-wider block">
-                Platform
-              </span>
-              <ul className="space-y-2 text-gray-300">
-                <li>
-                  <button
-                    onClick={() => onNavigate?.('dashboard')}
-                    className="hover:text-[#0082FF] transition-colors cursor-pointer text-left"
-                  >
-                    Surveillance Dashboard
-                  </button>
-                </li>
-                <li>
-                  <button
-                    onClick={() => onNavigate?.('diseases')}
-                    className="hover:text-[#0082FF] transition-colors cursor-pointer text-left"
-                  >
-                    Target Diseases Registry
-                  </button>
-                </li>
-                <li>
-                  <button
-                    onClick={() => onNavigate?.('ask')}
-                    className="hover:text-[#0082FF] transition-colors cursor-pointer text-left"
-                  >
-                    Ask Ikoli Intelligence
-                  </button>
-                </li>
-                <li>
-                  <a href="#projects" className="hover:text-[#0082FF] transition-colors">
-                    Case Studies
-                  </a>
-                </li>
-              </ul>
-            </div>
-
-            {/* Col 2: Target Diseases */}
-            <div className="space-y-3">
-              <span className="font-mono text-[11px] text-gray-400 font-bold uppercase tracking-wider block">
-                Target NTDs
-              </span>
-              <ul className="space-y-2 text-gray-300">
-                <li>
-                  <button
-                    onClick={() => onNavigate?.('diseases')}
-                    className="hover:text-[#0082FF] transition-colors cursor-pointer text-left"
-                  >
-                    Buruli Ulcer (IS2404 PCR)
-                  </button>
-                </li>
-                <li>
-                  <button
-                    onClick={() => onNavigate?.('diseases')}
-                    className="hover:text-[#0082FF] transition-colors cursor-pointer text-left"
-                  >
-                    Leprosy PB (6-Month MDT)
-                  </button>
-                </li>
-                <li>
-                  <button
-                    onClick={() => onNavigate?.('diseases')}
-                    className="hover:text-[#0082FF] transition-colors cursor-pointer text-left"
-                  >
-                    Leprosy MB (12-Month MDT)
-                  </button>
-                </li>
-                <li>
-                  <button
-                    onClick={() => onNavigate?.('diseases')}
-                    className="hover:text-[#0082FF] transition-colors cursor-pointer text-left"
-                  >
-                    Yaws (DPP Azithromycin)
-                  </button>
-                </li>
-              </ul>
-            </div>
-
-            {/* Col 3: Institutional Partners */}
-            <div className="space-y-3">
-              <span className="font-mono text-[11px] text-gray-400 font-bold uppercase tracking-wider block">
-                Partners
-              </span>
-              <ul className="space-y-2 text-gray-300">
-                <li className="flex items-center gap-1.5 hover:text-white transition-colors cursor-default">
-                  <span>RedAid Nigeria</span>
-                  <ExternalLink className="w-3 h-3 text-gray-500" />
-                </li>
-                <li className="flex items-center gap-1.5 hover:text-white transition-colors cursor-default">
-                  <span>FMoHSW Nigeria</span>
-                  <ExternalLink className="w-3 h-3 text-gray-500" />
-                </li>
-                <li className="flex items-center gap-1.5 hover:text-white transition-colors cursor-default">
-                  <span>NTBLCP Programme</span>
-                  <ExternalLink className="w-3 h-3 text-gray-500" />
-                </li>
-                <li className="flex items-center gap-1.5 hover:text-white transition-colors cursor-default">
-                  <span>Circles AI</span>
-                  <ExternalLink className="w-3 h-3 text-gray-500" />
-                </li>
-              </ul>
-            </div>
-
-            {/* Col 4: Data Trust Protocol */}
-            <div className="space-y-3">
-              <span className="font-mono text-[11px] text-gray-400 font-bold uppercase tracking-wider block">
-                Compliance
-              </span>
-              <div className="bg-white/5 p-3.5 rounded-xl border border-white/10 space-y-2">
-                <div className="flex items-center gap-2 text-emerald-400 font-mono text-[11px] font-bold">
-                  <ShieldCheck className="w-3.5 h-3.5" />
-                  <span>Zero-PII Tokenized</span>
-                </div>
-                <p className="text-[10px] text-gray-400 leading-relaxed font-mono">
-                  NDPR & WHO Guideline Compliant. All patient imagery processed strictly via cryptographic ephemeral pipelines.
-                </p>
-              </div>
-            </div>
-
+          {/* Right Local Telemetry: Nigeria WAT Time & Climate */}
+          <div className="flex items-center gap-2 text-gray-600 font-mono text-[11px]">
+            <span>Nigeria (WAT)</span>
+            <span className="font-bold text-[#1D1D1F]">{watTime || '4:40 PM'}</span>
+            <span>31°C</span>
+            <SunMedium className="w-3.5 h-3.5 text-amber-500" />
           </div>
-
-          {/* Bottom Bar: Copyright (Cleaned & Responsive) */}
-          <div className="pt-6 sm:pt-8 border-t border-white/10 flex flex-col sm:flex-row items-center justify-between text-[10px] sm:text-[11px] text-gray-500 font-mono gap-3 text-center sm:text-left">
-            <div className="flex items-center gap-2">
-              <span className="w-2 h-2 rounded-full bg-[#0082FF]" />
-              <span>National NTBLCP & WHO 2030 Skin NTD Surveillance Framework</span>
-            </div>
-            <span>© 2026 IKOLI AI • All Rights Reserved</span>
-          </div>
-
         </div>
-      </footer>
-    </StickyRevealFooter>
+
+      </div>
+    </footer>
   );
+
+  // If on Ask Ikoli page or static mode is requested, render without parallax reveal container
+  if (isStatic) {
+    return footerContent;
+  }
+
+  // Flagship layout: Smooth Sticky Reveal Curtain Footer
+  return <StickyRevealFooter>{footerContent}</StickyRevealFooter>;
 };

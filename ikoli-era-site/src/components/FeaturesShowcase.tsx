@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Play, Pause, RotateCcw, Plus, Database, Bot, Cpu, Building2, ShieldCheck, Sparkles, Activity, CheckCircle2 } from 'lucide-react';
+import { Play, Pause, RotateCcw, Plus, Database, Bot, Cpu, Building2, ShieldCheck, Activity, CheckCircle2 } from 'lucide-react';
 
 export const FeaturesShowcase: React.FC = () => {
   const [isStreaming, setIsStreaming] = useState(true);
@@ -252,12 +252,7 @@ export const FeaturesShowcase: React.FC = () => {
       <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[700px] h-[500px] bg-radial from-[#0082FF]/12 via-transparent to-transparent blur-3xl pointer-events-none" />
       
       {/* ── Section Header ───────────────────────────────────── */}
-      <div className="max-w-6xl mx-auto px-4 sm:px-8 md:px-12 space-y-4 text-center mb-12 sm:mb-16 relative z-10">
-        <div className="inline-flex items-center gap-2 bg-white/90 backdrop-blur-md text-[#0082FF] px-4 py-1.5 rounded-full text-xs font-mono font-bold tracking-wider uppercase border border-[#0082FF]/30 shadow-sm">
-          <Sparkles className="w-3.5 h-3.5 text-[#0082FF]" />
-          <span>AUTONOMOUS DIAGNOSTIC ENGINE</span>
-        </div>
-        
+      <div className="max-w-6xl mx-auto px-4 sm:px-8 md:px-12 space-y-3.5 text-center mb-10 sm:mb-14 relative z-10">
         <h2 className="font-display font-black text-3xl sm:text-4xl md:text-5xl text-[#0A0C10] tracking-tight">
           Multimodal Diagnostic Capabilities
         </h2>
