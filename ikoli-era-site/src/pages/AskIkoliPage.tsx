@@ -326,13 +326,13 @@ export const AskIkoliPage: React.FC<AskIkoliPageProps> = ({ onNavigate }) => {
 
           {/* Masked Hero Headline */}
           <div className="space-y-2 text-center">
-            <h1 className={`font-semibold text-3xl sm:text-5xl md:text-6xl tracking-tight leading-[1.08] ${
+            <h1 className={`font-display font-black text-3xl sm:text-5xl md:text-6xl tracking-tight leading-[1.06] ${
               isDark ? 'text-white' : 'text-[#1D1D1F]'
             }`}>
               Think clearly. Diagnose confidently.
             </h1>
-            <p className={`text-xs sm:text-sm md:text-base max-w-xl mx-auto leading-relaxed ${
-              isDark ? 'text-gray-400' : 'text-gray-600'
+            <p className={`text-xs sm:text-sm md:text-base max-w-xl mx-auto leading-relaxed font-medium ${
+              isDark ? 'text-gray-400' : 'text-gray-500'
             }`}>
               Nigeria's frontline clinical intelligence engine for Leprosy, Buruli Ulcer & Yaws differential staging.
             </p>
