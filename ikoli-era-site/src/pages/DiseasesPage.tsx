@@ -7,21 +7,23 @@ import {
   ChevronRight,
   Sparkles,
   Dna,
+  Maximize2,
+  X,
+  ArrowUpRight,
 } from 'lucide-react';
-import { motion } from 'framer-motion';
+import { motion, AnimatePresence } from 'framer-motion';
 
 interface DiseasesPageProps {
-  onNavigate: (page: 'home' | 'dashboard' | 'diseases' | 'ask' | 'about') => void;
+  onNavigate: (page: 'home' | 'dashboard' | 'diseases' | 'ask' | 'about' | 'styles') => void;
 }
 
-interface DiseaseDetail {
+export interface DiseaseDetail {
   id: string;
   name: string;
   code: string;
   category: 'Mycobacterial' | 'Necrotizing' | 'Treponemal' | 'Parasitic';
   categoryColor: string;
   tag: string;
-  videoUrl?: string;
   imageUrl: string;
   summary: string;
   clinicalPresentation: string[];
@@ -32,6 +34,9 @@ interface DiseaseDetail {
   preventionGoal: string;
   prevalenceIndex: string;
   disabilityBenchmark: string;
+  referralCenter: string;
+  blisterPackColor: string;
+  vmtProtocol: string;
 }
 
 const ALL_DISEASES: DiseaseDetail[] = [
@@ -42,7 +47,6 @@ const ALL_DISEASES: DiseaseDetail[] = [
     category: 'Mycobacterial',
     categoryColor: '#0071E3',
     tag: 'Early Detection Priority',
-    videoUrl: 'https://d8j0ntlcm91z4.cloudfront.net/user_38xzZboKViGWJOttwIXH07lWA1P/hf_20260506_030111_a9e15665-d379-4a7f-8116-695bbe452ad1.mp4',
     imageUrl: 'https://images.pexels.com/photos/7088530/pexels-photo-7088530.jpeg?auto=compress&cs=tinysrgb&w=800',
     summary: 'A chronic infectious disease caused by Mycobacterium leprae, characterized by 1 to 5 hypopigmented skin macules with definite loss of sensation to touch and temperature.',
     clinicalPresentation: [
@@ -61,6 +65,9 @@ const ALL_DISEASES: DiseaseDetail[] = [
     preventionGoal: 'Grade-0 Disability Maintenance (100% cure with zero physical deformity).',
     prevalenceIndex: '38.4% of National Staging Registry',
     disabilityBenchmark: '0% Target Disability',
+    referralCenter: 'Oji River Specialist Leprosy Hospital / Local PHC',
+    blisterPackColor: 'Green Standard PB Blister Pack',
+    vmtProtocol: 'Routine cotton wool wisp sensory testing across palm & sole dermatomes.',
   },
   {
     id: 'leprosy-mb',
@@ -69,7 +76,6 @@ const ALL_DISEASES: DiseaseDetail[] = [
     category: 'Mycobacterial',
     categoryColor: '#DE322D',
     tag: 'High Transmission & Deformity Risk',
-    videoUrl: 'https://d8j0ntlcm91z4.cloudfront.net/user_38xzZboKViGWJOttwIXH07lWA1P/hf_20260508_064122_c4750c0e-7476-4b44-94a2-a85a65c63bf2.mp4',
     imageUrl: 'https://images.pexels.com/photos/5428003/pexels-photo-5428003.jpeg?auto=compress&cs=tinysrgb&w=800',
     summary: 'A high-bacillary-load form of leprosy presenting with more than 5 infiltrative skin lesions and multiple enlarged peripheral nerve trunks (Ulnar, Common Peroneal).',
     clinicalPresentation: [
@@ -88,6 +94,9 @@ const ALL_DISEASES: DiseaseDetail[] = [
     preventionGoal: 'Grade-2 Disability Prevention (< 4.8% National Target via Early Decompression).',
     prevalenceIndex: '42.1% of National Staging Registry',
     disabilityBenchmark: '< 4.8% G2D Rate',
+    referralCenter: 'Oji River & Mile 4 Specialist Leprosy Centers',
+    blisterPackColor: 'Red/Blue Standard MB Blister Pack',
+    vmtProtocol: 'Voluntary Muscle Testing (VMT) of Ulnar, Median, and Common Peroneal nerves every 30 days.',
   },
   {
     id: 'buruli-ulcer',
@@ -96,7 +105,6 @@ const ALL_DISEASES: DiseaseDetail[] = [
     category: 'Necrotizing',
     categoryColor: '#10B981',
     tag: 'Rapid Tissue Necrosis Hazard',
-    videoUrl: 'https://d8j0ntlcm91z4.cloudfront.net/user_38xzZboKViGWJOttwIXH07lWA1P/hf_20260507_155500_808e6fdd-761f-4acd-b3be-cb7e6e700def.mp4',
     imageUrl: 'https://images.pexels.com/photos/3825586/pexels-photo-3825586.jpeg?auto=compress&cs=tinysrgb&w=800',
     summary: 'A debilitating necrotizing skin infection producing the immunosuppressive mycolactone toxin, resulting in painless subcutaneous fat necrosis and deeply undermined ulcers.',
     clinicalPresentation: [
@@ -116,6 +124,9 @@ const ALL_DISEASES: DiseaseDetail[] = [
     preventionGoal: 'Surgical Intervention Avoidance (Early Category I medical cure rate > 96%).',
     prevalenceIndex: '78.5% Laboratory Confirmation Rate',
     disabilityBenchmark: '> 95% Joint Mobility Saved',
+    referralCenter: 'Mile 4 Hospital Reference Lab (Abakaliki)',
+    blisterPackColor: 'Daily Co-Packaged Oral Rifampicin + Clarithromycin',
+    vmtProtocol: 'Joint mobility range of motion exercises and protective wound dressings.',
   },
   {
     id: 'yaws',
@@ -142,6 +153,9 @@ const ALL_DISEASES: DiseaseDetail[] = [
     preventionGoal: '100% Interruption of Transmission (WHO Morges Eradication Strategy).',
     prevalenceIndex: 'Rapid Point-of-Care Surveillance',
     disabilityBenchmark: '100% Bone Deformity Avoided',
+    referralCenter: 'Primary Health Care Center / NTBLCP Zonal Coordinator',
+    blisterPackColor: 'Single-Dose Azithromycin Oral Suspension / Tablets',
+    vmtProtocol: 'Active community contact tracing within 500m radius of index case.',
   },
   {
     id: 'leishmaniasis',
@@ -168,6 +182,9 @@ const ALL_DISEASES: DiseaseDetail[] = [
     preventionGoal: 'Scar Minimization & Mucocutaneous Dissemination Prevention.',
     prevalenceIndex: 'Regional Vector Nodes Active',
     disabilityBenchmark: '< 2% Dissemination Rate',
+    referralCenter: 'State Teaching Hospital Dermatology Department',
+    blisterPackColor: 'Specialized Antimonial / Miltefosine Unit',
+    vmtProtocol: 'Secondary bacterial infection prevention and thermotherapy.',
   },
 ];
 
@@ -175,7 +192,8 @@ export const DiseasesPage: React.FC<DiseasesPageProps> = ({ onNavigate }) => {
   const [selectedCategory, setSelectedCategory] = useState<string>('All');
   const [searchQuery, setSearchQuery] = useState<string>('');
   const [activeDiseaseId, setActiveDiseaseId] = useState<string>('leprosy-pb');
-  const [activeTab, setActiveTab] = useState<'clinical' | 'staging' | 'regimen' | 'lab'>('clinical');
+  const [activeTab, setActiveTab] = useState<'clinical' | 'staging' | 'regimen' | 'lab' | 'vmt'>('clinical');
+  const [isModalOpen, setIsModalOpen] = useState<boolean>(false);
 
   const filteredDiseases = useMemo(() => {
     return ALL_DISEASES.filter((d) => {
@@ -193,348 +211,464 @@ export const DiseasesPage: React.FC<DiseasesPageProps> = ({ onNavigate }) => {
     ALL_DISEASES.find((d) => d.id === activeDiseaseId) || ALL_DISEASES[0];
 
   return (
-    <div className="min-h-screen bg-white text-[#1D1D1F] font-sans selection:bg-[#0071E3] selection:text-white">
-      {/* ── Fixed Navigation Bar ────────────────────────────────────────── */}
-      <div className="sticky top-0 z-50">
-        <Navbar currentPage="diseases" onNavigate={onNavigate as any} />
-      </div>
+    <div className="min-h-screen bg-[#FBFBFD] text-[#1D1D1F] font-sans selection:bg-[#0071E3] selection:text-white">
+      
+      {/* ── Fixed Clean Capsule Navbar ─────────────────────────────────── */}
+      <Navbar currentPage="diseases" onNavigate={onNavigate} />
 
-      {/* ── Hero Section (WHO Data Portal Standard & Parallax Reveal) ───── */}
-      <section className="relative pt-12 pb-16 sm:pt-20 sm:pb-24 px-4 sm:px-8 md:px-12 max-w-7xl mx-auto overflow-hidden">
-        <div className="absolute top-1/3 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[700px] h-[400px] bg-radial from-[#0071E3]/8 via-transparent to-transparent blur-3xl pointer-events-none" />
-
-        <div className="text-center max-w-3xl mx-auto space-y-6 relative z-10">
-          <motion.div
-            initial={{ opacity: 0, y: 15 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.4 }}
-            className="inline-flex items-center gap-2 bg-[#F5F5F7] px-4 py-1.5 rounded-full border border-black/5 text-xs font-semibold text-[#0071E3]"
-          >
-            <Dna className="w-3.5 h-3.5" />
-            <span>WHO Data Portal Standard • ICD-11 Clinical Registry</span>
-          </motion.div>
-
-          <motion.h1
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.5, delay: 0.1 }}
-            className="text-4xl sm:text-6xl md:text-7xl font-extrabold tracking-tight text-[#1D1D1F] leading-[1.04]"
-          >
-            Target Skin NTDs. <br />
-            <span className="text-transparent bg-clip-text bg-gradient-to-r from-[#0071E3] via-[#5856D6] to-[#DE322D]">
-              Clinical Classification.
-            </span>
-          </motion.h1>
-
-          <motion.p
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.5, delay: 0.2 }}
-            className="text-base sm:text-lg text-gray-600 max-w-2xl mx-auto leading-relaxed font-normal"
-          >
-            Comprehensive diagnostic protocols, WHO multidrug therapy (MDT) blister pack regimens, real-time PCR validation, and disability prevention benchmarks across Nigeria.
-          </motion.p>
+      {/* ── Section 1: Hero Header ───────────────────────────────────────── */}
+      <section className="pt-28 sm:pt-36 pb-12 sm:pb-16 px-4 sm:px-8 max-w-7xl mx-auto text-center space-y-5">
+        
+        {/* Eyebrow Pill */}
+        <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-white border border-black/8 shadow-xs text-xs font-mono font-semibold text-gray-700">
+          <Dna className="w-3.5 h-3.5 text-[#0071E3]" />
+          <span>WHO DATA PORTAL STANDARD • ICD-11 CLINICAL REGISTRY</span>
         </div>
 
-        {/* ── Search & Filter Controls ──────────────────────────────────── */}
-        <div className="mt-12 sm:mt-16 max-w-4xl mx-auto space-y-4">
-          {/* Search Bar */}
+        {/* Hero Title */}
+        <h1 className="font-display font-black text-4xl sm:text-6xl md:text-7xl tracking-tight text-[#1D1D1F] leading-[1.06] max-w-4xl mx-auto">
+          Target Skin NTD Registry.
+        </h1>
+
+        {/* Subtitle */}
+        <p className="text-base sm:text-lg text-gray-500 max-w-2xl mx-auto font-medium leading-relaxed">
+          WHO multidrug therapy (MDT) blister pack protocols, clinical staging criteria, real-time PCR validation, and disability prevention standards across Nigeria.
+        </p>
+
+        {/* Search & Filter Bar */}
+        <div className="pt-4 max-w-2xl mx-auto space-y-3">
           <div className="relative">
-            <Search className="w-5 h-5 absolute left-4 top-1/2 -translate-y-1/2 text-gray-400" />
+            <Search className="w-4 h-4 absolute left-4 top-1/2 -translate-y-1/2 text-gray-400" />
             <input
               type="text"
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
-              placeholder="Search by disease name, ICD-11 code, or clinical symptoms..."
-              className="w-full bg-[#F5F5F7] border border-black/5 rounded-full pl-12 pr-6 py-4 text-xs sm:text-sm font-medium text-[#1D1D1F] focus:outline-none focus:ring-2 focus:ring-[#0071E3] focus:bg-white transition-all shadow-sm"
+              placeholder="Search by disease name, ICD code, or clinical symptoms..."
+              className="w-full bg-white border border-black/8 rounded-full pl-11 pr-5 py-3 text-xs sm:text-sm font-medium text-[#1D1D1F] placeholder-gray-400 shadow-xs focus:outline-none focus:ring-2 focus:ring-[#0071E3] transition-all"
             />
           </div>
 
-          {/* Category Filter Pills */}
-          <div className="flex items-center justify-center gap-2 overflow-x-auto pb-2 scrollbar-none">
+          {/* Filter Pills */}
+          <div className="flex items-center justify-center gap-1.5 overflow-x-auto pb-1 scrollbar-none">
             {['All', 'Mycobacterial', 'Necrotizing', 'Treponemal', 'Parasitic'].map((cat) => (
               <button
                 key={cat}
                 onClick={() => setSelectedCategory(cat)}
-                className={`px-4 py-2 rounded-full text-xs font-semibold transition-all cursor-pointer whitespace-nowrap ${
+                className={`px-3.5 py-1.5 rounded-full text-xs font-semibold transition-all cursor-pointer whitespace-nowrap ${
                   selectedCategory === cat
-                    ? 'bg-[#1D1D1F] text-white shadow-sm'
-                    : 'bg-[#F5F5F7] text-gray-600 hover:text-black hover:bg-gray-200'
+                    ? 'bg-[#1D1D1F] text-white shadow-xs'
+                    : 'bg-white text-gray-600 hover:text-black border border-black/5'
                 }`}
               >
-                {cat === 'All' ? 'All Diseases (5)' : cat}
+                {cat === 'All' ? 'All Diseases' : cat}
               </button>
             ))}
           </div>
         </div>
+
       </section>
 
-      {/* ── Interactive Master-Detail Disease Staging Inspector ────────── */}
-      <section className="py-8 sm:py-12 bg-[#F5F5F7] border-y border-black/5">
-        <div className="max-w-7xl mx-auto px-4 sm:px-8 md:px-12">
+      {/* ── Section 2: Interactive Master-Detail Disease Console ────────── */}
+      <section className="px-4 sm:px-8 max-w-7xl mx-auto pb-20 sm:pb-28">
+        
+        <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
           
-          <div className="grid grid-cols-1 lg:grid-cols-12 gap-8">
-            
-            {/* Left: Disease Selector List (4 Cols) */}
-            <div className="lg:col-span-4 space-y-3">
-              <span className="text-[11px] font-mono font-bold uppercase tracking-wider text-gray-500 block px-1">
-                Registry Index ({filteredDiseases.length})
-              </span>
+          {/* Left Column: Disease Selector Cards (4 Cols) */}
+          <div className="lg:col-span-4 space-y-2.5">
+            <span className="text-[11px] font-mono font-bold uppercase tracking-wider text-gray-400 block px-1">
+              Active Diseases ({filteredDiseases.length})
+            </span>
 
-              <div className="space-y-2">
-                {filteredDiseases.map((disease) => {
-                  const isSelected = activeDiseaseId === disease.id;
-                  return (
-                    <button
-                      key={disease.id}
-                      onClick={() => setActiveDiseaseId(disease.id)}
-                      className={`w-full text-left p-4 sm:p-5 rounded-2xl border transition-all cursor-pointer flex flex-col justify-between gap-3 group ${
-                        isSelected
-                          ? 'bg-white border-[#0071E3] shadow-lg scale-[1.01]'
-                          : 'bg-white/70 hover:bg-white border-black/5 hover:border-black/10'
-                      }`}
-                    >
-                      <div className="flex items-center justify-between">
-                        <span
-                          className="text-[10px] font-mono font-bold px-2.5 py-0.5 rounded-full"
-                          style={{
-                            backgroundColor: `${disease.categoryColor}15`,
-                            color: disease.categoryColor,
-                          }}
-                        >
-                          {disease.code}
-                        </span>
-                        <span className="text-[10px] font-mono text-gray-400">
-                          {disease.category}
-                        </span>
-                      </div>
+            <div className="space-y-2">
+              {filteredDiseases.map((disease) => {
+                const isSelected = activeDiseaseId === disease.id;
+                return (
+                  <button
+                    key={disease.id}
+                    onClick={() => setActiveDiseaseId(disease.id)}
+                    className={`w-full text-left p-4 rounded-2xl transition-all cursor-pointer flex flex-col justify-between gap-2 border group ${
+                      isSelected
+                        ? 'bg-white border-[#0071E3] shadow-md ring-1 ring-[#0071E3]'
+                        : 'bg-white/80 hover:bg-white border-black/5 hover:border-black/10'
+                    }`}
+                  >
+                    <div className="flex items-center justify-between">
+                      <span
+                        className="text-[10px] font-mono font-bold px-2 py-0.5 rounded-full"
+                        style={{
+                          backgroundColor: `${disease.categoryColor}15`,
+                          color: disease.categoryColor,
+                        }}
+                      >
+                        {disease.code}
+                      </span>
+                      <span className="text-[10px] font-mono text-gray-400">
+                        {disease.category}
+                      </span>
+                    </div>
 
-                      <div>
-                        <h3 className="font-extrabold text-sm sm:text-base text-[#1D1D1F] group-hover:text-[#0071E3] transition-colors">
-                          {disease.name}
-                        </h3>
-                        <p className="text-xs text-gray-500 line-clamp-1 mt-0.5">
-                          {disease.summary}
-                        </p>
-                      </div>
+                    <div>
+                      <h3 className="font-bold text-sm sm:text-base text-[#1D1D1F] group-hover:text-[#0071E3] transition-colors">
+                        {disease.name}
+                      </h3>
+                      <p className="text-xs text-gray-500 line-clamp-1 mt-0.5 font-normal">
+                        {disease.summary}
+                      </p>
+                    </div>
 
-                      <div className="flex items-center justify-between text-[11px] font-semibold text-gray-500 pt-1 border-t border-gray-100">
-                        <span>{disease.tag}</span>
-                        <ChevronRight className={`w-4 h-4 ${isSelected ? 'text-[#0071E3]' : 'text-gray-300'}`} />
-                      </div>
-                    </button>
-                  );
-                })}
-              </div>
+                    <div className="flex items-center justify-between text-[10px] font-semibold text-gray-400 pt-1 border-t border-black/5">
+                      <span>{disease.tag}</span>
+                      <ChevronRight
+                        className={`w-3.5 h-3.5 transition-transform ${
+                          isSelected ? 'text-[#0071E3] translate-x-0.5' : 'text-gray-300'
+                        }`}
+                      />
+                    </div>
+                  </button>
+                );
+              })}
             </div>
+          </div>
 
-            {/* Right: Rich Interactive WHO Staging Sheet (8 Cols) */}
-            <div className="lg:col-span-8 bg-white rounded-[32px] p-6 sm:p-8 md:p-10 border border-black/5 shadow-xl space-y-8">
-              
-              {/* Header: Title, ICD Code & Tags */}
-              <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-black/5 pb-6">
-                <div className="space-y-1">
-                  <div className="flex items-center gap-2">
-                    <span className="text-xs font-mono font-bold text-[#0071E3] bg-[#0071E3]/10 px-3 py-1 rounded-full">
-                      {currentDisease.code}
-                    </span>
-                    <span className="text-xs font-semibold text-gray-500">
-                      {currentDisease.category}
-                    </span>
-                  </div>
-                  <h2 className="text-2xl sm:text-4xl font-extrabold text-[#1D1D1F] tracking-tight">
-                    {currentDisease.name}
-                  </h2>
+          {/* Right Column: Interactive WHO Staging & Regimen Inspector (8 Cols) */}
+          <div className="lg:col-span-8 bg-white rounded-[32px] p-6 sm:p-8 md:p-10 border border-black/5 shadow-xl space-y-6">
+            
+            {/* Header: Title, ICD Code & Direct AI Diagnostic Action */}
+            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-black/5 pb-5">
+              <div className="space-y-1">
+                <div className="flex items-center gap-2">
+                  <span
+                    className="text-xs font-mono font-bold px-2.5 py-0.5 rounded-full"
+                    style={{
+                      backgroundColor: `${currentDisease.categoryColor}15`,
+                      color: currentDisease.categoryColor,
+                    }}
+                  >
+                    {currentDisease.code}
+                  </span>
+                  <span className="text-xs font-semibold text-gray-500">
+                    {currentDisease.category}
+                  </span>
                 </div>
+                <h2 className="text-2xl sm:text-3xl font-black text-[#1D1D1F] tracking-tight">
+                  {currentDisease.name}
+                </h2>
+              </div>
+
+              <div className="flex items-center gap-2">
+                <button
+                  onClick={() => setIsModalOpen(true)}
+                  className="bg-[#F5F5F7] hover:bg-[#EBEBEF] text-[#1D1D1F] px-4 py-2 rounded-full text-xs font-bold border border-black/5 flex items-center gap-1.5 transition-all cursor-pointer"
+                >
+                  <Maximize2 className="w-3.5 h-3.5" />
+                  <span>Full Staging Sheet</span>
+                </button>
 
                 <button
                   onClick={() => onNavigate('ask')}
-                  className="bg-[#0071E3] hover:bg-[#0077ED] text-white px-5 py-2.5 rounded-full text-xs font-bold shadow-md flex items-center gap-2 transition-all cursor-pointer self-start sm:self-auto"
+                  className="bg-[#0071E3] hover:bg-[#0077ED] active:scale-95 text-white px-4 py-2 rounded-full text-xs font-bold shadow-md shadow-[#0071E3]/20 flex items-center gap-1.5 transition-all cursor-pointer group"
                 >
                   <Sparkles className="w-3.5 h-3.5" />
-                  <span>Diagnose via AI</span>
+                  <span>Diagnose with AI</span>
+                  <ArrowUpRight className="w-3.5 h-3.5 group-hover:translate-x-0.5 group-hover:-translate-y-0.5 transition-transform" />
+                </button>
+              </div>
+            </div>
+
+            {/* High-Resolution Case Clinical Reference Banner */}
+            <div className="relative rounded-2xl overflow-hidden border border-black/5 bg-[#1D1D1F] h-48 sm:h-60 group">
+              <img
+                src={currentDisease.imageUrl}
+                alt={currentDisease.name}
+                className="w-full h-full object-cover opacity-85 group-hover:opacity-95 transition-opacity"
+              />
+              <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent pointer-events-none" />
+              
+              <div className="absolute bottom-4 left-4 right-4 flex items-center justify-between text-white">
+                <div className="space-y-0.5">
+                  <span className="text-[10px] font-mono text-emerald-400 font-bold uppercase tracking-wider block">
+                    Verified Clinical Archive
+                  </span>
+                  <h4 className="font-bold text-sm sm:text-base text-white">
+                    {currentDisease.name} Diagnostic Telemetry
+                  </h4>
+                </div>
+
+                <div className="bg-black/60 backdrop-blur-md px-3 py-1 rounded-full text-[10px] font-mono text-gray-300 border border-white/10 hidden sm:block">
+                  {currentDisease.referralCenter}
+                </div>
+              </div>
+            </div>
+
+            {/* Interactive Tab Switcher */}
+            <div className="flex items-center gap-1.5 border-b border-black/5 pb-2 overflow-x-auto scrollbar-none">
+              {[
+                { id: 'clinical', label: '1. Clinical Signs' },
+                { id: 'staging', label: '2. Staging Tiers' },
+                { id: 'regimen', label: '3. WHO MDT Regimen' },
+                { id: 'lab', label: '4. Lab & PCR' },
+                { id: 'vmt', label: '5. VMT & Prevention' },
+              ].map((tab) => (
+                <button
+                  key={tab.id}
+                  onClick={() => setActiveTab(tab.id as any)}
+                  className={`px-3.5 py-1.5 rounded-full text-xs font-bold transition-all cursor-pointer whitespace-nowrap ${
+                    activeTab === tab.id
+                      ? 'bg-[#1D1D1F] text-white shadow-xs'
+                      : 'text-gray-500 hover:text-black hover:bg-gray-100'
+                  }`}
+                >
+                  {tab.label}
+                </button>
+              ))}
+            </div>
+
+            {/* Dynamic Tab Panel Content */}
+            <div className="space-y-4 min-h-[220px]">
+              
+              {/* 1. Clinical Presentation */}
+              {activeTab === 'clinical' && (
+                <div className="space-y-4">
+                  <p className="text-sm text-gray-700 leading-relaxed font-normal">
+                    {currentDisease.summary}
+                  </p>
+                  
+                  <div className="space-y-2">
+                    <span className="text-[11px] font-mono font-bold uppercase tracking-wider text-gray-400 block">
+                      Core Diagnostic Presentation:
+                    </span>
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
+                      {currentDisease.clinicalPresentation.map((sign, i) => (
+                        <div key={i} className="flex items-start gap-2.5 p-3 rounded-2xl bg-[#F5F5F7] border border-black/5">
+                          <CheckCircle2 className="w-4 h-4 text-emerald-600 shrink-0 mt-0.5" />
+                          <span className="text-xs text-gray-700 leading-relaxed">{sign}</span>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                </div>
+              )}
+
+              {/* 2. Staging Criteria */}
+              {activeTab === 'staging' && (
+                <div className="space-y-3">
+                  <span className="text-[11px] font-mono font-bold uppercase tracking-wider text-gray-400 block">
+                    WHO Clinical Classification Tiers:
+                  </span>
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                    {currentDisease.stagingCriteria.map((tier, i) => (
+                      <div key={i} className="p-4 rounded-2xl bg-[#F5F5F7] border border-black/5 space-y-1.5">
+                        <span className="text-[10px] font-bold text-[#0071E3] font-mono">Stage {i + 1}</span>
+                        <h4 className="font-bold text-sm text-[#1D1D1F]">{tier.stage}</h4>
+                        <p className="text-xs text-gray-600 leading-relaxed">{tier.desc}</p>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              )}
+
+              {/* 3. WHO MDT Regimen */}
+              {activeTab === 'regimen' && (
+                <div className="p-5 rounded-2xl bg-[#F5F5F7] border border-black/5 space-y-4">
+                  <div className="space-y-1">
+                    <span className="text-[10px] font-mono font-bold uppercase text-[#0071E3]">
+                      Prescribed Pharmacotherapy Regimen
+                    </span>
+                    <h4 className="font-bold text-base text-[#1D1D1F]">
+                      {currentDisease.whoRegimen}
+                    </h4>
+                  </div>
+
+                  <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 pt-2 border-t border-black/5 text-xs font-mono">
+                    <div className="bg-white p-3 rounded-xl border border-black/5">
+                      <span className="text-gray-400 block text-[10px]">Duration</span>
+                      <strong className="text-[#1D1D1F] font-bold">{currentDisease.duration}</strong>
+                    </div>
+                    <div className="bg-white p-3 rounded-xl border border-black/5">
+                      <span className="text-gray-400 block text-[10px]">Blister Pack Type</span>
+                      <strong className="text-[#0071E3] font-bold">{currentDisease.blisterPackColor}</strong>
+                    </div>
+                    <div className="bg-white p-3 rounded-xl border border-black/5">
+                      <span className="text-gray-400 block text-[10px]">Disability Target</span>
+                      <strong className="text-emerald-600 font-bold">{currentDisease.disabilityBenchmark}</strong>
+                    </div>
+                  </div>
+                </div>
+              )}
+
+              {/* 4. Laboratory & PCR */}
+              {activeTab === 'lab' && (
+                <div className="p-5 rounded-2xl bg-[#F5F5F7] border border-black/5 space-y-3">
+                  <div className="space-y-1">
+                    <span className="text-[10px] font-mono font-bold uppercase text-[#5856D6]">
+                      Laboratory Confirmation Pipeline
+                    </span>
+                    <h4 className="font-bold text-sm sm:text-base text-[#1D1D1F]">
+                      {currentDisease.labConfirmation}
+                    </h4>
+                  </div>
+
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 pt-2 text-xs font-mono">
+                    <div className="bg-white p-3 rounded-xl border border-black/5">
+                      <span className="text-gray-400 block text-[10px]">Reference Center</span>
+                      <strong className="text-[#1D1D1F]">{currentDisease.referralCenter}</strong>
+                    </div>
+                    <div className="bg-white p-3 rounded-xl border border-black/5">
+                      <span className="text-gray-400 block text-[10px]">National Confirmation</span>
+                      <strong className="text-purple-600 font-bold">{currentDisease.prevalenceIndex}</strong>
+                    </div>
+                  </div>
+                </div>
+              )}
+
+              {/* 5. VMT & Disability Prevention */}
+              {activeTab === 'vmt' && (
+                <div className="p-5 rounded-2xl bg-[#F5F5F7] border border-black/5 space-y-3">
+                  <div className="space-y-1">
+                    <span className="text-[10px] font-mono font-bold uppercase text-emerald-600">
+                      Voluntary Muscle Testing (VMT) & Prevention Protocol
+                    </span>
+                    <h4 className="font-bold text-sm sm:text-base text-[#1D1D1F]">
+                      {currentDisease.preventionGoal}
+                    </h4>
+                  </div>
+
+                  <p className="text-xs text-gray-600 leading-relaxed font-normal">
+                    {currentDisease.vmtProtocol}
+                  </p>
+                </div>
+              )}
+
+            </div>
+
+          </div>
+
+        </div>
+
+      </section>
+
+      {/* ── Section 3: WHO 2030 Roadmap Milestones ─────────────────────── */}
+      <section className="px-4 sm:px-8 max-w-7xl mx-auto pb-24 sm:pb-32 space-y-8">
+        
+        <div className="text-center max-w-2xl mx-auto space-y-2">
+          <span className="text-xs font-mono font-bold uppercase tracking-wider text-[#0071E3]">
+            WHO 2030 Elimination Milestones
+          </span>
+          <h2 className="font-display font-black text-3xl sm:text-4xl text-[#1D1D1F] tracking-tight">
+            Progress Toward Zero Transmission
+          </h2>
+        </div>
+
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-5">
+          <div className="bg-white p-6 rounded-3xl border border-black/5 shadow-xs space-y-3">
+            <span className="text-xs font-mono font-bold text-[#0071E3] uppercase">MDT Completion Rate</span>
+            <div className="text-3xl font-black text-[#1D1D1F] font-mono">89.2%</div>
+            <div className="h-2 bg-gray-100 rounded-full overflow-hidden">
+              <div className="h-full bg-[#0071E3] rounded-full w-[89.2%]" />
+            </div>
+            <p className="text-[11px] text-gray-400 font-mono">Target: &gt; 85% Completion nationwide</p>
+          </div>
+
+          <div className="bg-white p-6 rounded-3xl border border-black/5 shadow-xs space-y-3">
+            <span className="text-xs font-mono font-bold text-emerald-600 uppercase">Grade-2 Disability Prevention</span>
+            <div className="text-3xl font-black text-emerald-600 font-mono">&lt; 4.8%</div>
+            <div className="h-2 bg-gray-100 rounded-full overflow-hidden">
+              <div className="h-full bg-emerald-500 rounded-full w-[95%]" />
+            </div>
+            <p className="text-[11px] text-gray-400 font-mono">Target: &lt; 5.0% Deformity rate</p>
+          </div>
+
+          <div className="bg-white p-6 rounded-3xl border border-black/5 shadow-xs space-y-3">
+            <span className="text-xs font-mono font-bold text-purple-600 uppercase">IS2404 PCR Molecular Match</span>
+            <div className="text-3xl font-black text-purple-600 font-mono">78.5%</div>
+            <div className="h-2 bg-gray-100 rounded-full overflow-hidden">
+              <div className="h-full bg-purple-500 rounded-full w-[78.5%]" />
+            </div>
+            <p className="text-[11px] text-gray-400 font-mono">Target: &gt; 70% Reference lab confirmation</p>
+          </div>
+        </div>
+
+      </section>
+
+      {/* ── Modal: Full Clinical Staging Sheet ─────────────────────────── */}
+      <AnimatePresence>
+        {isModalOpen && (
+          <div className="fixed inset-0 bg-black/50 backdrop-blur-md z-50 flex items-center justify-center p-4">
+            <motion.div
+              initial={{ opacity: 0, scale: 0.95 }}
+              animate={{ opacity: 1, scale: 1 }}
+              exit={{ opacity: 0, scale: 0.95 }}
+              className="bg-white rounded-[32px] p-6 sm:p-8 max-w-2xl w-full shadow-2xl border border-black/10 space-y-5 text-left max-h-[90vh] overflow-y-auto"
+            >
+              <div className="flex items-center justify-between border-b border-black/5 pb-4">
+                <div>
+                  <span className="text-[10px] font-mono font-bold text-[#0071E3] uppercase">
+                    ICD-11 CLINICAL REFERENCE
+                  </span>
+                  <h3 className="font-extrabold text-xl text-[#1D1D1F]">
+                    {currentDisease.name}
+                  </h3>
+                </div>
+
+                <button
+                  onClick={() => setIsModalOpen(false)}
+                  className="w-8 h-8 rounded-full bg-black/5 flex items-center justify-center text-gray-600 hover:bg-black/10 transition-colors cursor-pointer"
+                >
+                  <X className="w-4 h-4" />
                 </button>
               </div>
 
-              {/* Embedded Video / High-Res Image Player */}
-              <div className="relative rounded-3xl overflow-hidden shadow-md border border-black/5 bg-black">
-                {currentDisease.videoUrl ? (
-                  <video
-                    src={currentDisease.videoUrl}
-                    controls
-                    playsInline
-                    className="w-full h-64 sm:h-80 md:h-96 object-cover"
-                  />
-                ) : (
-                  <img
-                    src={currentDisease.imageUrl}
-                    alt={currentDisease.name}
-                    className="w-full h-64 sm:h-80 md:h-96 object-cover"
-                  />
-                )}
-                <div className="absolute top-4 left-4 bg-black/70 backdrop-blur-md text-white text-[10px] font-mono font-bold px-3 py-1 rounded-full flex items-center gap-1.5">
-                  <span className="w-2 h-2 rounded-full bg-[#0071E3] animate-ping" />
-                  <span>Clinical Case Video • FMoHSW Verified</span>
+              <div className="space-y-4 text-xs">
+                <div>
+                  <h4 className="font-bold text-[#1D1D1F] mb-1">Summary Description:</h4>
+                  <p className="text-gray-600 leading-relaxed font-normal">{currentDisease.summary}</p>
+                </div>
+
+                <div>
+                  <h4 className="font-bold text-[#1D1D1F] mb-1.5">WHO Prescribed Regimen:</h4>
+                  <div className="p-3.5 bg-[#F5F5F7] rounded-2xl border border-black/5 space-y-1">
+                    <p className="font-bold text-[#1D1D1F]">{currentDisease.whoRegimen}</p>
+                    <p className="text-gray-500 font-mono text-[11px]">Duration: {currentDisease.duration}</p>
+                  </div>
+                </div>
+
+                <div>
+                  <h4 className="font-bold text-[#1D1D1F] mb-1.5">Reference Center:</h4>
+                  <div className="p-3.5 bg-[#F5F5F7] rounded-2xl border border-black/5 font-mono text-[11px] text-gray-700">
+                    {currentDisease.referralCenter}
+                  </div>
                 </div>
               </div>
 
-              {/* Interactive Tabs Navigation */}
-              <div className="flex items-center gap-2 border-b border-black/5 pb-2 overflow-x-auto scrollbar-none">
-                {[
-                  { id: 'clinical', label: '1. Clinical Presentation' },
-                  { id: 'staging', label: '2. Staging Criteria' },
-                  { id: 'regimen', label: '3. WHO MDT Regimen' },
-                  { id: 'lab', label: '4. Laboratory & PCR' },
-                ].map((tab) => (
-                  <button
-                    key={tab.id}
-                    onClick={() => setActiveTab(tab.id as any)}
-                    className={`px-4 py-2 rounded-xl text-xs font-bold transition-all cursor-pointer whitespace-nowrap ${
-                      activeTab === tab.id
-                        ? 'bg-[#1D1D1F] text-white shadow-xs'
-                        : 'text-gray-500 hover:text-black hover:bg-gray-100'
-                    }`}
-                  >
-                    {tab.label}
-                  </button>
-                ))}
+              <div className="pt-2 flex items-center justify-between gap-3">
+                <button
+                  onClick={() => {
+                    setIsModalOpen(false);
+                    onNavigate('ask');
+                  }}
+                  className="flex-1 bg-[#0071E3] hover:bg-[#0077ED] text-white py-3 rounded-2xl font-bold text-xs shadow-md flex items-center justify-center gap-2 cursor-pointer"
+                >
+                  <Sparkles className="w-3.5 h-3.5" />
+                  <span>Launch Ask Ikoli for this Case</span>
+                </button>
+
+                <button
+                  onClick={() => setIsModalOpen(false)}
+                  className="bg-gray-100 hover:bg-gray-200 text-gray-700 px-5 py-3 rounded-2xl font-bold text-xs cursor-pointer"
+                >
+                  Close
+                </button>
               </div>
-
-              {/* Active Tab Content Display */}
-              <div className="space-y-6 min-h-[220px]">
-                
-                {/* 1. Clinical Presentation */}
-                {activeTab === 'clinical' && (
-                  <div className="space-y-4">
-                    <p className="text-sm text-gray-700 leading-relaxed font-normal">
-                      {currentDisease.summary}
-                    </p>
-                    <div className="space-y-2.5">
-                      <span className="text-xs font-mono font-bold uppercase tracking-wider text-gray-500 block">
-                        Diagnostic Signs & Sensory Criteria:
-                      </span>
-                      {currentDisease.clinicalPresentation.map((sign, i) => (
-                        <div key={i} className="flex items-start gap-3 p-3.5 rounded-2xl bg-[#F5F5F7] border border-black/5">
-                          <CheckCircle2 className="w-4 h-4 text-emerald-600 shrink-0 mt-0.5" />
-                          <span className="text-xs sm:text-sm text-gray-700 leading-snug">{sign}</span>
-                        </div>
-                      ))}
-                    </div>
-                  </div>
-                )}
-
-                {/* 2. Staging Criteria */}
-                {activeTab === 'staging' && (
-                  <div className="space-y-4">
-                    <span className="text-xs font-mono font-bold uppercase tracking-wider text-gray-500 block">
-                      WHO Staging Tiers:
-                    </span>
-                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                      {currentDisease.stagingCriteria.map((tier, i) => (
-                        <div key={i} className="p-5 rounded-2xl bg-[#F5F5F7] border border-black/5 space-y-2">
-                          <span className="text-xs font-bold text-[#0071E3] font-mono">Stage {i + 1}</span>
-                          <h4 className="font-bold text-sm text-[#1D1D1F]">{tier.stage}</h4>
-                          <p className="text-xs text-gray-600 leading-relaxed">{tier.desc}</p>
-                        </div>
-                      ))}
-                    </div>
-                  </div>
-                )}
-
-                {/* 3. WHO MDT Regimen */}
-                {activeTab === 'regimen' && (
-                  <div className="p-6 rounded-2xl bg-[#F5F5F7] border border-black/5 space-y-4">
-                    <div className="space-y-1">
-                      <span className="text-xs font-mono font-bold uppercase text-[#0071E3]">Prescribed Pharmacotherapy</span>
-                      <h4 className="font-bold text-base text-[#1D1D1F]">{currentDisease.whoRegimen}</h4>
-                    </div>
-                    <div className="pt-2 border-t border-black/5 grid grid-cols-1 sm:grid-cols-2 gap-4 text-xs font-mono">
-                      <div>
-                        <span className="text-gray-500 block">Treatment Duration:</span>
-                        <strong className="text-[#1D1D1F] font-black">{currentDisease.duration}</strong>
-                      </div>
-                      <div>
-                        <span className="text-gray-500 block">Disability Benchmark:</span>
-                        <strong className="text-emerald-700 font-black">{currentDisease.disabilityBenchmark}</strong>
-                      </div>
-                    </div>
-                  </div>
-                )}
-
-                {/* 4. Laboratory & PCR */}
-                {activeTab === 'lab' && (
-                  <div className="p-6 rounded-2xl bg-[#F5F5F7] border border-black/5 space-y-4">
-                    <div className="space-y-1">
-                      <span className="text-xs font-mono font-bold uppercase text-[#5856D6]">Laboratory Verification Pipeline</span>
-                      <h4 className="font-bold text-base text-[#1D1D1F]">{currentDisease.labConfirmation}</h4>
-                    </div>
-                    <p className="text-xs text-gray-600 leading-relaxed">
-                      All laboratory confirmations are synchronized into Nigeria’s national DHIS2 electronic registry with cryptographic hash verification.
-                    </p>
-                  </div>
-                )}
-
-              </div>
-
-              {/* Bottom Quick Telemetry Strip */}
-              <div className="pt-4 border-t border-black/5 flex flex-wrap items-center justify-between gap-4 text-xs font-mono text-gray-500">
-                <span>WHO Guideline Compliant</span>
-                <span className="text-[#0071E3] font-bold">{currentDisease.prevalenceIndex}</span>
-              </div>
-
-            </div>
-
+            </motion.div>
           </div>
-
-        </div>
-      </section>
-
-      {/* ── Section: WHO 2030 Roadmap Milestones ───────────────────────── */}
-      <section className="py-16 sm:py-24 px-4 sm:px-8 md:px-12 max-w-7xl mx-auto space-y-10">
-        <div className="text-center max-w-2xl mx-auto space-y-3">
-          <span className="text-xs font-bold uppercase tracking-widest text-[#0071E3]">
-            WHO 2030 Elimination Milestones
-          </span>
-          <h2 className="text-3xl sm:text-4xl font-extrabold text-[#1D1D1F]">
-            Progress Toward Zero Transmission
-          </h2>
-          <p className="text-xs sm:text-sm text-gray-600">
-            Real-time synchronization against the World Health Organization roadmap for Neglected Tropical Diseases.
-          </p>
-        </div>
-
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-          <div className="bg-[#F5F5F7] p-6 rounded-3xl border border-black/5 space-y-3">
-            <span className="text-xs font-mono font-bold text-[#0071E3] uppercase">MDT Completion Rate</span>
-            <div className="text-3xl font-black text-[#1D1D1F] font-mono">89.2%</div>
-            <div className="h-2 bg-gray-200 rounded-full overflow-hidden">
-              <div className="h-full bg-[#0071E3] rounded-full w-[89.2%]" />
-            </div>
-            <p className="text-[11px] text-gray-500">Target: &gt; 85% Completion nationwide</p>
-          </div>
-
-          <div className="bg-[#F5F5F7] p-6 rounded-3xl border border-black/5 space-y-3">
-            <span className="text-xs font-mono font-bold text-emerald-600 uppercase">Grade-2 Disability Prevention</span>
-            <div className="text-3xl font-black text-emerald-700 font-mono">&lt; 4.8%</div>
-            <div className="h-2 bg-gray-200 rounded-full overflow-hidden">
-              <div className="h-full bg-emerald-600 rounded-full w-[95%]" />
-            </div>
-            <p className="text-[11px] text-gray-500">Target: &lt; 5.0% Deformity rate</p>
-          </div>
-
-          <div className="bg-[#F5F5F7] p-6 rounded-3xl border border-black/5 space-y-3">
-            <span className="text-xs font-mono font-bold text-purple-600 uppercase">IS2404 PCR Molecular Match</span>
-            <div className="text-3xl font-black text-purple-700 font-mono">78.5%</div>
-            <div className="h-2 bg-gray-200 rounded-full overflow-hidden">
-              <div className="h-full bg-purple-600 rounded-full w-[78.5%]" />
-            </div>
-            <p className="text-[11px] text-gray-500">Target: &gt; 70% Reference lab confirmation</p>
-          </div>
-        </div>
-      </section>
+        )}
+      </AnimatePresence>
 
       {/* ── Footer ──────────────────────────────────────────────────────── */}
-      <Footer onNavigate={onNavigate as any} />
+      <Footer onNavigate={onNavigate} />
+
     </div>
   );
 };
+
+export default DiseasesPage;
