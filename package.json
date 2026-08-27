@@ -4,7 +4,7 @@
   "version": "1.0.0",
   "scripts": {
     "dev": "npm --prefix ikoli-era-site run dev",
-    "build": "npm --prefix ikoli-era-site run build",
+    "build": "npm --prefix ikoli-era-site run build && node -e \"const fs=require('fs'); if(fs.existsSync('ikoli-era-site/dist')){ fs.cpSync('ikoli-era-site/dist', 'dist', {recursive: true}); }\"",
     "preview": "npm --prefix ikoli-era-site run preview"
   }
 }

@@ -1,0 +1,11 @@
+{
+  "buildCommand": "npm --prefix ikoli-era-site run build",
+  "outputDirectory": "ikoli-era-site/dist",
+  "framework": "vite",
+  "rewrites": [
+    {
+      "source": "/(.*)",
+      "destination": "/index.html"
+    }
+  ]
+}
