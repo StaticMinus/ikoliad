@@ -11,6 +11,7 @@ import {
   ChevronRight,
   Sparkles,
 } from 'lucide-react';
+import { MagneticButton } from './ui/MagneticButton';
 
 interface NavbarProps {
   currentPage?: 'home' | 'dashboard' | 'diseases' | 'ask' | 'about' | 'styles';
@@ -79,17 +80,17 @@ export const Navbar: React.FC<NavbarProps> = ({
               const isActive = currentPage === item.id;
 
               return (
-                <button
-                  key={item.id}
-                  onClick={() => handleNavClick(item.id)}
-                  className={`px-4 py-1.5 rounded-full text-xs font-semibold transition-all duration-200 cursor-pointer ${
-                    isActive
-                      ? 'bg-white text-[#1D1D1F] shadow-xs font-bold'
-                      : 'text-[#1D1D1F]/70 hover:text-[#1D1D1F] hover:bg-white/60'
-                  }`}
-                >
-                  {item.label}
-                </button>
+                <MagneticButton key={item.id} magneticStrength={0.2} onClick={() => handleNavClick(item.id)}>
+                  <button
+                    className={`px-4 py-1.5 rounded-full text-xs font-semibold transition-all duration-200 cursor-pointer ${
+                      isActive
+                        ? 'bg-white text-[#1D1D1F] shadow-xs font-bold'
+                        : 'text-[#1D1D1F]/70 hover:text-[#1D1D1F] hover:bg-white/60'
+                    }`}
+                  >
+                    {item.label}
+                  </button>
+                </MagneticButton>
               );
             })}
           </nav>
@@ -98,17 +99,18 @@ export const Navbar: React.FC<NavbarProps> = ({
           <div className="flex items-center gap-2 shrink-0 pr-0.5">
             
             {/* Action CTA Pill with White Circular Arrow Badge */}
-            <button
-              onClick={() => handleNavClick('ask')}
-              className={`bg-[#0071E3] hover:bg-[#0077ED] text-white font-bold text-xs rounded-full pl-3.5 sm:pl-4 pr-1 sm:pr-1.5 py-1 sm:py-1.5 flex items-center gap-2 sm:gap-2.5 shadow-md shadow-[#0071E3]/25 transition-all hover:scale-105 cursor-pointer group ${
-                currentPage === 'ask' ? 'ring-2 ring-[#0071E3]/50' : ''
-              }`}
-            >
-              <span className="tracking-tight font-semibold">Ask Ikoli</span>
-              <div className="w-6 h-6 sm:w-6.5 sm:h-6.5 rounded-full bg-white text-[#0071E3] flex items-center justify-center shadow-xs group-hover:translate-x-0.5 group-hover:-translate-y-0.5 transition-transform duration-200">
-                <ArrowUpRight className="w-3.5 h-3.5 stroke-[2.5]" />
-              </div>
-            </button>
+            <MagneticButton magneticStrength={0.3} onClick={() => handleNavClick('ask')}>
+              <button
+                className={`bg-[#0071E3] hover:bg-[#0077ED] text-white font-bold text-xs rounded-full pl-3.5 sm:pl-4 pr-1 sm:pr-1.5 py-1 sm:py-1.5 flex items-center gap-2 sm:gap-2.5 shadow-md shadow-[#0071E3]/25 transition-all hover:scale-105 cursor-pointer group ${
+                  currentPage === 'ask' ? 'ring-2 ring-[#0071E3]/50' : ''
+                }`}
+              >
+                <span className="tracking-tight font-semibold">Ask Ikoli</span>
+                <div className="w-6 h-6 sm:w-6.5 sm:h-6.5 rounded-full bg-white text-[#0071E3] flex items-center justify-center shadow-xs group-hover:translate-x-0.5 group-hover:-translate-y-0.5 transition-transform duration-200">
+                  <ArrowUpRight className="w-3.5 h-3.5 stroke-[2.5]" />
+                </div>
+              </button>
+            </MagneticButton>
 
             {/* Mobile Hamburger Toggle (< md) */}
             <button

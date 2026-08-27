@@ -12,6 +12,9 @@ import {
   ArrowUpRight,
 } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
+import { Interactive3DCard } from '../components/ui/Interactive3DCard';
+import { KineticTextReveal } from '../components/ui/KineticTextReveal';
+import { MagneticButton } from '../components/ui/MagneticButton';
 
 interface DiseasesPageProps {
   onNavigate: (page: 'home' | 'dashboard' | 'diseases' | 'ask' | 'about' | 'styles') => void;
@@ -225,9 +228,13 @@ export const DiseasesPage: React.FC<DiseasesPageProps> = ({ onNavigate }) => {
           <span>WHO DATA PORTAL STANDARD • ICD-11 CLINICAL REGISTRY</span>
         </div>
 
-        {/* Hero Title */}
+        {/* Hero Title with Kinetic Typography */}
         <h1 className="font-display font-black text-4xl sm:text-6xl md:text-7xl tracking-tight text-[#1D1D1F] leading-[1.06] max-w-4xl mx-auto">
-          Target Skin NTD Registry.
+          <KineticTextReveal
+            text="Target Skin NTD Registry."
+            highlightWords={['NTD', 'Registry.']}
+            highlightClass="text-transparent bg-clip-text bg-gradient-to-r from-[#0071E3] to-[#DE322D]"
+          />
         </h1>
 
         {/* Subtitle */}
@@ -279,52 +286,53 @@ export const DiseasesPage: React.FC<DiseasesPageProps> = ({ onNavigate }) => {
               Active Diseases ({filteredDiseases.length})
             </span>
 
-            <div className="space-y-2">
+            <div className="space-y-2.5">
               {filteredDiseases.map((disease) => {
                 const isSelected = activeDiseaseId === disease.id;
                 return (
-                  <button
-                    key={disease.id}
-                    onClick={() => setActiveDiseaseId(disease.id)}
-                    className={`w-full text-left p-4 rounded-2xl transition-all cursor-pointer flex flex-col justify-between gap-2 border group ${
-                      isSelected
-                        ? 'bg-white border-[#0071E3] shadow-md ring-1 ring-[#0071E3]'
-                        : 'bg-white/80 hover:bg-white border-black/5 hover:border-black/10'
-                    }`}
-                  >
-                    <div className="flex items-center justify-between">
-                      <span
-                        className="text-[10px] font-mono font-bold px-2 py-0.5 rounded-full"
-                        style={{
-                          backgroundColor: `${disease.categoryColor}15`,
-                          color: disease.categoryColor,
-                        }}
-                      >
-                        {disease.code}
-                      </span>
-                      <span className="text-[10px] font-mono text-gray-400">
-                        {disease.category}
-                      </span>
-                    </div>
+                  <Interactive3DCard key={disease.id} maxTilt={6}>
+                    <button
+                      onClick={() => setActiveDiseaseId(disease.id)}
+                      className={`w-full text-left p-4 rounded-2xl transition-all cursor-pointer flex flex-col justify-between gap-2 border group ${
+                        isSelected
+                          ? 'bg-white border-[#0071E3] shadow-md ring-1 ring-[#0071E3]'
+                          : 'bg-white/80 hover:bg-white border-black/5 hover:border-black/10'
+                      }`}
+                    >
+                      <div className="flex items-center justify-between">
+                        <span
+                          className="text-[10px] font-mono font-bold px-2 py-0.5 rounded-full"
+                          style={{
+                            backgroundColor: `${disease.categoryColor}15`,
+                            color: disease.categoryColor,
+                          }}
+                        >
+                          {disease.code}
+                        </span>
+                        <span className="text-[10px] font-mono text-gray-400">
+                          {disease.category}
+                        </span>
+                      </div>
 
-                    <div>
-                      <h3 className="font-bold text-sm sm:text-base text-[#1D1D1F] group-hover:text-[#0071E3] transition-colors">
-                        {disease.name}
-                      </h3>
-                      <p className="text-xs text-gray-500 line-clamp-1 mt-0.5 font-normal">
-                        {disease.summary}
-                      </p>
-                    </div>
+                      <div>
+                        <h3 className="font-bold text-sm sm:text-base text-[#1D1D1F] group-hover:text-[#0071E3] transition-colors">
+                          {disease.name}
+                        </h3>
+                        <p className="text-xs text-gray-500 line-clamp-1 mt-0.5 font-normal">
+                          {disease.summary}
+                        </p>
+                      </div>
 
-                    <div className="flex items-center justify-between text-[10px] font-semibold text-gray-400 pt-1 border-t border-black/5">
-                      <span>{disease.tag}</span>
-                      <ChevronRight
-                        className={`w-3.5 h-3.5 transition-transform ${
-                          isSelected ? 'text-[#0071E3] translate-x-0.5' : 'text-gray-300'
-                        }`}
-                      />
-                    </div>
-                  </button>
+                      <div className="flex items-center justify-between text-[10px] font-semibold text-gray-400 pt-1 border-t border-black/5">
+                        <span>{disease.tag}</span>
+                        <ChevronRight
+                          className={`w-3.5 h-3.5 transition-transform ${
+                            isSelected ? 'text-[#0071E3] translate-x-0.5' : 'text-gray-300'
+                          }`}
+                        />
+                      </div>
+                    </button>
+                  </Interactive3DCard>
                 );
               })}
             </div>
@@ -356,31 +364,33 @@ export const DiseasesPage: React.FC<DiseasesPageProps> = ({ onNavigate }) => {
               </div>
 
               <div className="flex items-center gap-2">
-                <button
-                  onClick={() => setIsModalOpen(true)}
-                  className="bg-[#F5F5F7] hover:bg-[#EBEBEF] text-[#1D1D1F] px-4 py-2 rounded-full text-xs font-bold border border-black/5 flex items-center gap-1.5 transition-all cursor-pointer"
-                >
-                  <Maximize2 className="w-3.5 h-3.5" />
-                  <span>Full Staging Sheet</span>
-                </button>
+                <MagneticButton onClick={() => setIsModalOpen(true)}>
+                  <button
+                    className="bg-[#F5F5F7] hover:bg-[#EBEBEF] text-[#1D1D1F] px-4 py-2 rounded-full text-xs font-bold border border-black/5 flex items-center gap-1.5 transition-all cursor-pointer shadow-xs"
+                  >
+                    <Maximize2 className="w-3.5 h-3.5" />
+                    <span>Full Staging Sheet</span>
+                  </button>
+                </MagneticButton>
 
-                <button
-                  onClick={() => onNavigate('ask')}
-                  className="bg-[#0071E3] hover:bg-[#0077ED] active:scale-95 text-white px-4 py-2 rounded-full text-xs font-bold shadow-md shadow-[#0071E3]/20 flex items-center gap-1.5 transition-all cursor-pointer group"
-                >
-                  <Sparkles className="w-3.5 h-3.5" />
-                  <span>Diagnose with AI</span>
-                  <ArrowUpRight className="w-3.5 h-3.5 group-hover:translate-x-0.5 group-hover:-translate-y-0.5 transition-transform" />
-                </button>
+                <MagneticButton onClick={() => onNavigate('ask')}>
+                  <button
+                    className="bg-[#0071E3] hover:bg-[#0077ED] active:scale-95 text-white px-4 py-2 rounded-full text-xs font-bold shadow-md shadow-[#0071E3]/20 flex items-center gap-1.5 transition-all cursor-pointer group"
+                  >
+                    <Sparkles className="w-3.5 h-3.5" />
+                    <span>Diagnose with AI</span>
+                    <ArrowUpRight className="w-3.5 h-3.5 group-hover:translate-x-0.5 group-hover:-translate-y-0.5 transition-transform" />
+                  </button>
+                </MagneticButton>
               </div>
             </div>
 
-            {/* High-Resolution Case Clinical Reference Banner */}
+            {/* High-Resolution Case Clinical Reference Banner with B&W to Color Reveal */}
             <div className="relative rounded-2xl overflow-hidden border border-black/5 bg-[#1D1D1F] h-48 sm:h-60 group">
               <img
                 src={currentDisease.imageUrl}
                 alt={currentDisease.name}
-                className="w-full h-full object-cover opacity-85 group-hover:opacity-95 transition-opacity"
+                className="w-full h-full object-cover bw-reveal group-hover:scale-105 transition-all duration-700"
               />
               <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent pointer-events-none" />
               
@@ -394,7 +404,7 @@ export const DiseasesPage: React.FC<DiseasesPageProps> = ({ onNavigate }) => {
                   </h4>
                 </div>
 
-                <div className="bg-black/60 backdrop-blur-md px-3 py-1 rounded-full text-[10px] font-mono text-gray-300 border border-white/10 hidden sm:block">
+                <div className="liquid-glass px-3 py-1 rounded-full text-[10px] font-mono text-[#1D1D1F] font-semibold border border-white/40 hidden sm:block">
                   {currentDisease.referralCenter}
                 </div>
               </div>
@@ -560,32 +570,38 @@ export const DiseasesPage: React.FC<DiseasesPageProps> = ({ onNavigate }) => {
         </div>
 
         <div className="grid grid-cols-1 md:grid-cols-3 gap-5">
-          <div className="bg-white p-6 rounded-3xl border border-black/5 shadow-xs space-y-3">
-            <span className="text-xs font-mono font-bold text-[#0071E3] uppercase">MDT Completion Rate</span>
-            <div className="text-3xl font-black text-[#1D1D1F] font-mono">89.2%</div>
-            <div className="h-2 bg-gray-100 rounded-full overflow-hidden">
-              <div className="h-full bg-[#0071E3] rounded-full w-[89.2%]" />
+          <Interactive3DCard maxTilt={5}>
+            <div className="bg-white p-6 rounded-3xl border border-black/5 shadow-xs space-y-3 h-full">
+              <span className="text-xs font-mono font-bold text-[#0071E3] uppercase">MDT Completion Rate</span>
+              <div className="text-3xl font-black text-[#1D1D1F] font-mono">89.2%</div>
+              <div className="h-2 bg-gray-100 rounded-full overflow-hidden">
+                <div className="h-full bg-[#0071E3] rounded-full w-[89.2%]" />
+              </div>
+              <p className="text-[11px] text-gray-400 font-mono">Target: &gt; 85% Completion nationwide</p>
             </div>
-            <p className="text-[11px] text-gray-400 font-mono">Target: &gt; 85% Completion nationwide</p>
-          </div>
+          </Interactive3DCard>
 
-          <div className="bg-white p-6 rounded-3xl border border-black/5 shadow-xs space-y-3">
-            <span className="text-xs font-mono font-bold text-emerald-600 uppercase">Grade-2 Disability Prevention</span>
-            <div className="text-3xl font-black text-emerald-600 font-mono">&lt; 4.8%</div>
-            <div className="h-2 bg-gray-100 rounded-full overflow-hidden">
-              <div className="h-full bg-emerald-500 rounded-full w-[95%]" />
+          <Interactive3DCard maxTilt={5}>
+            <div className="bg-white p-6 rounded-3xl border border-black/5 shadow-xs space-y-3 h-full">
+              <span className="text-xs font-mono font-bold text-emerald-600 uppercase">Grade-2 Disability Prevention</span>
+              <div className="text-3xl font-black text-emerald-600 font-mono">&lt; 4.8%</div>
+              <div className="h-2 bg-gray-100 rounded-full overflow-hidden">
+                <div className="h-full bg-emerald-500 rounded-full w-[95%]" />
+              </div>
+              <p className="text-[11px] text-gray-400 font-mono">Target: &lt; 5.0% Deformity rate</p>
             </div>
-            <p className="text-[11px] text-gray-400 font-mono">Target: &lt; 5.0% Deformity rate</p>
-          </div>
+          </Interactive3DCard>
 
-          <div className="bg-white p-6 rounded-3xl border border-black/5 shadow-xs space-y-3">
-            <span className="text-xs font-mono font-bold text-purple-600 uppercase">IS2404 PCR Molecular Match</span>
-            <div className="text-3xl font-black text-purple-600 font-mono">78.5%</div>
-            <div className="h-2 bg-gray-100 rounded-full overflow-hidden">
-              <div className="h-full bg-purple-500 rounded-full w-[78.5%]" />
+          <Interactive3DCard maxTilt={5}>
+            <div className="bg-white p-6 rounded-3xl border border-black/5 shadow-xs space-y-3 h-full">
+              <span className="text-xs font-mono font-bold text-purple-600 uppercase">IS2404 PCR Molecular Match</span>
+              <div className="text-3xl font-black text-purple-600 font-mono">78.5%</div>
+              <div className="h-2 bg-gray-100 rounded-full overflow-hidden">
+                <div className="h-full bg-purple-500 rounded-full w-[78.5%]" />
+              </div>
+              <p className="text-[11px] text-gray-400 font-mono">Target: &gt; 70% Reference lab confirmation</p>
             </div>
-            <p className="text-[11px] text-gray-400 font-mono">Target: &gt; 70% Reference lab confirmation</p>
-          </div>
+          </Interactive3DCard>
         </div>
 
       </section>

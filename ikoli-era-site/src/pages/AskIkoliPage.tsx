@@ -6,6 +6,7 @@ import {
   type GeminiAttachment,
 } from '../services/geminiService';
 import { ClinicalMarkdown } from '../components/ui/ClinicalMarkdown';
+import { MagneticButton } from '../components/ui/MagneticButton';
 import {
   Sparkles,
   Plus,
@@ -614,13 +615,14 @@ export const AskIkoliPage: React.FC<AskIkoliPageProps> = ({ onNavigate }) => {
                   </button>
 
                   {/* Send Button */}
-                  <button
-                    onClick={() => handleSend(inputQuery)}
-                    disabled={!inputQuery.trim() && !attachedFile}
-                    className="w-9 h-9 rounded-full bg-[#0071E3] hover:bg-[#0077ED] text-white flex items-center justify-center transition-transform hover:scale-105 active:scale-95 disabled:opacity-30 disabled:cursor-not-allowed cursor-pointer shadow-md shadow-[#0071E3]/20"
-                  >
-                    <ArrowUp className="w-4 h-4 stroke-[2.5]" />
-                  </button>
+                  <MagneticButton onClick={() => handleSend(inputQuery)}>
+                    <button
+                      disabled={!inputQuery.trim() && !attachedFile}
+                      className="w-9 h-9 rounded-full bg-[#0071E3] hover:bg-[#0077ED] text-white flex items-center justify-center transition-transform hover:scale-105 active:scale-95 disabled:opacity-30 disabled:cursor-not-allowed cursor-pointer shadow-md shadow-[#0071E3]/20"
+                    >
+                      <ArrowUp className="w-4 h-4 stroke-[2.5]" />
+                    </button>
+                  </MagneticButton>
                 </div>
 
               </div>
@@ -629,7 +631,7 @@ export const AskIkoliPage: React.FC<AskIkoliPageProps> = ({ onNavigate }) => {
 
           </div>
 
-          {/* Quick Preset Diagnostic Suggestions */}
+          {/* Quick Preset Diagnostic Suggestions with Magnetic Buttons */}
           <div className="flex flex-wrap items-center justify-center gap-2 pt-1 text-xs">
             <span className={isDark ? 'text-gray-500' : 'text-gray-400'}>Suggested differentials:</span>
             {[
@@ -638,17 +640,17 @@ export const AskIkoliPage: React.FC<AskIkoliPageProps> = ({ onNavigate }) => {
               'Yaws Azithromycin dosing',
               'Mile 4 Lab PCR turnaround',
             ].map((p, idx) => (
-              <button
-                key={idx}
-                onClick={() => handleSend(p)}
-                className={`px-3 py-1 rounded-full border transition-all cursor-pointer ${
-                  isDark
-                    ? 'bg-white/5 border-white/10 text-gray-300 hover:bg-white/10 hover:text-white'
-                    : 'bg-white border-black/10 text-gray-700 hover:bg-gray-100 hover:text-black shadow-xs'
-                }`}
-              >
-                {p}
-              </button>
+              <MagneticButton key={idx} onClick={() => handleSend(p)}>
+                <button
+                  className={`px-3 py-1 rounded-full border transition-all cursor-pointer ${
+                    isDark
+                      ? 'bg-white/5 border-white/10 text-gray-300 hover:bg-white/10 hover:text-white'
+                      : 'bg-white border-black/10 text-gray-700 hover:bg-gray-100 hover:text-black shadow-xs'
+                  }`}
+                >
+                  {p}
+                </button>
+              </MagneticButton>
             ))}
           </div>
 

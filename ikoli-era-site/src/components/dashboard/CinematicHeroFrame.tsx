@@ -1,5 +1,6 @@
 import React, { useEffect, useRef, useState, useCallback } from 'react';
 import { ArrowUpRight, ChevronDown } from 'lucide-react';
+import { MagneticButton } from '../ui/MagneticButton';
 
 interface CinematicHeroFrameProps {
   onExplore?: () => void;
@@ -334,13 +335,14 @@ export const CinematicHeroFrame: React.FC<CinematicHeroFrameProps> = ({
               </p>
             </div>
 
-            <button
-              onClick={onExplore}
-              className="w-10 h-10 sm:w-12 sm:h-12 rounded-full bg-white text-[#1D1D1F] flex items-center justify-center shadow-lg hover:scale-105 active:scale-95 transition-all shrink-0 cursor-pointer group/btn"
-              aria-label="Explore diseases"
-            >
-              <ArrowUpRight className="w-5 h-5 stroke-[2.5] group-hover/btn:translate-x-0.5 group-hover/btn:-translate-y-0.5 transition-transform" />
-            </button>
+            <MagneticButton onClick={onExplore}>
+              <button
+                className="w-10 h-10 sm:w-12 sm:h-12 rounded-full bg-white text-[#1D1D1F] flex items-center justify-center shadow-lg hover:scale-105 active:scale-95 transition-all shrink-0 cursor-pointer group/btn"
+                aria-label="Explore diseases"
+              >
+                <ArrowUpRight className="w-5 h-5 stroke-[2.5] group-hover/btn:translate-x-0.5 group-hover/btn:-translate-y-0.5 transition-transform" />
+              </button>
+            </MagneticButton>
           </div>
 
           {/* Subtle Bottom Scroll Cue Indicator */}

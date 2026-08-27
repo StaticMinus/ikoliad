@@ -3,6 +3,7 @@ import { Navbar } from './Navbar';
 import { SplineScene } from './ui/splite';
 import { Spotlight } from './ui/spotlight';
 import { ArrowRight, Bot, Cpu, Eye, Radio } from 'lucide-react';
+import { MagneticButton } from './ui/MagneticButton';
 
 interface HeroSectionProps {
   currentPage?: 'home' | 'dashboard' | 'diseases' | 'ask' | 'about' | 'styles';
@@ -36,7 +37,7 @@ export const HeroSection: React.FC<HeroSectionProps> = ({
       <div className="relative max-w-7xl mx-auto px-4 sm:px-8 md:px-12 pt-2 pb-6 flex-1 flex flex-col justify-between w-full">
         
         {/* ── Floating Sentinel Network Badge (Responsive Position) ───── */}
-        <div className="self-center lg:self-auto lg:absolute lg:top-2 lg:right-12 z-30 bg-white/90 backdrop-blur-md p-2.5 sm:p-3 px-3.5 sm:px-4.5 rounded-2xl shadow-xl border border-white/80 flex items-center gap-3 hover:scale-105 transition-all duration-300 group mb-4 lg:mb-0">
+        <div className="self-center lg:self-auto lg:absolute lg:top-2 lg:right-12 z-30 liquid-glass p-2.5 sm:p-3 px-3.5 sm:px-4.5 rounded-2xl shadow-xl flex items-center gap-3 hover:scale-105 transition-all duration-300 group mb-4 lg:mb-0">
           {/* 4 Overlapping AI Cyber Sentinel Avatars */}
           <div className="flex -space-x-2 overflow-hidden">
             <div className="w-6 h-6 sm:w-7 sm:h-7 rounded-full bg-[#0A0C10] border-2 border-white flex items-center justify-center text-[#0082FF] shadow-xs group-hover:border-[#0082FF] transition-colors">
@@ -77,20 +78,22 @@ export const HeroSection: React.FC<HeroSectionProps> = ({
             </p>
 
             <div className="mt-6 sm:mt-7 flex flex-wrap items-center justify-center lg:justify-start gap-3 w-full sm:w-auto">
-              <button
-                onClick={() => onNavigate?.('ask')}
-                className="bg-[#0071E3] hover:bg-[#0077ED] active:scale-95 text-white px-6 sm:px-7 py-3 rounded-full text-xs sm:text-sm font-semibold tracking-tight inline-flex items-center gap-2 shadow-lg shadow-[#0071E3]/25 transition-all hover:scale-105 group cursor-pointer"
-              >
-                <span>Ask Ikoli AI</span>
-                <ArrowRight className="w-4 h-4 group-hover:translate-x-0.5 transition-transform" />
-              </button>
+              <MagneticButton onClick={() => onNavigate?.('ask')}>
+                <button
+                  className="bg-[#0071E3] hover:bg-[#0077ED] active:scale-95 text-white px-6 sm:px-7 py-3 rounded-full text-xs sm:text-sm font-semibold tracking-tight inline-flex items-center gap-2 shadow-lg shadow-[#0071E3]/25 transition-all hover:scale-105 group cursor-pointer"
+                >
+                  <span>Ask Ikoli AI</span>
+                  <ArrowRight className="w-4 h-4 group-hover:translate-x-0.5 transition-transform" />
+                </button>
+              </MagneticButton>
 
-              <button
-                onClick={() => onNavigate?.('dashboard')}
-                className="bg-white/90 hover:bg-white active:scale-95 text-[#1D1D1F] px-6 sm:px-7 py-3 rounded-full text-xs sm:text-sm font-semibold tracking-tight border border-black/10 hover:border-black/20 shadow-sm hover:shadow-md transition-all cursor-pointer"
-              >
-                <span>Explore Dashboard</span>
-              </button>
+              <MagneticButton onClick={() => onNavigate?.('dashboard')}>
+                <button
+                  className="bg-white/90 hover:bg-white active:scale-95 text-[#1D1D1F] px-6 sm:px-7 py-3 rounded-full text-xs sm:text-sm font-semibold tracking-tight border border-black/10 hover:border-black/20 shadow-sm hover:shadow-md transition-all cursor-pointer"
+                >
+                  <span>Explore Dashboard</span>
+                </button>
+              </MagneticButton>
             </div>
           </div>
 

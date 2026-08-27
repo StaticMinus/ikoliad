@@ -1,6 +1,7 @@
 import React, { useRef } from 'react';
 import { motion, useScroll, useTransform } from 'framer-motion';
 import { BlobVideo } from './ui/BlobVideo';
+import { Interactive3DCard } from './ui/Interactive3DCard';
 
 const STATEMENT = "An intelligent multimodal AI engine that detects, verifies, and stages. Automating anomaly detection, differential screening, and national reporting with zero patient data exposure.";
 
@@ -13,7 +14,7 @@ const WordReveal: React.FC<{
   const color = useTransform(
     progress,
     range,
-    ['rgba(10, 12, 16, 0.22)', 'rgba(10, 12, 16, 1)']
+    ['rgba(29, 29, 31, 0.22)', 'rgba(29, 29, 31, 1)']
   );
 
   return (
@@ -40,36 +41,43 @@ export const SpotlightMetrics: React.FC = () => {
     <section
       id="surveillance"
       ref={containerRef}
-      className="w-full bg-white py-16 sm:py-24 px-4 sm:px-8 md:px-12 border-b border-gray-100 selection:bg-[#0082FF] selection:text-white"
+      className="w-full bg-[#FBFBFD] py-16 sm:py-24 px-4 sm:px-8 md:px-12 border-b border-black/5 selection:bg-[#0071E3] selection:text-white"
     >
       <div className="max-w-6xl mx-auto flex flex-col lg:flex-row items-center justify-between gap-10 lg:gap-16">
         
-        {/* Left Column: Rounded Clinical Profile Video Card (Clean, Pill Removed) */}
+        {/* Left Column: Rounded Clinical Profile Video Card (Clean 3D Card) */}
         <div className="w-full lg:w-5/12 flex justify-center">
-          <div className="relative w-full max-w-[420px] aspect-[4/3] rounded-[24px] sm:rounded-[32px] overflow-hidden shadow-2xl border border-gray-100 group bg-black">
-            <BlobVideo
-              autoPlay
-              loop
-              muted
-              playsInline
-              src="/assets/lady-removing-glasses.mp4"
-              className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700"
-            />
-            <div className="absolute inset-0 bg-gradient-to-t from-black/50 via-transparent to-transparent opacity-50 pointer-events-none" />
-          </div>
+          <Interactive3DCard maxTilt={8} className="w-full max-w-[420px]">
+            <div className="relative w-full aspect-[4/3] rounded-[28px] sm:rounded-[32px] overflow-hidden shadow-2xl border border-black/5 group bg-black">
+              <BlobVideo
+                autoPlay
+                loop
+                muted
+                playsInline
+                src="/assets/lady-removing-glasses.mp4"
+                className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700 bw-reveal"
+              />
+              <div className="absolute inset-0 bg-gradient-to-t from-black/50 via-transparent to-transparent opacity-50 pointer-events-none" />
+              
+              <div className="absolute top-4 left-4 liquid-glass px-3 py-1 rounded-full text-[10px] font-mono font-bold text-[#1D1D1F] flex items-center gap-1.5 shadow-xs">
+                <span className="w-1.5 h-1.5 rounded-full bg-[#0071E3] animate-ping" />
+                <span>Clinical Telemetry</span>
+              </div>
+            </div>
+          </Interactive3DCard>
         </div>
 
         {/* Right Column: Interactive Scroll-Reveal Headline & 3 Metrics Columns */}
         <div className="w-full lg:w-7/12 space-y-8 sm:space-y-10 text-left">
           
           <div className="space-y-3 sm:space-y-4">
-            <div className="flex items-center gap-2 font-mono text-xs text-[#0082FF] font-bold uppercase tracking-widest">
-              <span className="w-2 h-2 rounded-full bg-[#0082FF] animate-ping" />
+            <div className="flex items-center gap-2 font-mono text-xs text-[#0071E3] font-bold uppercase tracking-widest">
+              <span className="w-2 h-2 rounded-full bg-[#0071E3] animate-ping" />
               <span>MULTIMODAL INTELLIGENCE • IKOLI AI</span>
             </div>
 
             {/* Scroll-Driven Dynamic Word-by-Word Text Reveal */}
-            <h2 className="font-sans font-medium text-xl sm:text-2xl md:text-[32px] lg:text-[36px] leading-[1.3] tracking-tight">
+            <h2 className="font-display font-medium text-xl sm:text-2xl md:text-[32px] lg:text-[36px] leading-[1.3] tracking-tight text-[#1D1D1F]">
               {words.map((word, i) => {
                 const start = i / words.length;
                 const end = start + 1 / words.length;
@@ -86,37 +94,43 @@ export const SpotlightMetrics: React.FC = () => {
           </div>
 
           {/* 3 Metrics Columns (Stacked on mobile, 3-col on sm+) */}
-          <div className="grid grid-cols-1 sm:grid-cols-3 gap-6 sm:gap-4 pt-6 border-t border-gray-100">
+          <div className="grid grid-cols-1 sm:grid-cols-3 gap-6 sm:gap-4 pt-6 border-t border-black/5">
             
             {/* Metric 1 */}
-            <div className="group cursor-pointer">
-              <span className="font-display font-extrabold text-3xl sm:text-4xl lg:text-5xl text-[#0A0C10] block tracking-tight group-hover:text-[#0082FF] transition-colors">
-                89.2%
-              </span>
-              <span className="text-xs text-gray-500 font-semibold font-sans mt-1 sm:mt-2 block">
-                MDT Treatment Cure Rate
-              </span>
-            </div>
+            <Interactive3DCard maxTilt={6}>
+              <div className="p-4 rounded-2xl bg-white border border-black/5 shadow-xs group cursor-pointer hover:shadow-md transition-all">
+                <span className="font-display font-extrabold text-3xl sm:text-4xl text-[#1D1D1F] block tracking-tight group-hover:text-[#0071E3] transition-colors">
+                  89.2%
+                </span>
+                <span className="text-xs text-gray-500 font-semibold font-sans mt-1 block">
+                  MDT Treatment Cure Rate
+                </span>
+              </div>
+            </Interactive3DCard>
 
             {/* Metric 2 */}
-            <div className="group cursor-pointer">
-              <span className="font-display font-extrabold text-3xl sm:text-4xl lg:text-5xl text-[#0082FF] block tracking-tight">
-                &lt; 5%
-              </span>
-              <span className="text-xs text-gray-500 font-semibold font-sans mt-1 sm:mt-2 block">
-                Disability Target (G2D)
-              </span>
-            </div>
+            <Interactive3DCard maxTilt={6}>
+              <div className="p-4 rounded-2xl bg-white border border-black/5 shadow-xs group cursor-pointer hover:shadow-md transition-all">
+                <span className="font-display font-extrabold text-3xl sm:text-4xl text-emerald-600 block tracking-tight">
+                  &lt; 4.8%
+                </span>
+                <span className="text-xs text-gray-500 font-semibold font-sans mt-1 block">
+                  Disability Target (G2D)
+                </span>
+              </div>
+            </Interactive3DCard>
 
             {/* Metric 3 */}
-            <div className="group cursor-pointer">
-              <span className="font-display font-extrabold text-3xl sm:text-4xl lg:text-5xl text-[#0A0C10] block tracking-tight group-hover:text-[#0082FF] transition-colors">
-                78.5%
-              </span>
-              <span className="text-xs text-gray-500 font-semibold font-sans mt-1 sm:mt-2 block">
-                PCR Laboratory Confirmed
-              </span>
-            </div>
+            <Interactive3DCard maxTilt={6}>
+              <div className="p-4 rounded-2xl bg-white border border-black/5 shadow-xs group cursor-pointer hover:shadow-md transition-all">
+                <span className="font-display font-extrabold text-3xl sm:text-4xl text-purple-600 block tracking-tight">
+                  78.5%
+                </span>
+                <span className="text-xs text-gray-500 font-semibold font-sans mt-1 block">
+                  IS2404 PCR Match
+                </span>
+              </div>
+            </Interactive3DCard>
 
           </div>
 
