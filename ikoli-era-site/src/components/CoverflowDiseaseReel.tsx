@@ -100,18 +100,8 @@ export const CoverflowDiseaseReel: React.FC<CoverflowDiseaseReelProps> = ({
 
                 <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent pointer-events-none" />
 
-                {/* Badges */}
-                <div className="absolute top-4 inset-x-4 flex items-center justify-between z-20">
-                  <span className="px-3 py-1 rounded-full text-[10px] font-mono font-bold text-white shadow-xs backdrop-blur-md bg-black/60 border border-white/20">
-                    {d.category}
-                  </span>
-                  <span className="bg-white/95 backdrop-blur-md px-2.5 py-1 rounded-full text-[10px] font-mono font-bold text-[#1D1D1F] border border-black/5 shadow-xs">
-                    {d.casesPill}
-                  </span>
-                </div>
-
                 <div className="absolute bottom-4 left-4 right-4 text-white z-20">
-                  <span className="text-[10px] font-mono font-bold text-blue-200 uppercase tracking-wider block">
+                  <span className="text-[10px] font-mono font-bold text-blue-200 uppercase tracking-wider block mb-0.5">
                     {d.code}
                   </span>
                   <h3 className="font-bold text-base sm:text-lg text-white leading-tight">

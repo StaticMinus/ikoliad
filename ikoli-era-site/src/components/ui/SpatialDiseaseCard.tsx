@@ -25,7 +25,6 @@ export const SpatialDiseaseCard: React.FC<SpatialDiseaseCardProps> = ({ disease,
   const [rotateX, setRotateX] = useState(0);
   const [rotateY, setRotateY] = useState(0);
   const [glarePos, setGlarePos] = useState({ x: 50, y: 50, opacity: 0 });
-  const [isHovered, setIsHovered] = useState(false);
 
   const handleMouseMove = (e: React.MouseEvent<HTMLDivElement>) => {
     if (!cardRef.current) return;
@@ -47,12 +46,7 @@ export const SpatialDiseaseCard: React.FC<SpatialDiseaseCardProps> = ({ disease,
     });
   };
 
-  const handleMouseEnter = () => {
-    setIsHovered(true);
-  };
-
   const handleMouseLeave = () => {
-    setIsHovered(false);
     setRotateX(0);
     setRotateY(0);
     setGlarePos((prev) => ({ ...prev, opacity: 0 }));
@@ -62,7 +56,6 @@ export const SpatialDiseaseCard: React.FC<SpatialDiseaseCardProps> = ({ disease,
     <motion.div
       ref={cardRef}
       onMouseMove={handleMouseMove}
-      onMouseEnter={handleMouseEnter}
       onMouseLeave={handleMouseLeave}
       onClick={onClick}
       style={{
@@ -79,7 +72,7 @@ export const SpatialDiseaseCard: React.FC<SpatialDiseaseCardProps> = ({ disease,
         }}
       />
 
-      {/* ── Top Image Banner with Micro-Scanner HUD ───────────────────────── */}
+      {/* ── Top Image Banner ────────────────────────────────────────────── */}
       <div className="relative w-full h-48 sm:h-52 overflow-hidden bg-gray-100">
         <img
           src={disease.image}
@@ -87,30 +80,11 @@ export const SpatialDiseaseCard: React.FC<SpatialDiseaseCardProps> = ({ disease,
           className="w-full h-full object-cover group-hover:scale-108 transition-transform duration-700 ease-out"
         />
 
-        <div className="absolute inset-0 bg-gradient-to-t from-black/75 via-black/20 to-transparent pointer-events-none" />
-
-        {/* Top Badges */}
-        <div className="absolute top-3.5 inset-x-3.5 flex items-center justify-between gap-2 z-20">
-          <span className="px-3 py-1 rounded-full text-[10px] font-mono font-bold text-white shadow-xs backdrop-blur-md bg-black/60 border border-white/20 flex items-center gap-1.5">
-            <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse" />
-            <span>{disease.category}</span>
-          </span>
-          <span className="bg-white/95 backdrop-blur-md px-2.5 py-1 rounded-full text-[10px] font-mono font-bold text-[#1D1D1F] border border-black/5 shadow-xs">
-            {disease.casesPill}
-          </span>
-        </div>
-
-        {/* Optical Scanning Corner Brackets on Hover */}
-        <div className={`transition-opacity duration-300 pointer-events-none ${isHovered ? 'opacity-100' : 'opacity-40'}`}>
-          <div className="absolute top-3 left-3 w-2.5 h-2.5 border-t-2 border-white" />
-          <div className="absolute top-3 right-3 w-2.5 h-2.5 border-t-2 border-r-2 border-white" />
-          <div className="absolute bottom-3 left-3 w-2.5 h-2.5 border-b-2 border-l-2 border-white" />
-          <div className="absolute bottom-3 right-3 w-2.5 h-2.5 border-b-2 border-r-2 border-white" />
-        </div>
+        <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent pointer-events-none" />
 
         {/* Bottom Text Over Image */}
-        <div className="absolute bottom-3 left-3.5 right-3.5 text-white z-20">
-          <span className="text-[10px] font-mono font-bold text-gray-300 uppercase tracking-wider block">
+        <div className="absolute bottom-3.5 left-4 right-4 text-white z-20">
+          <span className="text-[10px] font-mono font-bold text-blue-200 uppercase tracking-wider block mb-0.5">
             {disease.code}
           </span>
           <h3 className="font-bold text-base sm:text-lg text-white leading-tight drop-shadow-sm transition-colors">

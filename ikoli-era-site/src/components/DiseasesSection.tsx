@@ -149,12 +149,6 @@ export const DiseasesSection: React.FC<DiseasesSectionProps> = ({ onOpenDiseases
                         <Plus className="w-5 h-5 stroke-[2.5]" />
                       </div>
                     </div>
-
-                    {/* 4 L-Shaped Corner Brackets */}
-                    <div className="absolute top-3 left-3 w-2.5 h-2.5 border-t-2 border-l-2 border-white pointer-events-none opacity-80 z-20" />
-                    <div className="absolute top-3 right-3 w-2.5 h-2.5 border-t-2 border-r-2 border-white pointer-events-none opacity-80 z-20" />
-                    <div className="absolute bottom-3 left-3 w-2.5 h-3 border-b-2 border-l-2 border-white pointer-events-none opacity-80 z-20" />
-                    <div className="absolute bottom-3 right-3 w-2.5 h-2.5 border-b-2 border-r-2 border-white pointer-events-none opacity-80 z-20" />
                   </div>
 
                   {/* Title */}
