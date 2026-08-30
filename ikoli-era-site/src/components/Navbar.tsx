@@ -375,19 +375,19 @@ export const Navbar: React.FC<NavbarProps> = ({
                 </div>
               </div>
 
-              {/* ── 2. Bottom Row: Single Grand Realistic Photographic Card (Clean No Text) ── */}
+              {/* ── 2. Bottom Row: Single Grand Landscape Portrait of Distinguished Black Leader ── */}
               <div
                 onClick={() => handleNavClick('about')}
-                className="relative w-full aspect-[16/6] sm:aspect-[21/7] rounded-[28px] sm:rounded-[32px] overflow-hidden bg-gray-900 shadow-lg group cursor-pointer"
+                className="relative w-full aspect-[16/6] sm:aspect-[21/8] min-h-[220px] sm:min-h-[280px] rounded-[28px] sm:rounded-[32px] overflow-hidden bg-gray-900 shadow-lg group cursor-pointer"
               >
                 <img
-                  src="/media/about_contact_creative_color.jpg"
-                  alt="IKOLI Sovereign Healthcare AI Consortium"
-                  className="absolute inset-0 w-full h-full object-cover group-hover:scale-104 transition-transform duration-700 ease-out"
+                  src="/media/lead_clinician_hero.jpg"
+                  alt="Distinguished Nigerian Clinical Leader"
+                  className="absolute inset-0 w-full h-full object-cover object-[center_20%] group-hover:scale-104 transition-transform duration-700 ease-out"
                 />
                 
                 {/* Floating White Circular Arrow Button in Bottom Right */}
-                <div className="absolute bottom-5 sm:bottom-7 right-6 sm:right-10 flex items-center">
+                <div className="absolute bottom-5 sm:bottom-7 right-6 sm:right-10 flex items-center z-10">
                   <div className="w-11 h-11 sm:w-13 sm:h-13 rounded-full bg-white text-black shadow-xl flex items-center justify-center shrink-0 group-hover:scale-110 transition-transform duration-200">
                     <ArrowRight className="w-5 h-5 stroke-[2.5] text-black" />
                   </div>
