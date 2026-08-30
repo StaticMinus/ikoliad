@@ -13,7 +13,7 @@ import {
 } from 'lucide-react';
 
 interface AboutPageProps {
-  onNavigate: (page: 'home' | 'dashboard' | 'diseases' | 'ask' | 'about' | 'styles' | 'api') => void;
+  onNavigate: (page: any) => void;
 }
 
 export const AboutPage: React.FC<AboutPageProps> = ({ onNavigate }) => {
@@ -129,85 +129,87 @@ export const AboutPage: React.FC<AboutPageProps> = ({ onNavigate }) => {
   ];
 
   return (
-    <div className="w-full bg-[#FFFFFF] text-[#1D1D1F] min-h-screen font-sans selection:bg-[#0071E3] selection:text-white pb-16">
+    <div className="w-full bg-[#FFFFFF] text-[#1D1D1F] min-h-screen font-sans selection:bg-[#0071E3] selection:text-white">
       
       {/* ── Fixed Universal Floating Navbar ──────────────────────────────── */}
       <Navbar currentPage="about" onNavigate={onNavigate} />
 
       {/* ══════════════════════════════════════════════════════════════════════
-          1. DARK EDITORIAL CINEMATIC HERO (Matching Alina Kovaleva Hero)
+          1. FULL-WIDTH EDGE-TO-EDGE CINEMATIC EDITORIAL HERO (No Container)
       ══════════════════════════════════════════════════════════════════════ */}
-      <section className="w-full bg-[#0E0F11] text-white pt-32 sm:pt-36 pb-16 sm:pb-20 relative overflow-hidden select-none border-b border-white/10">
+      <section className="relative w-full min-h-[85vh] sm:min-h-[92vh] flex items-center justify-center overflow-hidden bg-[#0A0B0D] text-white select-none border-b border-black/10">
         
-        {/* Subtle Ambient Glow */}
-        <div className="absolute top-1/4 left-1/2 -translate-x-1/2 w-[600px] h-[300px] bg-[#0071E3]/15 blur-[140px] rounded-full pointer-events-none" />
+        {/* Full-Bleed Archival Portrait Background */}
+        <img
+          src="/media/community-elder-portrait.jpg"
+          alt="Ikoli Harcourt Whyte (1905–1977)"
+          className="absolute inset-0 w-full h-full object-cover object-top filter grayscale contrast-125 opacity-80"
+        />
+        
+        {/* Cinematic Layered Vignettes & Gradients */}
+        <div className="absolute inset-0 bg-gradient-to-t from-black via-black/40 to-black/70" />
+        <div className="absolute inset-0 bg-gradient-to-r from-black/80 via-transparent to-black/80" />
+        <div className="absolute top-1/3 left-1/2 -translate-x-1/2 w-[700px] h-[350px] bg-[#0071E3]/15 blur-[160px] rounded-full pointer-events-none" />
 
-        <div className="max-w-[1240px] mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
+        {/* Edge-to-Edge Content Grid */}
+        <div className="relative z-10 w-full max-w-7xl mx-auto px-6 sm:px-12 lg:px-16 pt-36 pb-20 flex flex-col justify-between min-h-[85vh] sm:min-h-[92vh]">
           
-          {/* Main Hero Photographic Card */}
-          <div className="relative rounded-[36px] overflow-hidden bg-[#16171A] border border-white/10 shadow-2xl min-h-[540px] sm:min-h-[660px] flex items-center justify-center">
-            
-            {/* High-Contrast Archival Portrait */}
-            <img
-              src="/media/community-elder-portrait.jpg"
-              alt="Ikoli Harcourt Whyte (1905–1977)"
-              className="absolute inset-0 w-full h-full object-cover object-top filter grayscale contrast-125 opacity-85"
-            />
-            
-            {/* Vignette & Gradients */}
-            <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/35 to-black/60" />
-            <div className="absolute inset-0 bg-gradient-to-r from-black/75 via-transparent to-black/75" />
+          {/* Top Left Quote Manifesto */}
+          <div className="max-w-md text-left space-y-2">
+            <span className="text-[11px] font-mono tracking-widest uppercase text-[#0071E3] font-bold block">
+              Historical Inspiration &bull; 1905–1977
+            </span>
+            <p className="text-sm sm:text-base text-gray-200 font-light leading-relaxed">
+              "I want every hymn and every clinical discovery to bring dignified life and zero suffering to our people."
+            </p>
+            <span className="text-xs font-serif italic text-gray-400 block">
+              — Ikoli Harcourt Whyte
+            </span>
+          </div>
 
-            {/* Top Left Quote Manifesto (Matching Attached Screenshot) */}
-            <div className="absolute top-8 sm:top-12 left-6 sm:left-12 z-20 max-w-sm text-left">
-              <span className="text-[10px] font-mono tracking-widest uppercase text-[#0071E3] font-bold block mb-1">
-                Historical Inspiration &bull; 1905–1977
-              </span>
-              <p className="text-xs sm:text-sm text-gray-300 font-light leading-relaxed">
-                "I want every hymn and every clinical discovery to bring dignified life and zero suffering to our people."
-              </p>
-              <span className="text-[10px] font-serif italic text-gray-400 block mt-1">
-                — Ikoli Harcourt Whyte
+          {/* Center Dynamic Choral Audio / Narrative Play Pill */}
+          <div className="my-auto py-12 flex flex-col items-center justify-center gap-4 text-center">
+            <button
+              onClick={toggleHymnAudio}
+              className={`w-20 h-20 sm:w-24 sm:h-24 rounded-full backdrop-blur-xl border flex items-center justify-center shadow-2xl transition-all duration-300 cursor-pointer active:scale-95 ${
+                isPlayingHymn
+                  ? 'bg-[#0071E3] text-white border-[#0071E3] scale-105 shadow-[0_0_50px_rgba(0,113,227,0.5)]'
+                  : 'bg-white/20 hover:bg-white/30 text-white border-white/30 hover:scale-105'
+              }`}
+              title="Play Choral Hymnody of Ikoli Harcourt Whyte"
+            >
+              {isPlayingHymn ? (
+                <Pause className="w-8 h-8 sm:w-9 sm:h-9 fill-current text-white" />
+              ) : (
+                <Play className="w-8 h-8 sm:w-9 sm:h-9 fill-current translate-x-0.5 text-white" />
+              )}
+            </button>
+            
+            <div className="flex items-center gap-2 bg-black/60 px-4 py-1.5 rounded-full border border-white/15 backdrop-blur-md">
+              <Music className="w-4 h-4 text-[#0071E3]" />
+              <span className="text-xs font-mono tracking-wider uppercase text-white/90 font-bold">
+                {isPlayingHymn ? 'Playing "Atula Egwu" Sacred Suite' : 'Play Choral Hymns'}
               </span>
             </div>
+          </div>
 
-            {/* Center Dynamic Choral Audio / Narrative Play Pill */}
-            <div className="relative z-30 flex flex-col items-center gap-3">
-              <button
-                onClick={toggleHymnAudio}
-                className={`w-16 h-16 sm:w-20 sm:h-20 rounded-full backdrop-blur-xl border flex items-center justify-center shadow-2xl transition-all duration-300 cursor-pointer active:scale-95 ${
-                  isPlayingHymn
-                    ? 'bg-[#0071E3] text-white border-[#0071E3] scale-105'
-                    : 'bg-white/20 hover:bg-white/30 text-white border-white/30'
-                }`}
-                title="Play Choral Hymnody of Ikoli Harcourt Whyte"
-              >
-                {isPlayingHymn ? (
-                  <Pause className="w-6 h-6 sm:w-7 sm:h-7 fill-current text-white" />
-                ) : (
-                  <Play className="w-6 h-6 sm:w-7 sm:h-7 fill-current translate-x-0.5 text-white" />
-                )}
-              </button>
-              
-              <div className="flex items-center gap-2 bg-black/50 px-3.5 py-1 rounded-full border border-white/10 backdrop-blur-md">
-                <Music className="w-3.5 h-3.5 text-[#0071E3]" />
-                <span className="text-[11px] font-mono tracking-wider uppercase text-white/90 font-bold">
-                  {isPlayingHymn ? 'Playing "Atula Egwu" Suite' : 'Play Choral Hymns'}
-                </span>
-              </div>
-            </div>
-
-            {/* Right Large Bold Condensed Typography (Matching Attached Screenshot) */}
-            <div className="absolute bottom-8 sm:bottom-12 right-6 sm:right-12 z-20 text-right">
-              <span className="text-[11px] font-mono font-bold tracking-widest text-[#0071E3] uppercase block mb-1">
+          {/* Bottom Row: Eyebrow + Bold Display Name */}
+          <div className="flex flex-col sm:flex-row items-start sm:items-end justify-between gap-4 pt-8 border-t border-white/10">
+            <div className="text-left">
+              <span className="text-xs font-mono font-bold tracking-widest text-[#0071E3] uppercase block mb-1">
                 Father of Igbo Church Music
               </span>
-              <h1 className="font-display font-black text-3xl sm:text-5xl md:text-6xl tracking-tight text-white leading-none">
+              <span className="text-xs text-gray-400 font-medium block">
+                Composer &bull; Humanitarian &bull; Uzuakoli Sanctuary
+              </span>
+            </div>
+
+            <div className="text-left sm:text-right">
+              <h1 className="font-display font-black text-4xl sm:text-6xl md:text-7xl tracking-tight text-white leading-none">
                 IKOLI<br />
                 <span className="text-gray-300">HARCOURT WHYTE</span>
               </h1>
             </div>
-
           </div>
 
         </div>
@@ -215,23 +217,23 @@ export const AboutPage: React.FC<AboutPageProps> = ({ onNavigate }) => {
       </section>
 
       {/* ── Main Editorial Content Wrapper ───────────────────────────────── */}
-      <main className="max-w-[1240px] mx-auto px-4 sm:px-6 lg:px-8 space-y-20 sm:space-y-28 pt-16 sm:pt-24 text-left">
+      <main className="max-w-7xl mx-auto px-5 sm:px-10 md:px-16 space-y-24 sm:space-y-32 pt-20 sm:pt-28 text-left">
         
         {/* ══════════════════════════════════════════════════════════════════════
-            2. SECTION: "ABOUT IKOLI / ОБО МНЕ" (Editorial Split Bento Grid)
+            2. SECTION: "ABOUT IKOLI HARCOURT WHYTE" (Editorial Split Bento Grid)
         ══════════════════════════════════════════════════════════════════════ */}
         <section className="space-y-8">
           
           <div className="flex flex-col sm:flex-row sm:items-baseline justify-between gap-2 border-b border-black/5 pb-4">
             <h2 className="font-display font-black text-2xl sm:text-3xl tracking-tight text-[#1D1D1F] uppercase">
-              ABOUT IKOLI HARCOURT WHYTE &bull; ОБО МНЕ
+              ABOUT IKOLI HARCOURT WHYTE &bull; HISTORICAL BIOGRAPHY
             </h2>
             <span className="text-xs font-mono text-gray-400 font-semibold tracking-wider">
               Wikipedia Standard &bull; Historical Biography
             </span>
           </div>
 
-          {/* 3-Column Bento Grid Matching Attached Layout */}
+          {/* 3-Column Bento Grid */}
           <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 items-stretch">
             
             {/* Left Box: Gray Card with Biographical Overview (Span 4) */}
@@ -325,13 +327,13 @@ export const AboutPage: React.FC<AboutPageProps> = ({ onNavigate }) => {
         </section>
 
         {/* ══════════════════════════════════════════════════════════════════════
-            3. SECTION: "HISTORICAL WORKS & ARCHIVE / МОЕ ПОРТФОЛИО"
+            3. SECTION: "HISTORICAL WORKS & ARCHIVE"
         ══════════════════════════════════════════════════════════════════════ */}
         <section className="space-y-8">
           
           <div className="flex flex-col sm:flex-row sm:items-baseline justify-between gap-2 border-b border-black/5 pb-4">
             <h2 className="font-display font-black text-2xl sm:text-3xl tracking-tight text-[#1D1D1F] uppercase">
-              HISTORICAL ARCHIVE &amp; HYMNODY &bull; МОЕ ПОРТФОЛИО
+              HISTORICAL ARCHIVE &amp; HYMNODY &bull; SACRED WORKS
             </h2>
             <span className="text-xs font-mono text-gray-400 font-semibold tracking-wider">
               06 Historical Milestones
@@ -420,7 +422,7 @@ export const AboutPage: React.FC<AboutPageProps> = ({ onNavigate }) => {
                 <Volume2 className="w-5 h-5" />
               </div>
               <span className="text-xs font-mono font-bold tracking-wider uppercase text-gray-400 group-hover:text-white block">
-                МОИ РАБОТЫ
+                SACRED CHORAL HYMNS
               </span>
               <span className="font-bold text-sm text-white block mt-1">
                 {isPlayingHymn ? 'Stop Choral Audio' : 'Play "Atula Egwu"'}
@@ -452,20 +454,20 @@ export const AboutPage: React.FC<AboutPageProps> = ({ onNavigate }) => {
         </section>
 
         {/* ══════════════════════════════════════════════════════════════════════
-            4. SECTION: "CHRONOLOGY & MILESTONES / ЭТАПЫ РАБОТЫ"
+            4. SECTION: "CHRONOLOGY & MILESTONES"
         ══════════════════════════════════════════════════════════════════════ */}
         <section className="space-y-8">
           
           <div className="flex flex-col sm:flex-row sm:items-baseline justify-between gap-2 border-b border-black/5 pb-4">
             <h2 className="font-display font-black text-2xl sm:text-3xl tracking-tight text-[#1D1D1F] uppercase">
-              LIFE CHRONOLOGY &bull; ЭТАПЫ РАБОТЫ
+              LIFE CHRONOLOGY &bull; 1905 TO 2026
             </h2>
             <span className="text-xs font-mono text-gray-400 font-semibold tracking-wider">
               1905 &ndash; 2026 Historical Arc
             </span>
           </div>
 
-          {/* 4 Numbered Horizontal Rows (Matching Attached Screenshot) */}
+          {/* 4 Numbered Horizontal Rows */}
           <div className="divide-y divide-black/10 border-y border-black/10">
             {chronologyMilestones.map((stage) => (
               <div
@@ -498,7 +500,7 @@ export const AboutPage: React.FC<AboutPageProps> = ({ onNavigate }) => {
         </section>
 
         {/* ══════════════════════════════════════════════════════════════════════
-            5. SECTION: "4-IMAGE HISTORICAL GALLERY / ФОТОГРАФИИ"
+            5. SECTION: "4-IMAGE HISTORICAL GALLERY"
         ══════════════════════════════════════════════════════════════════════ */}
         <section className="space-y-8">
           
@@ -527,13 +529,13 @@ export const AboutPage: React.FC<AboutPageProps> = ({ onNavigate }) => {
         </section>
 
         {/* ══════════════════════════════════════════════════════════════════════
-            6. SECTION: "PANORAMIC BANNER / @IKOLI_HARCOURT_WHYTE"
+            6. SECTION: "PANORAMIC BANNER / SACRED CHORAL HERITAGE"
         ══════════════════════════════════════════════════════════════════════ */}
         <section className="space-y-6">
           
           <div className="flex items-center justify-between">
             <h3 className="font-display font-black text-xl sm:text-2xl text-[#1D1D1F] tracking-tight uppercase">
-              @IKOLI_WHYTE &bull; SACRED CHORAL HERITAGE
+              SACRED CHORAL HERITAGE &bull; UZUAKOLI HYMNS
             </h3>
             <span className="text-xs font-mono text-gray-400 font-semibold">
               Uzuakoli &bull; Abia State &bull; Nigeria
@@ -565,13 +567,13 @@ export const AboutPage: React.FC<AboutPageProps> = ({ onNavigate }) => {
         </section>
 
         {/* ══════════════════════════════════════════════════════════════════════
-            7. SECTION: "LEGACY & CONSORTIUM CONTACT / КОНТАКТЫ"
+            7. SECTION: "LEGACY & CONSORTIUM CONTACT"
         ══════════════════════════════════════════════════════════════════════ */}
         <section className="space-y-8">
           
           <div className="flex flex-col sm:flex-row sm:items-baseline justify-between gap-2 border-b border-black/5 pb-4">
             <h2 className="font-display font-black text-2xl sm:text-3xl tracking-tight text-[#1D1D1F] uppercase">
-              LEGACY &amp; DEPLOYMENT &bull; КОНТАКТЫ
+              LEGACY &amp; DEPLOYMENT &bull; CONSORTIUM LIAISON
             </h2>
             <span className="text-xs font-mono text-gray-400 font-semibold tracking-wider">
               RedAid Nigeria &bull; DAHW &bull; FMOH
@@ -667,20 +669,17 @@ export const AboutPage: React.FC<AboutPageProps> = ({ onNavigate }) => {
 
         </section>
 
-      </main>
-
-      {/* ══════════════════════════════════════════════════════════════════════
-          8. SECTION: BOTTOM HIGH-CONTRAST BAR (СВЯЖИТЕСЬ СО МНОЙ)
-      ══════════════════════════════════════════════════════════════════════ */}
-      <div className="max-w-[1240px] mx-auto px-4 sm:px-6 lg:px-8 mt-20">
-        <div className="bg-[#0E0F11] rounded-[32px] p-6 sm:p-8 text-white flex flex-col sm:flex-row items-center justify-between gap-6 border border-white/10 shadow-2xl">
+        {/* ══════════════════════════════════════════════════════════════════════
+            8. SECTION: BOTTOM HIGH-CONTRAST BAR
+        ══════════════════════════════════════════════════════════════════════ */}
+        <section className="bg-[#0E0F11] rounded-[32px] p-6 sm:p-8 text-white flex flex-col sm:flex-row items-center justify-between gap-6 border border-white/10 shadow-2xl">
           <div className="flex items-center gap-3">
             <div className="w-10 h-10 rounded-full bg-[#0071E3] text-white flex items-center justify-center font-black">
               <Sparkles className="w-5 h-5" />
             </div>
             <div className="text-left">
               <h4 className="font-display font-bold text-base sm:text-lg text-white">
-                IKOLI HARCOURT WHYTE HERITAGE &bull; СВЯЖИТЕСЬ СО МНОЙ
+                IKOLI HARCOURT WHYTE HERITAGE &bull; CONNECT WITH CONSORTIUM
               </h4>
               <span className="text-xs text-gray-400 font-mono">
                 Father of Igbo Church Music &bull; The Soul of IKOLI AI
@@ -702,12 +701,13 @@ export const AboutPage: React.FC<AboutPageProps> = ({ onNavigate }) => {
               Developer APIs
             </button>
           </div>
-        </div>
+        </section>
 
-        {/* Universal Footer */}
-        <div className="mt-12">
-          <Footer onNavigate={onNavigate} />
-        </div>
+      </main>
+
+      {/* ── Universal Full-Width Footer ──────────────────────────────────── */}
+      <div className="w-full mt-24">
+        <Footer onNavigate={onNavigate} />
       </div>
 
     </div>
