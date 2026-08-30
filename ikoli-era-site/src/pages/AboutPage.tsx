@@ -8,7 +8,6 @@ import {
   Check,
   Send,
   Sparkles,
-  Music,
   Volume2,
 } from 'lucide-react';
 
@@ -135,83 +134,106 @@ export const AboutPage: React.FC<AboutPageProps> = ({ onNavigate }) => {
       <Navbar currentPage="about" onNavigate={onNavigate} />
 
       {/* ══════════════════════════════════════════════════════════════════════
-          1. FULL-WIDTH EDGE-TO-EDGE CINEMATIC EDITORIAL HERO (No Container)
+          1. 100% EDITORIAL HERO SECTION (BLUEPRINT PORTRAIT & SPATIAL COLUMNS)
       ══════════════════════════════════════════════════════════════════════ */}
-      <section className="relative w-full min-h-[85vh] sm:min-h-[92vh] flex items-center justify-center overflow-hidden bg-[#0A0B0D] text-white select-none border-b border-black/10">
+      <section className="relative w-full min-h-screen bg-black text-white flex flex-col justify-between overflow-hidden select-none">
         
-        {/* Full-Bleed Archival Portrait Background */}
-        <img
-          src="/media/community-elder-portrait.jpg"
-          alt="Ikoli Harcourt Whyte (1905–1977)"
-          className="absolute inset-0 w-full h-full object-cover object-top filter grayscale contrast-125 opacity-80"
-        />
-        
-        {/* Cinematic Layered Vignettes & Gradients */}
-        <div className="absolute inset-0 bg-gradient-to-t from-black via-black/40 to-black/70" />
-        <div className="absolute inset-0 bg-gradient-to-r from-black/80 via-transparent to-black/80" />
-        <div className="absolute top-1/3 left-1/2 -translate-x-1/2 w-[700px] h-[350px] bg-[#0071E3]/15 blur-[160px] rounded-full pointer-events-none" />
+        {/* 1. Full-Bleed Archival / Editorial Portrait Background */}
+        <div className="absolute inset-0 z-0">
+          <img
+            src="/media/about_ikoli_editorial_hero.jpg"
+            alt="Ikoli Harcourt Whyte (1905–1977)"
+            className="w-full h-full object-cover object-center filter grayscale contrast-115 brightness-95"
+          />
+          {/* Spatial Atmospheric Vignette Overlays for High-Contrast Readability */}
+          <div className="absolute inset-0 bg-gradient-to-t from-black via-transparent to-black/60 pointer-events-none" />
+          <div className="absolute inset-0 bg-gradient-to-r from-black/85 via-transparent to-black/85 pointer-events-none" />
+          <div className="absolute inset-0 bg-black/25 pointer-events-none" />
+        </div>
 
-        {/* Edge-to-Edge Content Grid */}
-        <div className="relative z-10 w-full max-w-7xl mx-auto px-6 sm:px-12 lg:px-16 pt-36 pb-20 flex flex-col justify-between min-h-[85vh] sm:min-h-[92vh]">
-          
-          {/* Top Left Quote Manifesto */}
-          <div className="max-w-md text-left space-y-2">
-            <span className="text-[11px] font-mono tracking-widest uppercase text-[#0071E3] font-bold block">
-              Historical Inspiration &bull; 1905–1977
-            </span>
-            <p className="text-sm sm:text-base text-gray-200 font-light leading-relaxed">
-              "I want every hymn and every clinical discovery to bring dignified life and zero suffering to our people."
-            </p>
-            <span className="text-xs font-serif italic text-gray-400 block">
-              — Ikoli Harcourt Whyte
-            </span>
+        {/* 2. Spatial Refractive Seam Lines (Vertical Columns from Blueprint) */}
+        <div className="absolute left-[38%] top-0 bottom-0 w-[1px] bg-gradient-to-b from-white/0 via-white/20 to-white/0 pointer-events-none z-10 hidden md:block" />
+        <div className="absolute left-[62%] top-0 bottom-0 w-[1px] bg-gradient-to-b from-white/0 via-white/20 to-white/0 pointer-events-none z-10 hidden md:block" />
+
+        {/* 3. Top Subtle Inner Navigation / Header Bar */}
+        <div className="relative z-20 w-full px-6 sm:px-12 md:px-16 pt-24 sm:pt-28 flex items-center justify-between">
+          <div className="font-display font-black text-xs sm:text-sm tracking-widest text-white/90 uppercase flex items-center gap-2">
+            <span>IKOLI HARCOURT WHYTE</span>
+            <span className="text-[#0071E3]">&bull;</span>
+            <span className="text-gray-400 font-mono text-[10px]">1905 &ndash; 1977</span>
           </div>
+          <div className="hidden sm:flex items-center gap-6 text-[11px] font-mono tracking-widest text-white/70 uppercase">
+            <a href="#biography" className="hover:text-white transition-colors cursor-pointer">BIOGRAPHY</a>
+            <a href="#music" className="hover:text-white transition-colors cursor-pointer">CHORAL SUITE</a>
+            <a href="#uzuakoli" className="hover:text-white transition-colors cursor-pointer">UZUAKOLI SANCTUARY</a>
+            <a href="#consortium" className="hover:text-white transition-colors cursor-pointer">CONSORTIUM</a>
+          </div>
+        </div>
 
-          {/* Center Dynamic Choral Audio / Narrative Play Pill */}
-          <div className="my-auto py-12 flex flex-col items-center justify-center gap-4 text-center">
+        {/* 4. Left Mid-Height Paragraph (Exact Blueprint Placement) */}
+        <div className="relative z-20 px-6 sm:px-12 md:px-16 my-auto pt-8">
+          <div className="max-w-[280px] sm:max-w-xs md:max-w-sm space-y-2">
+            <p className="text-[11px] sm:text-xs font-mono font-medium tracking-widest text-white/85 uppercase leading-relaxed">
+              HISTORICAL INSPIRATION &amp; HUMANITARIAN LEGACY &bull; HOW A LEPROSY COMPOSER IN UZUAKOLI TRANSFORMED NTD STIGMA INTO HOPE &amp; SACRED HARMONY (1905–1977)
+            </p>
+          </div>
+        </div>
+
+        {/* 5. Bottom Section: Center Action Audio Trigger & Bottom-Right Stacked Typography */}
+        <div className="relative z-20 w-full px-6 sm:px-12 md:px-16 pb-12 sm:pb-16 flex flex-col md:flex-row items-start md:items-end justify-between gap-8">
+          
+          {/* Center Play / Choral Hymnody Trigger Button */}
+          <div className="flex items-center gap-4">
             <button
               onClick={toggleHymnAudio}
-              className={`w-20 h-20 sm:w-24 sm:h-24 rounded-full backdrop-blur-xl border flex items-center justify-center shadow-2xl transition-all duration-300 cursor-pointer active:scale-95 ${
-                isPlayingHymn
-                  ? 'bg-[#0071E3] text-white border-[#0071E3] scale-105 shadow-[0_0_50px_rgba(0,113,227,0.5)]'
-                  : 'bg-white/20 hover:bg-white/30 text-white border-white/30 hover:scale-105'
-              }`}
-              title="Play Choral Hymnody of Ikoli Harcourt Whyte"
+              className="flex items-center gap-3.5 group cursor-pointer text-left"
+              title="Play / Pause Sacred Choral Hymnody of Ikoli Harcourt Whyte"
             >
-              {isPlayingHymn ? (
-                <Pause className="w-8 h-8 sm:w-9 sm:h-9 fill-current text-white" />
-              ) : (
-                <Play className="w-8 h-8 sm:w-9 sm:h-9 fill-current translate-x-0.5 text-white" />
-              )}
+              <div className={`w-12 h-12 sm:w-14 sm:h-14 rounded-full backdrop-blur-md border flex items-center justify-center text-white shadow-2xl transition-all duration-300 group-hover:scale-110 ${
+                isPlayingHymn
+                  ? 'bg-[#0071E3] border-[#0071E3] scale-105 shadow-[0_0_40px_rgba(0,113,227,0.6)]'
+                  : 'bg-white/15 hover:bg-white/30 border-white/30 group-hover:bg-white group-hover:text-black'
+              }`}>
+                {isPlayingHymn ? (
+                  <Pause className="w-5 h-5 fill-current text-white" />
+                ) : (
+                  <Play className="w-5 h-5 fill-current translate-x-0.5" />
+                )}
+              </div>
+              <div className="space-y-0.5">
+                <span className="text-[10px] font-mono font-bold tracking-widest text-white/60 uppercase block">
+                  {isPlayingHymn ? 'PLAYING ATULA EGWU SUITE' : 'SACRED CHORAL HYMNODY'}
+                </span>
+                <span className="text-xs sm:text-sm font-bold text-white uppercase tracking-wider group-hover:text-[#00D2FF] transition-colors flex items-center gap-1">
+                  <span>{isPlayingHymn ? 'PAUSE CHORAL AUDIO' : 'PLAY HYMN SUITE'}</span>
+                  <ArrowUpRight className="w-3.5 h-3.5 group-hover:translate-x-0.5 group-hover:-translate-y-0.5 transition-transform" />
+                </span>
+              </div>
             </button>
-            
-            <div className="flex items-center gap-2 bg-black/60 px-4 py-1.5 rounded-full border border-white/15 backdrop-blur-md">
-              <Music className="w-4 h-4 text-[#0071E3]" />
-              <span className="text-xs font-mono tracking-wider uppercase text-white/90 font-bold">
-                {isPlayingHymn ? 'Playing "Atula Egwu" Sacred Suite' : 'Play Choral Hymns'}
-              </span>
-            </div>
           </div>
 
-          {/* Bottom Row: Eyebrow + Bold Display Name */}
-          <div className="flex flex-col sm:flex-row items-start sm:items-end justify-between gap-4 pt-8 border-t border-white/10">
-            <div className="text-left">
-              <span className="text-xs font-mono font-bold tracking-widest text-[#0071E3] uppercase block mb-1">
-                Father of Igbo Church Music
-              </span>
-              <span className="text-xs text-gray-400 font-medium block">
-                Composer &bull; Humanitarian &bull; Uzuakoli Sanctuary
-              </span>
-            </div>
-
-            <div className="text-left sm:text-right">
-              <h1 className="font-display font-black text-4xl sm:text-6xl md:text-7xl tracking-tight text-white leading-none">
-                IKOLI<br />
-                <span className="text-gray-300">HARCOURT WHYTE</span>
-              </h1>
-            </div>
+          {/* Bottom-Right Stacked Grand Display Heading (Exact Matching Typography) */}
+          <div className="text-left md:text-right">
+            <h1 className="font-display font-black text-6xl sm:text-8xl md:text-9xl lg:text-[120px] xl:text-[130px] tracking-tight leading-[0.86] text-white uppercase select-none drop-shadow-2xl">
+              IKOLI<br />
+              HARCOURT WHYTE
+            </h1>
           </div>
 
+        </div>
+
+        {/* Scroll Down Indicator */}
+        <div
+          onClick={() => {
+            const el = document.getElementById('biography');
+            el?.scrollIntoView({ behavior: 'smooth' });
+          }}
+          className="absolute bottom-3 left-1/2 -translate-x-1/2 z-20 cursor-pointer text-white/50 hover:text-white transition-colors flex flex-col items-center gap-1"
+        >
+          <span className="text-[9px] font-mono uppercase tracking-widest">SCROLL TO EXPLORE</span>
+          <div className="w-4 h-6 rounded-full border border-white/30 flex items-start justify-center p-1">
+            <div className="w-1 h-1.5 rounded-full bg-white animate-bounce" />
+          </div>
         </div>
 
       </section>

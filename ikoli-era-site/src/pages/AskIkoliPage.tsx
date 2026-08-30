@@ -220,12 +220,6 @@ export const AskIkoliPage: React.FC<AskIkoliPageProps> = ({ onNavigate }) => {
     setAttachedFile(null);
   };
 
-  const workspaceRef = useRef<HTMLDivElement>(null);
-
-  const scrollToWorkspace = () => {
-    workspaceRef.current?.scrollIntoView({ behavior: 'smooth' });
-  };
-
   return (
     <main
       className={`w-full min-h-screen font-sans selection:bg-[#0071E3] selection:text-white flex flex-col transition-colors duration-300 ${
@@ -245,106 +239,11 @@ export const AskIkoliPage: React.FC<AskIkoliPageProps> = ({ onNavigate }) => {
       />
 
       {/* ══════════════════════════════════════════════════════════════════════
-          FULL EDITORIAL HERO SECTION (100% REFERENCE BLUEPRINT REPLICATION)
+          MAIN REFINED CLINICAL INTELLIGENCE WORKSPACE (CLEAN & MINIMAL)
       ══════════════════════════════════════════════════════════════════════ */}
-      <section className="relative w-full min-h-screen bg-black text-white flex flex-col justify-between overflow-hidden select-none">
-        
-        {/* 1. Background Cinematic Monochrome Portrait */}
-        <div className="absolute inset-0 z-0">
-          <img
-            src="/media/ask_ikoli_editorial_hero.jpg"
-            alt="Ikoli Clinical AI Pioneer"
-            className="w-full h-full object-cover object-center filter grayscale contrast-115 brightness-90"
-          />
-          {/* Spatial Atmospheric Gradient Overlays for High-Contrast Readability */}
-          <div className="absolute inset-0 bg-gradient-to-t from-black via-transparent to-black/60 pointer-events-none" />
-          <div className="absolute inset-0 bg-gradient-to-r from-black/85 via-transparent to-black/85 pointer-events-none" />
-          <div className="absolute inset-0 bg-black/25 pointer-events-none" />
-        </div>
-
-        {/* 2. Spatial Refractive Seam Lines (Vertical Columns from Blueprint) */}
-        <div className="absolute left-[38%] top-0 bottom-0 w-[1px] bg-gradient-to-b from-white/0 via-white/20 to-white/0 pointer-events-none z-10 hidden md:block" />
-        <div className="absolute left-[62%] top-0 bottom-0 w-[1px] bg-gradient-to-b from-white/0 via-white/20 to-white/0 pointer-events-none z-10 hidden md:block" />
-
-        {/* 3. Top Subtle Inner Navigation / Header Bar */}
-        <div className="relative z-20 w-full px-6 sm:px-12 md:px-16 pt-24 sm:pt-28 flex items-center justify-between">
-          <div className="font-display font-black text-xs sm:text-sm tracking-widest text-white/90 uppercase flex items-center gap-2">
-            <span>IKOLI HARCOURT</span>
-            <span className="text-[#0071E3]">&bull;</span>
-            <span className="text-gray-400 font-mono text-[10px]">AI v1.1</span>
-          </div>
-          <div className="hidden sm:flex items-center gap-6 text-[11px] font-mono tracking-widest text-white/70 uppercase">
-            <button onClick={scrollToWorkspace} className="hover:text-white transition-colors cursor-pointer">CONSULTATION</button>
-            <button onClick={() => onNavigate('diseases')} className="hover:text-white transition-colors cursor-pointer">DIAGNOSTICS</button>
-            <button onClick={() => onNavigate('dashboard')} className="hover:text-white transition-colors cursor-pointer">SURVEILLANCE</button>
-            <button onClick={() => onNavigate('about')} className="hover:text-white transition-colors cursor-pointer">HERITAGE</button>
-          </div>
-        </div>
-
-        {/* 4. Left Mid-Height Paragraph (Exact Positioning from Reference) */}
-        <div className="relative z-20 px-6 sm:px-12 md:px-16 my-auto pt-8">
-          <div className="max-w-[280px] sm:max-w-xs md:max-w-sm space-y-2">
-            <p className="text-[11px] sm:text-xs font-mono font-medium tracking-widest text-white/85 uppercase leading-relaxed">
-              SOVEREIGN CLINICAL INTELLIGENCE EMPOWERING FRONTLINE CHEWS WITH REAL-TIME MULTIMODAL INFERENCE &amp; ZERO-PII PRECISION
-            </p>
-          </div>
-        </div>
-
-        {/* 5. Bottom Section: Center Action Trigger & Bottom-Right Stacked Typography */}
-        <div className="relative z-20 w-full px-6 sm:px-12 md:px-16 pb-12 sm:pb-16 flex flex-col md:flex-row items-start md:items-end justify-between gap-8">
-          
-          {/* Center Play / Consultation Trigger Button */}
-          <div className="flex items-center gap-4">
-            <button
-              onClick={scrollToWorkspace}
-              className="flex items-center gap-3.5 group cursor-pointer text-left"
-            >
-              <div className="w-12 h-12 sm:w-14 sm:h-14 rounded-full bg-white/15 hover:bg-white/30 backdrop-blur-md border border-white/30 flex items-center justify-center text-white shadow-2xl group-hover:scale-110 group-hover:bg-white group-hover:text-black transition-all duration-300">
-                <Sparkles className="w-5 h-5 group-hover:rotate-12 transition-transform" />
-              </div>
-              <div className="space-y-0.5">
-                <span className="text-[10px] font-mono font-bold tracking-widest text-white/60 uppercase block">
-                  INITIALIZE INFERENCE
-                </span>
-                <span className="text-xs sm:text-sm font-bold text-white uppercase tracking-wider group-hover:text-[#00D2FF] transition-colors flex items-center gap-1">
-                  <span>START CONSULTATION</span>
-                  <ArrowUp className="w-3.5 h-3.5 rotate-45 group-hover:translate-x-0.5 group-hover:-translate-y-0.5 transition-transform" />
-                </span>
-              </div>
-            </button>
-          </div>
-
-          {/* Bottom-Right Stacked Grand Display Heading (Exact Matching Typography) */}
-          <div className="text-left md:text-right">
-            <h1 className="font-display font-black text-6xl sm:text-8xl md:text-9xl lg:text-[130px] tracking-tight leading-[0.86] text-white uppercase select-none drop-shadow-2xl">
-              ASK<br />IKOLI
-            </h1>
-          </div>
-
-        </div>
-
-        {/* Scroll Down Indicator */}
-        <div
-          onClick={scrollToWorkspace}
-          className="absolute bottom-3 left-1/2 -translate-x-1/2 z-20 cursor-pointer text-white/50 hover:text-white transition-colors flex flex-col items-center gap-1"
-        >
-          <span className="text-[9px] font-mono uppercase tracking-widest">SCROLL TO CONSULT</span>
-          <div className="w-4 h-6 rounded-full border border-white/30 flex items-start justify-center p-1">
-            <div className="w-1 h-1.5 rounded-full bg-white animate-bounce" />
-          </div>
-        </div>
-
-      </section>
-
-      {/* ══════════════════════════════════════════════════════════════════════
-          MAIN REFINED CLINICAL INTELLIGENCE WORKSPACE (INTERACTIVE STUDIO)
-      ══════════════════════════════════════════════════════════════════════ */}
-      <section
-        ref={workspaceRef}
-        className={`relative w-full pt-16 sm:pt-20 pb-16 px-4 sm:px-6 md:px-8 overflow-hidden transition-colors duration-300 flex-1 flex flex-col items-center ${
-          isDark ? 'bg-[#0C0C0C]' : 'bg-[#FBFBFD]'
-        }`}
-      >
+      <section className={`relative w-full pt-28 sm:pt-32 pb-16 px-4 sm:px-6 md:px-8 overflow-hidden transition-colors duration-300 flex-1 flex flex-col items-center ${
+        isDark ? 'bg-[#0C0C0C]' : 'bg-[#FBFBFD]'
+      }`}>
         
         {/* Subtle Ambient Lighting Glow */}
         <div className={`absolute top-1/4 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[780px] h-[520px] blur-3xl pointer-events-none ${
