@@ -542,15 +542,15 @@ export const Navbar: React.FC<NavbarProps> = ({
                 className="pointer-events-auto w-full max-w-2xl bg-white rounded-[28px] sm:rounded-[32px] shadow-[0_24px_70px_rgba(0,0,0,0.25)] border border-black/10 overflow-hidden flex flex-col max-h-[80vh]"
               >
                 {/* Search Input Header */}
-                <div className="p-4 sm:p-5 border-b border-black/8 flex items-center gap-3 bg-[#FBFBFD]">
-                  <Search className="w-5 h-5 text-[#0071E3] shrink-0" />
+                <div className="p-4 sm:p-5 flex items-center gap-3 bg-white">
+                  <Search className="w-4 h-4 text-gray-400 shrink-0" />
                   <input
                     type="text"
                     autoFocus
                     value={searchQuery}
                     onChange={(e) => setSearchQuery(e.target.value)}
-                    placeholder="Search diseases, WHO protocols, APIs, hymnal heritage..."
-                    className="w-full bg-transparent text-sm sm:text-base text-[#1D1D1F] placeholder-gray-400 outline-none font-sans font-medium"
+                    placeholder="Search diseases, protocols, APIs..."
+                    className="w-full bg-transparent text-sm text-[#1D1D1F] placeholder-gray-400 outline-none font-sans font-medium"
                   />
                   {searchQuery ? (
                     <button
@@ -560,71 +560,48 @@ export const Navbar: React.FC<NavbarProps> = ({
                       <X className="w-4 h-4" />
                     </button>
                   ) : (
-                    <kbd className="hidden sm:inline-flex text-[10px] font-mono font-bold bg-black/5 text-gray-500 px-2 py-0.5 rounded shadow-2xs">
+                    <button
+                      onClick={() => setSearchModalOpen(false)}
+                      className="text-[10px] font-mono font-semibold text-gray-400 hover:text-black px-1.5 py-0.5 rounded transition-colors"
+                    >
                       ESC
-                    </kbd>
+                    </button>
                   )}
                 </div>
 
-                {/* Results List */}
-                <div className="overflow-y-auto p-3 sm:p-4 space-y-1.5 divide-y divide-black/5 max-h-[55vh]">
-                  {filteredSearchResults.length === 0 ? (
-                    <div className="py-12 text-center space-y-2">
-                      <p className="text-sm font-semibold text-gray-700">No results found for &ldquo;{searchQuery}&rdquo;</p>
-                      <p className="text-xs text-gray-400 font-mono">Try searching &ldquo;Leprosy&rdquo;, &ldquo;Buruli&rdquo;, &ldquo;API&rdquo;, or &ldquo;Hymns&rdquo;</p>
-                    </div>
-                  ) : (
-                    filteredSearchResults.map((result, idx) => {
-                      const ResultIcon = result.icon;
-                      return (
+                {/* Results List (Only displayed when user types) */}
+                {searchQuery.trim().length > 0 && (
+                  <div className="border-t border-black/5 overflow-y-auto p-2 space-y-1 max-h-[50vh]">
+                    {filteredSearchResults.length === 0 ? (
+                      <div className="py-6 text-center text-xs text-gray-400 font-mono">
+                        No results found for &ldquo;{searchQuery}&rdquo;
+                      </div>
+                    ) : (
+                      filteredSearchResults.map((result, idx) => (
                         <div
                           key={idx}
                           onClick={() => handleNavClick(result.page)}
-                          className="pt-1.5 first:pt-0 group flex items-center justify-between p-3 rounded-2xl hover:bg-[#F5F5F7] transition-all cursor-pointer text-left"
+                          className="flex items-center justify-between px-3 py-2.5 rounded-xl hover:bg-[#F5F5F7] transition-all cursor-pointer text-left group"
                         >
-                          <div className="flex items-start gap-3.5 pr-2">
-                            <div className="w-9 h-9 rounded-xl bg-black/[0.04] group-hover:bg-[#0071E3] group-hover:text-white text-gray-700 border border-black/5 flex items-center justify-center shrink-0 transition-colors shadow-2xs mt-0.5">
-                              <ResultIcon className="w-4 h-4" />
-                            </div>
+                          <div className="flex items-center gap-3">
+                            <Search className="w-3.5 h-3.5 text-gray-400 group-hover:text-[#0071E3] transition-colors" />
                             <div className="space-y-0.5">
-                              <div className="flex items-center gap-2">
-                                <span className="font-bold text-xs sm:text-sm text-[#1D1D1F] group-hover:text-[#0071E3] transition-colors">
-                                  {result.title}
-                                </span>
-                                <span className="text-[9px] font-mono font-bold uppercase tracking-wider bg-black/[0.05] text-gray-600 px-1.5 py-0.2 rounded-full">
-                                  {result.category}
-                                </span>
-                              </div>
-                              <p className="text-[11px] sm:text-xs text-gray-500 line-clamp-1">
+                              <span className="text-xs font-semibold text-[#1D1D1F] group-hover:text-[#0071E3] transition-colors block">
+                                {result.title}
+                              </span>
+                              <span className="text-[11px] text-gray-500 line-clamp-1 block">
                                 {result.desc}
-                              </p>
+                              </span>
                             </div>
                           </div>
-
-                          <div className="shrink-0 pl-2">
-                            <div className="w-7 h-7 rounded-full bg-white group-hover:bg-[#0071E3] group-hover:text-white text-gray-400 border border-black/5 flex items-center justify-center transition-all shadow-2xs">
-                              <ArrowRight className="w-3.5 h-3.5" />
-                            </div>
-                          </div>
+                          <span className="text-[10px] font-mono text-gray-400 uppercase shrink-0 pl-3">
+                            {result.category}
+                          </span>
                         </div>
-                      );
-                    })
-                  )}
-                </div>
-
-                {/* Footer Telemetry & Navigation Hints */}
-                <div className="px-5 py-3 bg-[#FBFBFD] border-t border-black/8 flex items-center justify-between text-[11px] font-mono text-gray-500">
-                  <div className="flex items-center gap-3">
-                    <span className="flex items-center gap-1">
-                      <span className="text-[#0071E3] font-bold">&bull;</span>
-                      <span>{filteredSearchResults.length} resources available</span>
-                    </span>
+                      ))
+                    )}
                   </div>
-                  <div className="hidden sm:flex items-center gap-3 text-gray-400">
-                    <span>Press <kbd className="bg-black/5 px-1.5 py-0.5 rounded text-gray-600 font-bold">↵</kbd> to jump</span>
-                    <span>Press <kbd className="bg-black/5 px-1.5 py-0.5 rounded text-gray-600 font-bold">ESC</kbd> to exit</span>
-                  </div>
-                </div>
+                )}
               </motion.div>
             </div>
           </>
