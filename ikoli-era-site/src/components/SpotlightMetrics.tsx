@@ -58,11 +58,6 @@ export const SpotlightMetrics: React.FC = () => {
                 className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700 bw-reveal"
               />
               <div className="absolute inset-0 bg-gradient-to-t from-black/50 via-transparent to-transparent opacity-50 pointer-events-none" />
-              
-              <div className="absolute top-4 left-4 liquid-glass px-3 py-1 rounded-full text-[10px] font-mono font-bold text-[#1D1D1F] flex items-center gap-1.5 shadow-xs">
-                <span className="w-1.5 h-1.5 rounded-full bg-[#0071E3] animate-ping" />
-                <span>Clinical Telemetry</span>
-              </div>
             </div>
           </Interactive3DCard>
         </div>
@@ -99,10 +94,10 @@ export const SpotlightMetrics: React.FC = () => {
             {/* Metric 1 */}
             <Interactive3DCard maxTilt={6}>
               <div className="p-4 rounded-2xl bg-white border border-black/5 shadow-xs group cursor-pointer hover:shadow-md transition-all">
-                <span className="font-display font-extrabold text-3xl sm:text-4xl text-[#1D1D1F] block tracking-tight group-hover:text-[#0071E3] transition-colors">
+                <span className="font-display font-extrabold text-3xl sm:text-4xl text-[#1D1D1F] block tracking-tight">
                   89.2%
                 </span>
-                <span className="text-xs text-gray-500 font-semibold font-sans mt-1 block">
+                <span className="text-xs text-[#1D1D1F] font-semibold font-sans mt-1 block">
                   MDT Treatment Cure Rate
                 </span>
               </div>
@@ -111,10 +106,10 @@ export const SpotlightMetrics: React.FC = () => {
             {/* Metric 2 */}
             <Interactive3DCard maxTilt={6}>
               <div className="p-4 rounded-2xl bg-white border border-black/5 shadow-xs group cursor-pointer hover:shadow-md transition-all">
-                <span className="font-display font-extrabold text-3xl sm:text-4xl text-emerald-600 block tracking-tight">
+                <span className="font-display font-extrabold text-3xl sm:text-4xl text-[#1D1D1F] block tracking-tight">
                   &lt; 4.8%
                 </span>
-                <span className="text-xs text-gray-500 font-semibold font-sans mt-1 block">
+                <span className="text-xs text-[#1D1D1F] font-semibold font-sans mt-1 block">
                   Disability Target (G2D)
                 </span>
               </div>
@@ -123,10 +118,10 @@ export const SpotlightMetrics: React.FC = () => {
             {/* Metric 3 */}
             <Interactive3DCard maxTilt={6}>
               <div className="p-4 rounded-2xl bg-white border border-black/5 shadow-xs group cursor-pointer hover:shadow-md transition-all">
-                <span className="font-display font-extrabold text-3xl sm:text-4xl text-purple-600 block tracking-tight">
+                <span className="font-display font-extrabold text-3xl sm:text-4xl text-[#1D1D1F] block tracking-tight">
                   78.5%
                 </span>
-                <span className="text-xs text-gray-500 font-semibold font-sans mt-1 block">
+                <span className="text-xs text-[#1D1D1F] font-semibold font-sans mt-1 block">
                   IS2404 PCR Match
                 </span>
               </div>

@@ -7,7 +7,6 @@ export interface DiseaseEntry {
   author?: string;
   category: string;
   category_color: string;
-  video_url?: string;
   image_url: string;
   display_order: number;
 }
@@ -21,9 +20,8 @@ export const INITIAL_DISEASES: DiseaseEntry[] = [
     description: 'An evidence-based clinical analysis of Mycobacterium ulcerans tissue necrosis, undermined edges, and Category I/II/III classification for rapid surgical triage.',
     author: 'By NTBLCP & RedAid Clinical Registry',
     category: 'Buruli Ulcer',
-    category_color: '#10B981',
-    video_url: '/media/clinical-exam.mp4',
-    image_url: '/media/field-screening-action.jpg',
+    category_color: '#0071E3',
+    image_url: '/media/home_buruli_differential.jpg',
     display_order: 1,
   },
   {
@@ -32,8 +30,7 @@ export const INITIAL_DISEASES: DiseaseEntry[] = [
     title: 'Identifying Early Hypopigmentation in Paucibacillary Leprosy',
     category: 'Leprosy (PB)',
     category_color: '#0071E3',
-    video_url: '/media/patient-consult.mp4',
-    image_url: '/media/sensory-mapping-consult.jpg',
+    image_url: '/media/home_pb_leprosy_hypopigmentation.jpg',
     display_order: 2,
   },
   {
@@ -41,9 +38,8 @@ export const INITIAL_DISEASES: DiseaseEntry[] = [
     type: 'standard',
     title: 'Multibacillary Nerve Thickening & Sensory Mapping',
     category: 'Leprosy (MB)',
-    category_color: '#DE322D',
-    video_url: '/media/community-worker.mp4',
-    image_url: '/media/lab-microscopy.jpg',
+    category_color: '#0071E3',
+    image_url: '/media/home_mb_leprosy_nerve_mapping.jpg',
     display_order: 3,
   },
   {
@@ -51,9 +47,8 @@ export const INITIAL_DISEASES: DiseaseEntry[] = [
     type: 'standard',
     title: 'Yaws Papilloma & Ulcerative Differential Criteria',
     category: 'Yaws / Leish',
-    category_color: '#8B5CF6',
-    video_url: '/media/Hero.mp4',
-    image_url: '/media/tablet-diagnostics.jpg',
+    category_color: '#0071E3',
+    image_url: '/media/home_yaws_differential_screening.jpg',
     display_order: 4,
   },
 ];

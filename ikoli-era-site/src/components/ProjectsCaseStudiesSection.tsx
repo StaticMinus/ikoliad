@@ -26,12 +26,6 @@ const CircleRingIcon: React.FC = () => (
   </svg>
 );
 
-const ArrowIcon: React.FC = () => (
-  <svg width="18" height="18" viewBox="0 0 18 18" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-    <line x1="2" y1="16" x2="16" y2="2" />
-    <polyline points="7,2 16,2 16,11" />
-  </svg>
-);
 
 const WaveCircleIcon: React.FC = () => (
   <svg width="22" height="22" viewBox="0 0 22 22" fill="none" stroke="currentColor" strokeWidth="1.5">
@@ -40,13 +34,6 @@ const WaveCircleIcon: React.FC = () => (
   </svg>
 );
 
-const LinesIcon: React.FC = () => (
-  <svg width="24" height="18" viewBox="0 0 24 18" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round">
-    <line x1="0" y1="3" x2="24" y2="3" />
-    <line x1="6" y1="9" x2="24" y2="9" />
-    <line x1="0" y1="15" x2="18" y2="15" />
-  </svg>
-);
 
 const BoltIcon: React.FC = () => (
   <svg width="14" height="20" viewBox="0 0 14 20" fill="currentColor">
@@ -61,16 +48,14 @@ const PlusIcon: React.FC = () => (
   </svg>
 );
 
-// --- Marquee Logos Data (Institutional Partners & Frameworks) ---
+// --- Marquee Logos Data (Official 6 Consortium Partners) ---
 const MARQUEE_LOGOS = [
-  { name: 'RedAid Nigeria', icon: <PlusIcon /> },
-  { name: 'FMoHSW Nigeria', icon: <CircleRingIcon /> },
-  { name: 'NTBLCP Programme', icon: <LinesIcon /> },
-  { name: 'Circles AI', icon: <DotsIcon /> },
-  { name: 'DHIS2 Integrated', icon: <CodeIcon /> },
-  { name: 'DAHW Relief', icon: <WaveCircleIcon /> },
-  { name: 'WHO 2030 NTD Target', icon: <ArrowIcon /> },
-  { name: 'Zero-PII Vault', icon: <BoltIcon /> },
+  { name: 'DAHW German Leprosy & TB Relief Association e.V.', icon: <WaveCircleIcon /> },
+  { name: 'RedAid Nigeria (RAN)', icon: <PlusIcon /> },
+  { name: 'Digital Dreams Limited (DD)', icon: <CodeIcon /> },
+  { name: 'FMOH / NTBLCP Nigeria', icon: <CircleRingIcon /> },
+  { name: 'University of Nigeria, Nsukka (VRC-UNN)', icon: <DotsIcon /> },
+  { name: 'IDEA Nigeria', icon: <BoltIcon /> },
 ];
 
 // --- Case Studies Data ---
@@ -128,8 +113,8 @@ const CASE_STUDIES: CaseStudy[] = [
     ],
   },
   {
-    id: 'circles-ai-vision',
-    title: 'Circles AI Vision',
+    id: 'ikoli-neural-vision',
+    title: 'IKOLI Vision Core',
     category: 'Deep Learning Skin Lesion Anomaly Detection',
     year: '2026',
     video: '/media/Hero.mp4',

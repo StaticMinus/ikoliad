@@ -5,7 +5,7 @@ import { CinematicHeroFrame } from '../components/dashboard/CinematicHeroFrame';
 import { SurveillanceHubConsole } from '../components/dashboard/SurveillanceHubConsole';
 
 interface DashboardPageProps {
-  onNavigate: (page: 'home' | 'dashboard' | 'diseases' | 'ask' | 'about' | 'styles') => void;
+  onNavigate: (page: 'home' | 'dashboard' | 'diseases' | 'ask' | 'about' | 'styles' | 'api') => void;
 }
 
 export const DashboardPage: React.FC<DashboardPageProps> = ({ onNavigate }) => {

@@ -6,8 +6,8 @@ import { ArrowRight, Bot, Cpu, Eye, Radio } from 'lucide-react';
 import { MagneticButton } from './ui/MagneticButton';
 
 interface HeroSectionProps {
-  currentPage?: 'home' | 'dashboard' | 'diseases' | 'ask' | 'about' | 'styles';
-  onNavigate?: (page: 'home' | 'dashboard' | 'diseases' | 'ask' | 'about' | 'styles') => void;
+  currentPage?: string;
+  onNavigate?: (page: any) => void;
 }
 
 export const HeroSection: React.FC<HeroSectionProps> = ({
@@ -17,7 +17,7 @@ export const HeroSection: React.FC<HeroSectionProps> = ({
   return (
     <section
       id="hero-master-container"
-      className="relative w-full bg-gradient-to-b from-[#CDE3FA] via-[#E2F0FD] to-[#FFFFFF] overflow-hidden select-none pb-12 sm:pb-16 min-h-[85vh] lg:min-h-[88vh] flex flex-col justify-between"
+      className="relative w-full bg-gradient-to-b from-[#CDE3FA] via-[#E2F0FD] to-[#FFFFFF] overflow-hidden select-none pt-24 sm:pt-28 pb-12 sm:pb-16 min-h-[88vh] lg:min-h-[92vh] flex flex-col justify-between"
     >
       {/* Interactive Cursor Spotlight Glow Effect */}
       <Spotlight
@@ -25,19 +25,17 @@ export const HeroSection: React.FC<HeroSectionProps> = ({
         size={320}
       />
 
-      {/* Navbar — Responsive header */}
-      <div className="relative z-40">
-        <Navbar
-          currentPage={currentPage}
-          onNavigate={onNavigate}
-        />
-      </div>
+      {/* Navbar — Floating responsive capsule */}
+      <Navbar
+        currentPage={currentPage}
+        onNavigate={onNavigate}
+      />
 
       {/* Hero Master Container */}
-      <div className="relative max-w-7xl mx-auto px-4 sm:px-8 md:px-12 pt-2 pb-6 flex-1 flex flex-col justify-between w-full">
+      <div className="relative max-w-7xl mx-auto px-4 sm:px-8 md:px-12 pt-4 pb-6 flex-1 flex flex-col justify-between w-full">
         
-        {/* ── Floating Sentinel Network Badge (Responsive Position) ───── */}
-        <div className="self-center lg:self-auto lg:absolute lg:top-2 lg:right-12 z-30 liquid-glass p-2.5 sm:p-3 px-3.5 sm:px-4.5 rounded-2xl shadow-xl flex items-center gap-3 hover:scale-105 transition-all duration-300 group mb-4 lg:mb-0">
+        {/* ── Floating Sentinel Network Badge (Positioned by the AI Face) ───── */}
+        <div className="self-center lg:self-auto lg:absolute lg:top-28 lg:right-12 z-30 liquid-glass p-2.5 sm:p-3 px-3.5 sm:px-4.5 rounded-2xl shadow-xl flex items-center gap-3 hover:scale-105 transition-all duration-300 group mb-4 lg:mb-0">
           {/* 4 Overlapping AI Cyber Sentinel Avatars */}
           <div className="flex -space-x-2 overflow-hidden">
             <div className="w-6 h-6 sm:w-7 sm:h-7 rounded-full bg-[#0A0C10] border-2 border-white flex items-center justify-center text-[#0082FF] shadow-xs group-hover:border-[#0082FF] transition-colors">

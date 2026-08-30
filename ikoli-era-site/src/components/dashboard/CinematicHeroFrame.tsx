@@ -1,6 +1,10 @@
 import React, { useEffect, useRef, useState, useCallback } from 'react';
 import { ArrowUpRight, ChevronDown } from 'lucide-react';
 import { MagneticButton } from '../ui/MagneticButton';
+import { gsap } from 'gsap';
+import { ScrollTrigger } from 'gsap/ScrollTrigger';
+
+gsap.registerPlugin(ScrollTrigger);
 
 interface CinematicHeroFrameProps {
   onExplore?: () => void;
@@ -173,29 +177,26 @@ export const CinematicHeroFrame: React.FC<CinematicHeroFrameProps> = ({
     };
   }, [drawFrame]);
 
-  // ── 5. Pinned Scroll-Linked Engine ─────────────────────────────────
+  // ── 5. GSAP ScrollTrigger Pinned Engine ───────────────────────────
   useEffect(() => {
-    const handleScroll = () => {
-      const outer = outerTrackRef.current;
-      if (!outer) return;
+    const outer = outerTrackRef.current;
+    if (!outer) return;
 
-      const rect = outer.getBoundingClientRect();
-      const scrollableDistance = outer.offsetHeight - window.innerHeight;
+    const ctx = gsap.context(() => {
+      ScrollTrigger.create({
+        trigger: outer,
+        start: 'top top',
+        end: 'bottom bottom',
+        scrub: 0.8,
+        onUpdate: (self) => {
+          const progress = self.progress;
+          setScrollProgress(progress);
+          targetFrameRef.current = progress * (TOTAL_FRAMES - 1);
+        },
+      });
+    }, outerTrackRef);
 
-      if (scrollableDistance <= 0) return;
-
-      const scrolledAmount = -rect.top;
-      const rawProgress = scrolledAmount / scrollableDistance;
-      const progress = Math.min(Math.max(rawProgress, 0), 1);
-
-      setScrollProgress(progress);
-      targetFrameRef.current = progress * (TOTAL_FRAMES - 1);
-    };
-
-    window.addEventListener('scroll', handleScroll, { passive: true });
-    handleScroll();
-
-    return () => window.removeEventListener('scroll', handleScroll);
+    return () => ctx.revert();
   }, []);
 
   // Synchronized stage brackets with sleek lerp transitions
@@ -213,7 +214,7 @@ export const CinematicHeroFrame: React.FC<CinematicHeroFrameProps> = ({
       <div className="sticky top-0 w-full h-screen flex flex-col justify-between px-3 sm:px-6 md:px-8 pb-4 sm:pb-6 select-none overflow-hidden bg-[#FBFBFD] max-w-[1600px] mx-auto">
         
         {/* Top Header Text Section with Clean Dark Typography and Generous Spacing */}
-        <div className="text-center pt-16 sm:pt-20 md:pt-24 pb-3 sm:pb-5 space-y-1.5 shrink-0">
+        <div className="text-center pt-28 sm:pt-32 md:pt-36 lg:pt-40 pb-3 sm:pb-5 space-y-1.5 shrink-0">
           <h2 className="font-display font-black text-2xl sm:text-4xl md:text-5xl lg:text-6xl tracking-tight uppercase text-[#1D1D1F]">
             YOUR HEALTH, OUR MISSION
           </h2>

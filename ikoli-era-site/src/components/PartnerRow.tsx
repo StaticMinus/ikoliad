@@ -1,61 +1,56 @@
 import React from 'react';
-import { Layers, Globe2, ShieldCheck } from 'lucide-react';
+import { ShieldCheck, Cpu, GraduationCap, Globe2, HeartHandshake } from 'lucide-react';
 
 export const PartnerRow: React.FC = () => {
+  // Official 7 Consortium Partners from Governance Charter
   const partners = [
     {
-      name: 'Federal Ministry of Health',
-      acronym: 'FMoHSW',
-      logoUrl: '/partners/fmoh.png',
-      isImage: true,
-      tag: 'Federal Authority',
-    },
-    {
-      name: 'NTBLCP Programme',
-      acronym: 'NTBLCP',
-      logoUrl: '/partners/ntblcp.jpg',
-      isImage: true,
-      tag: 'National Custodian',
+      name: 'DAHW German Leprosy & TB Relief Association e.V.',
+      acronym: 'DAHW',
+      tag: 'International Relief Partner',
+      badgeColor: '#0D9488',
+      icon: <Globe2 className="w-5 h-5 text-teal-600" />,
+      isImage: false,
     },
     {
       name: 'RedAid Nigeria',
-      acronym: 'RedAid',
+      acronym: 'RAN',
+      tag: 'Clinical Field Operations',
+      badgeColor: '#DE322D',
       logoUrl: '/partners/redaid.jpg',
       isImage: true,
-      tag: 'Clinical Field Operations',
     },
     {
-      name: 'Circles AI',
-      acronym: 'Circles AI',
-      icon: (
-        <div className="w-8 h-8 rounded-full border-2 border-[#1D1D1F] flex items-center justify-center bg-white shadow-xs">
-          <div className="w-3.5 h-3.5 rounded-full bg-[#0071E3]" />
-        </div>
-      ),
+      name: 'Digital Dreams Limited',
+      acronym: 'DD',
+      tag: 'Technology & AI Engineering Lead',
+      badgeColor: '#0071E3',
+      icon: <Cpu className="w-5 h-5 text-[#0071E3]" />,
       isImage: false,
-      tag: 'Neural Vision Co-Lead',
     },
     {
-      name: 'DHIS2 Integrated',
-      acronym: 'DHIS2',
-      icon: (
-        <div className="w-8 h-8 rounded-xl bg-indigo-50 border border-indigo-100 flex items-center justify-center text-indigo-600 shadow-xs">
-          <Layers className="w-4 h-4" />
-        </div>
-      ),
-      isImage: false,
-      tag: 'National EHR Pipeline',
+      name: 'Federal Ministry of Health & Social Welfare / NTBLCP',
+      acronym: 'FMOH / NTBLCP',
+      tag: 'Federal Health Authority',
+      badgeColor: '#10B981',
+      logoUrl: '/partners/fmoh.png',
+      isImage: true,
     },
     {
-      name: 'DAHW Relief',
-      acronym: 'DAHW',
-      icon: (
-        <div className="w-8 h-8 rounded-xl bg-teal-50 border border-teal-100 flex items-center justify-center text-teal-600 shadow-xs">
-          <Globe2 className="w-4 h-4" />
-        </div>
-      ),
+      name: 'University of Nigeria, Nsukka — Vaccine Research Centre',
+      acronym: 'VRC-UNN',
+      tag: 'Academic & Vaccine Research Centre',
+      badgeColor: '#7C3AED',
+      icon: <GraduationCap className="w-5 h-5 text-purple-600" />,
       isImage: false,
-      tag: 'Geneva WHO Partner',
+    },
+    {
+      name: 'IDEA Nigeria',
+      acronym: 'IDEA',
+      tag: 'Dignity, Inclusion & Advocacy',
+      badgeColor: '#EC4899',
+      icon: <HeartHandshake className="w-5 h-5 text-pink-600" />,
+      isImage: false,
     },
   ];
 
@@ -69,7 +64,7 @@ export const PartnerRow: React.FC = () => {
         .partner-marquee-track {
           display: flex;
           width: max-content;
-          animation: scrollPartnersMarquee 28s linear infinite;
+          animation: scrollPartnersMarquee 32s linear infinite;
         }
         .partner-marquee-track:hover {
           animation-play-state: paused;
@@ -83,11 +78,11 @@ export const PartnerRow: React.FC = () => {
           <div className="inline-flex items-center gap-1.5 bg-white px-3.5 py-1 rounded-full border border-black/5 text-[11px] font-semibold text-gray-500 shadow-xs">
             <ShieldCheck className="w-3.5 h-3.5 text-[#0071E3]" />
             <span className="uppercase tracking-wider font-mono text-[10px] text-gray-600">
-              Official Institutional Custodianship & Partnerships
+              Official Consortium Partners
             </span>
           </div>
           <p className="text-xs sm:text-sm text-gray-500 font-medium">
-            Governed by Nigeria's national health authorities and leading leprosy relief organizations.
+            Governed by Nigeria's national health authorities, academic medical centers, and clinical relief organizations.
           </p>
         </div>
 
@@ -99,15 +94,18 @@ export const PartnerRow: React.FC = () => {
           <div className="absolute right-0 top-0 bottom-0 w-24 sm:w-36 bg-gradient-to-l from-[#FAFAFA] via-[#FAFAFA]/90 to-transparent z-10 pointer-events-none" />
 
           {/* Scrolling Partner Track */}
-          <div className="partner-marquee-track flex items-center gap-6 sm:gap-8 cursor-pointer">
+          <div className="partner-marquee-track flex items-center gap-5 sm:gap-6 cursor-pointer">
             {[...partners, ...partners, ...partners].map((p, idx) => (
               <div
                 key={idx}
-                className="flex items-center gap-3.5 bg-white px-5 py-3 rounded-2xl border border-black/5 shadow-xs hover:shadow-md hover:border-black/10 transition-all shrink-0 group"
+                className="flex items-center gap-3.5 bg-white px-5 py-3.5 rounded-2xl border border-black/5 shadow-xs hover:shadow-md hover:border-black/10 transition-all shrink-0 group"
               >
-                {/* Logo Container */}
-                <div className="w-10 h-10 rounded-xl flex items-center justify-center bg-[#F5F5F7]/80 p-1 shrink-0 overflow-hidden group-hover:scale-105 transition-transform">
-                  {p.isImage ? (
+                {/* Logo / Icon Container */}
+                <div 
+                  className="w-10 h-10 rounded-xl flex items-center justify-center p-1.5 shrink-0 overflow-hidden group-hover:scale-105 transition-transform"
+                  style={{ backgroundColor: `${p.badgeColor}12` }}
+                >
+                  {p.isImage && p.logoUrl ? (
                     <img
                       src={p.logoUrl}
                       alt={p.name}
@@ -120,9 +118,17 @@ export const PartnerRow: React.FC = () => {
 
                 {/* Name & Tag */}
                 <div className="flex flex-col text-left">
-                  <span className="font-display font-black text-sm text-[#1D1D1F] tracking-tight group-hover:text-[#0071E3] transition-colors leading-tight">
-                    {p.name}
-                  </span>
+                  <div className="flex items-center gap-2">
+                    <span className="font-display font-bold text-xs sm:text-sm text-[#1D1D1F] tracking-tight group-hover:text-[#0071E3] transition-colors leading-tight">
+                      {p.name}
+                    </span>
+                    <span 
+                      className="px-2 py-0.5 rounded-md text-[9px] font-mono font-bold shrink-0"
+                      style={{ color: p.badgeColor, backgroundColor: `${p.badgeColor}15` }}
+                    >
+                      {p.acronym}
+                    </span>
+                  </div>
                   <span className="text-[10px] font-mono text-gray-400 font-semibold mt-0.5">
                     {p.tag}
                   </span>

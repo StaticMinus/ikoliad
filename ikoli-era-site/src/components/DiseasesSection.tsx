@@ -2,7 +2,6 @@ import React, { useState } from 'react';
 import type { DiseaseEntry } from '../data/diseasesData';
 import { INITIAL_DISEASES } from '../data/diseasesData';
 import { Plus, ArrowUpRight } from 'lucide-react';
-import { BlobVideo } from './ui/BlobVideo';
 import { Interactive3DCard } from './ui/Interactive3DCard';
 import { MagneticButton } from './ui/MagneticButton';
 
@@ -58,40 +57,29 @@ export const DiseasesSection: React.FC<DiseasesSectionProps> = ({ onOpenDiseases
               className="grid grid-cols-1 lg:grid-cols-2 rounded-[28px] sm:rounded-[32px] border border-black/5 bg-white min-h-[460px] overflow-hidden shadow-lg group cursor-pointer"
             >
               
-              {/* Left Side: Interactive Video / Image Container */}
-              <div className="relative w-full h-[300px] lg:h-full min-h-[300px] overflow-hidden bg-black">
-                {featuredDisease.video_url ? (
-                  <BlobVideo
-                    autoPlay
-                    loop
-                    muted
-                    playsInline
-                    className="w-full h-full object-cover bw-reveal transition-transform duration-700 ease-out group-hover:scale-105"
-                    src={featuredDisease.video_url}
-                  />
-                ) : (
-                  <img
-                    src={featuredDisease.image_url}
-                    alt={featuredDisease.title}
-                    className="w-full h-full object-cover bw-reveal transition-transform duration-700 ease-out group-hover:scale-105"
-                  />
-                )}
+              {/* Left Side: High-Definition Clinical Image */}
+              <div className="relative w-full h-[300px] lg:h-full min-h-[300px] overflow-hidden bg-gray-100">
+                <img
+                  src={featuredDisease.image_url}
+                  alt={featuredDisease.title}
+                  className="w-full h-full object-cover transition-transform duration-700 ease-out group-hover:scale-105"
+                />
 
                 {/* Dark Hover Overlay */}
                 <div className="absolute inset-0 bg-black/20 opacity-0 transition-opacity duration-300 group-hover:opacity-100 pointer-events-none" />
 
                 {/* Centered '+' Icon */}
-                <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
+                <div className="absolute inset-0 flex items-center justify-center pointer-events-none z-20">
                   <div className="w-14 h-14 rounded-full bg-white/30 backdrop-blur-md flex items-center justify-center text-white scale-75 opacity-0 transition-all duration-300 group-hover:scale-100 group-hover:opacity-100 shadow-lg">
                     <Plus className="w-6 h-6 stroke-[2.5]" />
                   </div>
                 </div>
 
                 {/* 4 L-Shaped Corner Brackets */}
-                <div className="absolute top-4 left-4 w-3 h-3 border-t-2 border-l-2 border-white pointer-events-none opacity-80" />
-                <div className="absolute top-4 right-4 w-3 h-3 border-t-2 border-r-2 border-white pointer-events-none opacity-80" />
-                <div className="absolute bottom-4 left-4 w-3 h-3 border-b-2 border-l-2 border-white pointer-events-none opacity-80" />
-                <div className="absolute bottom-4 right-4 w-3 h-3 border-b-2 border-r-2 border-white pointer-events-none opacity-80" />
+                <div className="absolute top-4 left-4 w-3 h-3 border-t-2 border-l-2 border-white pointer-events-none opacity-80 z-20" />
+                <div className="absolute top-4 right-4 w-3 h-3 border-t-2 border-r-2 border-white pointer-events-none opacity-80 z-20" />
+                <div className="absolute bottom-4 left-4 w-3 h-3 border-b-2 border-l-2 border-white pointer-events-none opacity-80 z-20" />
+                <div className="absolute bottom-4 right-4 w-3 h-3 border-b-2 border-r-2 border-white pointer-events-none opacity-80 z-20" />
               </div>
 
               {/* Right Side: Featured Content */}
@@ -117,17 +105,15 @@ export const DiseasesSection: React.FC<DiseasesSectionProps> = ({ onOpenDiseases
                   )}
                 </div>
 
-                {/* Footer with Author and Category Badge */}
+                {/* Footer with Author and Clean Neutral Category Badge */}
                 <div className="pt-6 mt-6 border-t border-black/5 flex items-center justify-between">
                   <span className="text-gray-400 text-xs font-mono font-semibold">
                     {featuredDisease.author || 'By NTBLCP Surveillance Panel'}
                   </span>
 
-                  <span
-                    className="rounded-full text-white text-[10px] font-mono font-bold px-3 py-1 shadow-xs"
-                    style={{ backgroundColor: featuredDisease.category_color }}
-                  >
-                    {featuredDisease.category}
+                  <span className="rounded-full text-[#1D1D1F] text-[10px] font-mono font-bold px-3 py-1 bg-[#F5F5F7] border border-black/5 group-hover:bg-[#1D1D1F] group-hover:text-white transition-colors flex items-center gap-1.5">
+                    <span className="w-1.5 h-1.5 rounded-full bg-emerald-500" />
+                    <span>{featuredDisease.category}</span>
                   </span>
                 </div>
               </div>
@@ -146,60 +132,47 @@ export const DiseasesSection: React.FC<DiseasesSectionProps> = ({ onOpenDiseases
               >
                 
                 <div>
-                  {/* Image / Video Container (16:10 Aspect Ratio with Hover Effects) */}
-                  <div className="relative w-full aspect-[16/10] rounded-2xl overflow-hidden bg-black mb-4">
-                    {disease.video_url ? (
-                      <BlobVideo
-                        autoPlay
-                        loop
-                        muted
-                        playsInline
-                        className="w-full h-full object-cover bw-reveal transition-transform duration-700 ease-out group-hover:scale-105"
-                        src={disease.video_url}
-                      />
-                    ) : (
-                      <img
-                        src={disease.image_url}
-                        alt={disease.title}
-                        className="w-full h-full object-cover bw-reveal transition-transform duration-700 ease-out group-hover:scale-105"
-                      />
-                    )}
+                  {/* Image Container (16:10 Aspect Ratio with Hover Effects) */}
+                  <div className="relative w-full aspect-[16/10] rounded-2xl overflow-hidden bg-gray-100 mb-4">
+                    <img
+                      src={disease.image_url}
+                      alt={disease.title}
+                      className="w-full h-full object-cover transition-transform duration-700 ease-out group-hover:scale-105"
+                    />
 
                     {/* Dark Hover Overlay */}
                     <div className="absolute inset-0 bg-black/20 opacity-0 transition-opacity duration-300 group-hover:opacity-100 pointer-events-none" />
 
                     {/* Centered '+' Icon */}
-                    <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
+                    <div className="absolute inset-0 flex items-center justify-center pointer-events-none z-20">
                       <div className="w-11 h-11 rounded-full bg-white/30 backdrop-blur-md flex items-center justify-center text-white scale-75 opacity-0 transition-all duration-300 group-hover:scale-100 group-hover:opacity-100 shadow-md">
                         <Plus className="w-5 h-5 stroke-[2.5]" />
                       </div>
                     </div>
 
                     {/* 4 L-Shaped Corner Brackets */}
-                    <div className="absolute top-3 left-3 w-2.5 h-2.5 border-t-2 border-l-2 border-white pointer-events-none opacity-80" />
-                    <div className="absolute top-3 right-3 w-2.5 h-2.5 border-t-2 border-r-2 border-white pointer-events-none opacity-80" />
-                    <div className="absolute bottom-3 left-3 w-2.5 h-2.5 border-b-2 border-l-2 border-white pointer-events-none opacity-80" />
-                    <div className="absolute bottom-3 right-3 w-2.5 h-2.5 border-b-2 border-r-2 border-white pointer-events-none opacity-80" />
+                    <div className="absolute top-3 left-3 w-2.5 h-2.5 border-t-2 border-l-2 border-white pointer-events-none opacity-80 z-20" />
+                    <div className="absolute top-3 right-3 w-2.5 h-2.5 border-t-2 border-r-2 border-white pointer-events-none opacity-80 z-20" />
+                    <div className="absolute bottom-3 left-3 w-2.5 h-3 border-b-2 border-l-2 border-white pointer-events-none opacity-80 z-20" />
+                    <div className="absolute bottom-3 right-3 w-2.5 h-2.5 border-b-2 border-r-2 border-white pointer-events-none opacity-80 z-20" />
                   </div>
 
                   {/* Title */}
-                  <h4 className="font-bold text-sm sm:text-base leading-snug text-[#1D1D1F] group-hover:text-[#0071E3] transition-colors">
+                  <h4 className="font-bold text-sm sm:text-base text-[#1D1D1F] line-clamp-2 leading-snug group-hover:text-[#0071E3] transition-colors mb-2">
                     {disease.title}
                   </h4>
                 </div>
 
-                {/* Category Badge Row */}
-                <div className="flex items-center justify-between pt-4 mt-3 border-t border-black/5">
-                  <span className="text-[10px] font-mono font-bold text-gray-400">
-                    DIAGNOSTIC CRITERIA
+                {/* Footer Metadata */}
+                <div className="pt-3 border-t border-black/5 flex items-center justify-between mt-auto">
+                  <span className="rounded-full text-[#1D1D1F] text-[10px] font-mono font-bold px-2.5 py-1 bg-[#F5F5F7] border border-black/5 group-hover:bg-[#1D1D1F] group-hover:text-white transition-colors flex items-center gap-1.5">
+                    <span className="w-1.5 h-1.5 rounded-full bg-blue-500" />
+                    <span>{disease.category}</span>
                   </span>
 
-                  <span
-                    className="rounded-full text-white text-[10px] font-mono font-bold px-2.5 py-0.5 shadow-2xs"
-                    style={{ backgroundColor: disease.category_color }}
-                  >
-                    {disease.category}
-                  </span>
+                  <div className="w-7 h-7 rounded-full bg-[#F5F5F7] text-[#1D1D1F] border border-black/5 group-hover:bg-[#1D1D1F] group-hover:text-white flex items-center justify-center transition-colors">
+                    <ArrowUpRight className="w-3.5 h-3.5" />
+                  </div>
                 </div>
 
               </article>
@@ -211,5 +184,3 @@ export const DiseasesSection: React.FC<DiseasesSectionProps> = ({ onOpenDiseases
     </section>
   );
 };
-
-export default DiseasesSection;

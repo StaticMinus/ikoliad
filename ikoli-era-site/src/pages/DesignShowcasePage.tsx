@@ -255,7 +255,7 @@ export const STYLES_CATALOG: StyleMeta[] = [
 ];
 
 interface DesignShowcasePageProps {
-  onNavigate: (page: 'home' | 'dashboard' | 'diseases' | 'ask') => void;
+  onNavigate: (page: 'home' | 'dashboard' | 'diseases' | 'ask' | 'about' | 'styles' | 'api') => void;
 }
 
 export const DesignShowcasePage: React.FC<DesignShowcasePageProps> = ({ onNavigate }) => {

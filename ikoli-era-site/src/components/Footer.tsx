@@ -3,7 +3,7 @@ import { ArrowUpRight, ShieldCheck, SunMedium } from 'lucide-react';
 import { StickyRevealFooter } from './StickyRevealFooter';
 
 interface FooterProps {
-  onNavigate?: (page: 'home' | 'dashboard' | 'diseases' | 'ask' | 'about' | 'styles') => void;
+  onNavigate?: (page: any) => void;
   isStatic?: boolean;
 }
 
@@ -40,10 +40,10 @@ export const Footer: React.FC<FooterProps> = ({ onNavigate, isStatic = false }) 
           {/* Col 1: Bio & Mission Statement (Span 4) */}
           <div className="md:col-span-4 space-y-3">
             <h3 className="font-display font-bold text-xl sm:text-2xl text-[#1D1D1F] tracking-tight leading-snug">
-              IKOLI is Nigeria's national Skin NTD clinical intelligence & autonomous vision diagnostic system.
+              IKOLI AI is Nigeria's sovereign Skin NTD clinical intelligence & autonomous diagnostic system.
             </h3>
             <p className="text-xs sm:text-sm text-gray-500 leading-relaxed font-sans font-medium">
-              Developed in partnership with RedAid Nigeria, FMoHSW, NTBLCP, and DAHW to eliminate Leprosy, Buruli Ulcer, and Yaws.
+              Developed by the IKOLI Consortium (DAHW, RedAid Nigeria, Digital Dreams, FMOH/NTBLCP, VRC-UNN, IDEA) to eliminate Leprosy and Buruli Ulcer disability by 2030.
             </p>
           </div>
 
@@ -79,6 +79,14 @@ export const Footer: React.FC<FooterProps> = ({ onNavigate, isStatic = false }) 
               </li>
               <li>
                 <button
+                  onClick={() => onNavigate?.('api')}
+                  className="hover:text-[#0071E3] transition-colors cursor-pointer text-left"
+                >
+                  API Platform
+                </button>
+              </li>
+              <li>
+                <button
                   onClick={() => onNavigate?.('ask')}
                   className="hover:text-[#0071E3] transition-colors cursor-pointer text-left"
                 >
@@ -87,10 +95,18 @@ export const Footer: React.FC<FooterProps> = ({ onNavigate, isStatic = false }) 
               </li>
               <li>
                 <button
+                  onClick={() => onNavigate?.('protocols')}
+                  className="hover:text-[#0071E3] transition-colors cursor-pointer text-left font-semibold text-[#1D1D1F]"
+                >
+                  Protocols &amp; Safeguards
+                </button>
+              </li>
+              <li>
+                <button
                   onClick={() => onNavigate?.('about')}
                   className="hover:text-[#0071E3] transition-colors cursor-pointer text-left"
                 >
-                  About & Governance
+                  About &amp; Heritage
                 </button>
               </li>
             </ul>
@@ -99,31 +115,41 @@ export const Footer: React.FC<FooterProps> = ({ onNavigate, isStatic = false }) 
           {/* Col 3: Follow & Governance Partners Pill Badges (Span 3) */}
           <div className="md:col-span-3 space-y-3">
             <span className="font-sans text-xs text-gray-400 font-semibold block tracking-wide">
-              Governance & Partners
+              Governance & Consortium
             </span>
             <div className="flex flex-wrap gap-2 pt-0.5">
-              <span className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-white border border-black/5 text-[11px] font-medium text-gray-700 shadow-xs hover:border-black/15 transition-all">
-                <span className="w-2 h-2 rounded-full bg-[#DE322D]" />
-                <span>RedAid Nigeria</span>
+              <span className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-white border border-black/8 text-[11px] font-semibold text-[#1D1D1F] shadow-[0_2px_8px_rgba(0,0,0,0.02)] hover:bg-[#1D1D1F] hover:text-white hover:border-[#1D1D1F] transition-all duration-200 cursor-default group">
+                <span className="w-1.5 h-1.5 rounded-full bg-teal-500 group-hover:bg-white transition-colors" />
+                <span>DAHW</span>
               </span>
 
-              <span className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-white border border-black/5 text-[11px] font-medium text-gray-700 shadow-xs hover:border-black/15 transition-all">
-                <span className="w-2 h-2 rounded-full bg-[#0082FF]" />
-                <span>FMoHSW Nigeria</span>
+              <span className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-white border border-black/8 text-[11px] font-semibold text-[#1D1D1F] shadow-[0_2px_8px_rgba(0,0,0,0.02)] hover:bg-[#1D1D1F] hover:text-white hover:border-[#1D1D1F] transition-all duration-200 cursor-default group">
+                <span className="w-1.5 h-1.5 rounded-full bg-[#DE322D] group-hover:bg-white transition-colors" />
+                <span>RedAid Nigeria (RAN)</span>
               </span>
 
-              <span className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-white border border-black/5 text-[11px] font-medium text-gray-700 shadow-xs hover:border-black/15 transition-all">
-                <span className="w-2 h-2 rounded-full bg-[#10B981]" />
-                <span>NTBLCP Programme</span>
+              <span className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-white border border-black/8 text-[11px] font-semibold text-[#1D1D1F] shadow-[0_2px_8px_rgba(0,0,0,0.02)] hover:bg-[#1D1D1F] hover:text-white hover:border-[#1D1D1F] transition-all duration-200 cursor-default group">
+                <span className="w-1.5 h-1.5 rounded-full bg-[#0071E3] group-hover:bg-white transition-colors" />
+                <span>Digital Dreams (DD)</span>
               </span>
 
-              <span className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-white border border-black/5 text-[11px] font-medium text-gray-700 shadow-xs hover:border-black/15 transition-all">
-                <span className="w-2 h-2 rounded-full bg-amber-500" />
-                <span>DAHW Relief</span>
+              <span className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-white border border-black/8 text-[11px] font-semibold text-[#1D1D1F] shadow-[0_2px_8px_rgba(0,0,0,0.02)] hover:bg-[#1D1D1F] hover:text-white hover:border-[#1D1D1F] transition-all duration-200 cursor-default group">
+                <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 group-hover:bg-white transition-colors" />
+                <span>FMOH / NTBLCP</span>
               </span>
 
-              <span className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-white border border-black/5 text-[11px] font-medium text-gray-700 shadow-xs hover:border-black/15 transition-all">
-                <ShieldCheck className="w-3 h-3 text-[#0071E3]" />
+              <span className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-white border border-black/8 text-[11px] font-semibold text-[#1D1D1F] shadow-[0_2px_8px_rgba(0,0,0,0.02)] hover:bg-[#1D1D1F] hover:text-white hover:border-[#1D1D1F] transition-all duration-200 cursor-default group">
+                <span className="w-1.5 h-1.5 rounded-full bg-purple-500 group-hover:bg-white transition-colors" />
+                <span>VRC-UNN</span>
+              </span>
+
+              <span className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-white border border-black/8 text-[11px] font-semibold text-[#1D1D1F] shadow-[0_2px_8px_rgba(0,0,0,0.02)] hover:bg-[#1D1D1F] hover:text-white hover:border-[#1D1D1F] transition-all duration-200 cursor-default group">
+                <span className="w-1.5 h-1.5 rounded-full bg-pink-500 group-hover:bg-white transition-colors" />
+                <span>IDEA Nigeria</span>
+              </span>
+
+              <span className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-white border border-black/8 text-[11px] font-semibold text-[#1D1D1F] shadow-[0_2px_8px_rgba(0,0,0,0.02)] hover:bg-[#1D1D1F] hover:text-white hover:border-[#1D1D1F] transition-all duration-200 cursor-default group">
+                <ShieldCheck className="w-3.5 h-3.5 text-gray-500 group-hover:text-white transition-colors" />
                 <span>Zero-PII Vault</span>
               </span>
             </div>
@@ -166,10 +192,10 @@ export const Footer: React.FC<FooterProps> = ({ onNavigate, isStatic = false }) 
 
         </div>
 
-        {/* ── Giant Typographic Kinetic Wordmark (Like 'faizur' in reference) ── */}
+        {/* ── Giant Typographic Wordmark: IKOLI AI ── */}
         <div className="w-full flex justify-center items-end pointer-events-none pt-4 sm:pt-8 overflow-hidden select-none -mb-6 sm:-mb-10">
-          <span className="font-display font-black text-[130px] sm:text-[220px] md:text-[280px] lg:text-[360px] leading-[0.76] tracking-tighter text-[#1D1D1F] text-center w-full block lowercase">
-            ikoli
+          <span className="font-display font-black text-[90px] sm:text-[150px] md:text-[200px] lg:text-[260px] leading-[0.76] tracking-tight text-[#1D1D1F] text-center w-full block uppercase">
+            IKOLI <span className="text-[#0071E3]">AI</span>
           </span>
         </div>
 
@@ -180,16 +206,19 @@ export const Footer: React.FC<FooterProps> = ({ onNavigate, isStatic = false }) 
             <span>Ikoli AI © 2026</span>
             <span>•</span>
             <button
-              onClick={() => onNavigate?.('about')}
+              onClick={() => onNavigate?.('protocols')}
               className="hover:text-[#1D1D1F] transition-colors cursor-pointer"
             >
-              Privacy Policy
+              Privacy Policy &amp; NDPA 2023
             </button>
             <span>•</span>
-            <span className="text-emerald-600 font-semibold flex items-center gap-1">
+            <button
+              onClick={() => onNavigate?.('protocols')}
+              className="text-emerald-600 font-semibold flex items-center gap-1 hover:text-emerald-700 transition-colors cursor-pointer"
+            >
               <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" />
               <span>Zero-PII Protocol</span>
-            </span>
+            </button>
           </div>
 
           {/* Right Local Telemetry: Nigeria WAT Time & Climate */}

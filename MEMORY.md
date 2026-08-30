@@ -46,13 +46,13 @@ All projects, components, and interfaces in this workspace must default to the *
 
 ---
 
-## 3. Institutional Governance & Partnerships
-- **Programme Host**: RedAid Nigeria
-- **National Custodian**: Federal Ministry of Health & Social Welfare (FMoHSW)
-- **Operational Programme**: National TB, Buruli Ulcer & Leprosy Control Programme (NTBLCP)
-- **Technical Co-Lead**: Circles AI
-- **Data Gateway**: DHIS2 Integrated
-- **International Relief**: DAHW Relief
+## 3. Official Consortium Governance & Partners (6 Members)
+1. **DAHW**: DAHW German Leprosy and Tuberculosis Relief Association e.V. (International Relief Partner)
+2. **RAN**: RedAid Nigeria (Programme Leadership & Clinical Field Lead — CEO: Dr. Daniel Nze Egbule)
+3. **DD**: Digital Dreams Limited (Technology Architecture & Clinical AI Engineering Lead)
+4. **FMOH**: Federal Ministry of Health and Social Welfare / NTBLCP (National Sovereign Health Custodian)
+5. **VRC-UNN**: University of Nigeria, Nsukka — Vaccine Research Centre (Academic Medical Centre & Vaccine Research Lead)
+6. **IDEA**: IDEA Nigeria (Persons Affected Dignity, Inclusion & Community Advocacy)
 
 ---
 
@@ -61,3 +61,28 @@ All projects, components, and interfaces in this workspace must default to the *
 - **Grade-2 Disability Prevention**: `< 5%`
 - **PCR Laboratory Confirmation**: `78.5%`
 - **Zero-PII Standard**: SHA-256 field tokenization, zero facial biometrics stored.
+
+---
+
+## 5. Milestone & Session Checkpoint Log (August 30, 2026)
+
+### Key Achievements in Current Session:
+1. **Interactive Story Console ([StoryScrollTriggerSection.tsx](file:///c:/Users/David/Music/IKOLI/ikoli-era-site/src/components/StoryScrollTriggerSection.tsx))**:
+   - Built a 5-chapter interactive scroll-scrub story console on the Diseases page (`#diseases`).
+   - Redesigned from the previous dark card into the official **Apple Clean / Spatial Minimalist** aesthetic with pure white bento surfaces, segmented capsules, and soft cloud gray metric cards.
+   - Added polyphonic Choral Ambient synthesizer honoring Ikoli Harcourt Whyte.
+2. **Consortium Alignment (6 Official Partners)**:
+   - Successfully removed provisional `SSA2` partner across all navigation, footers, marquees, AI system prompts, and data constants.
+   - Grounded all AI and platform representations in the 6 confirmed partners (DAHW, RedAid Nigeria, Digital Dreams, FMOH/NTBLCP, VRC-UNN, IDEA Nigeria) with Dr. Daniel Nze Egbule as RedAid CEO / Country Rep.
+3. **Color Harmonization**:
+   - Standardized disease category badges, ICD-11 headers, and action icons to single consistent **Apple Semantic Blue (`#0071E3`)**.
+4. **Build Verification**:
+   - Both `ikoli-era-site` (`http://localhost:5210/`) and `ikoli-web` (`http://localhost:5173/`) compile with **0 errors**.
+
+### Quick Resume Instructions:
+1. Open PowerShell / Terminal in workspace:
+   ```bash
+   cd c:\Users\David\Music\IKOLI\ikoli-era-site
+   npm run dev
+   ```
+2. Open browser at `http://localhost:5210/` to test all active pages (`#home`, `#dashboard`, `#diseases`, `#ask`, `#about`, `#styles`).

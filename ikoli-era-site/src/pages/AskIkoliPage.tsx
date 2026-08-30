@@ -25,7 +25,7 @@ import {
 } from 'lucide-react';
 
 interface AskIkoliPageProps {
-  onNavigate: (page: 'home' | 'dashboard' | 'diseases' | 'ask' | 'about' | 'styles') => void;
+  onNavigate: (page: 'home' | 'dashboard' | 'diseases' | 'ask' | 'about' | 'styles' | 'api') => void;
 }
 
 interface ChatMessage {
@@ -40,33 +40,10 @@ interface ChatMessage {
   source?: 'omniroute-live' | 'gemini-live' | 'openrouter-live' | 'clinical-knowledge-base';
 }
 
-const INITIAL_CONVERSATION: ChatMessage[] = [
-  {
-    id: 'msg-1',
-    sender: 'user',
-    text: 'Should we initiate MDT for a patient presenting with hypopigmented macules and sensory loss in Oji River LGA?',
-    timestamp: '10:14 AM',
-  },
-  {
-    id: 'msg-2',
-    sender: 'ai',
-    text: "Under Nigeria NTBLCP guidelines, here is the immediate clinical evaluation protocol for this case:\n\n1. **Sensory Deficit Confirmation:** Documented loss of thermal or light touch sensation over hypopigmented skin patches confirms Hansen's disease.\n2. **Lesion Classification:** Count the active lesions: 1 to 5 lesions classifies as **Paucibacillary (PB)**; 6 or more lesions or multiple enlarged nerve trunks classifies as **Multibacillary (MB)**.\n3. **Voluntary Muscle Testing (VMT):** Perform baseline motor and sensory mapping on ulnar and common peroneal nerves to prevent Grade-2 Disability (G2D).\n4. **Treatment Dispatch:** Initiate standard WHO Blister Pack (PB: 6 months; MB: 12 months).\n\nWhich clinical parameter would you like to verify next?",
-    timestamp: '10:14 AM',
-    category: 'Leprosy MDT Protocol',
-    dimensions: [
-      'PB Blister Pack: 6 months daily Dapsone + monthly Rifampicin.',
-      'MB Blister Pack: 12 months daily Dapsone + Clofazimine + monthly Rifampicin.',
-      'Disability Prevention: Keep national Grade-2 Disability rate under 4.8%.',
-      'Zero-PII Notification: Case hashed with SHA-256 HMAC for state epidemiological dashboard.',
-    ],
-    followUpPrompt: 'Review 6-Month PB Blister Pack vs 12-Month MB Regimen',
-    source: 'gemini-live',
-  },
-];
-
 export const AskIkoliPage: React.FC<AskIkoliPageProps> = ({ onNavigate }) => {
   const [theme, setTheme] = useState<'dark' | 'light'>('light');
-  const [messages, setMessages] = useState<ChatMessage[]>(INITIAL_CONVERSATION);
+  // Clean fresh start on every entry
+  const [messages, setMessages] = useState<ChatMessage[]>([]);
   const [inputQuery, setInputQuery] = useState('');
   const [isTyping, setIsTyping] = useState(false);
   const [copiedId, setCopiedId] = useState<string | null>(null);
@@ -173,7 +150,7 @@ export const AskIkoliPage: React.FC<AskIkoliPageProps> = ({ onNavigate }) => {
     }
   };
 
-  // Main Query Submission Handler with Gemini AI & OmniRoute
+  // Main Query Submission Handler with Live AI Model & Web Search
   const handleSend = async (textToSend: string) => {
     const query = textToSend.trim();
     if (!query && !attachedFile) return;
@@ -229,7 +206,6 @@ export const AskIkoliPage: React.FC<AskIkoliPageProps> = ({ onNavigate }) => {
   const handleSpeak = (text: string) => {
     if ('speechSynthesis' in window) {
       window.speechSynthesis.cancel();
-      // Remove raw asterisks for clean speech
       const cleanText = text.replace(/\*\*/g, '').replace(/•/g, '');
       const utterance = new SpeechSynthesisUtterance(cleanText);
       utterance.rate = 1.0;
@@ -250,7 +226,7 @@ export const AskIkoliPage: React.FC<AskIkoliPageProps> = ({ onNavigate }) => {
         isDark ? 'bg-[#0C0C0C] text-white' : 'bg-[#FBFBFD] text-[#1D1D1F]'
       }`}
     >
-      {/* ── Fixed Clean Navbar ─────────────────────────────────── */}
+      {/* ── Fixed Centered Capsule Navbar ─────────────────────────────────── */}
       <Navbar currentPage="ask" onNavigate={onNavigate} />
 
       {/* Hidden File Input */}
@@ -263,9 +239,9 @@ export const AskIkoliPage: React.FC<AskIkoliPageProps> = ({ onNavigate }) => {
       />
 
       {/* ══════════════════════════════════════════════════════════════════════
-          MAIN REFINED CLINICAL INTELLIGENCE WORKSPACE (SINGLE INTEGRATED VIEW)
+          MAIN REFINED CLINICAL INTELLIGENCE WORKSPACE (CLEAN & MINIMAL)
       ══════════════════════════════════════════════════════════════════════ */}
-      <section className={`relative w-full pt-28 pb-16 px-4 sm:px-6 md:px-8 overflow-hidden transition-colors duration-300 flex-1 flex flex-col items-center ${
+      <section className={`relative w-full pt-28 sm:pt-32 pb-16 px-4 sm:px-6 md:px-8 overflow-hidden transition-colors duration-300 flex-1 flex flex-col items-center ${
         isDark ? 'bg-[#0C0C0C]' : 'bg-[#FBFBFD]'
       }`}>
         
@@ -278,11 +254,11 @@ export const AskIkoliPage: React.FC<AskIkoliPageProps> = ({ onNavigate }) => {
 
         <div className="w-full max-w-4xl mx-auto flex flex-col items-center text-center relative z-10 space-y-6">
           
-          {/* Top Status Header Bar */}
+          {/* Top Status Header Bar (Clean, Minimal, No Developer/Model Pills) */}
           <div className="w-full flex items-center justify-between gap-3 border-b pb-4 pt-1 transition-colors duration-300 border-black/5 dark:border-white/10">
             
-            {/* Left: Mode Badge */}
-            <div className="flex items-center gap-2.5">
+            {/* Left: Clean Brand Status Badge */}
+            <div className="flex items-center gap-2">
               <div className={`px-3.5 py-1.5 rounded-full flex items-center gap-2 border text-xs font-mono font-medium backdrop-blur-xl ${
                 isDark ? 'bg-white/5 border-white/10 text-gray-200' : 'bg-white border-black/10 text-gray-800 shadow-xs'
               }`}>
@@ -291,15 +267,15 @@ export const AskIkoliPage: React.FC<AskIkoliPageProps> = ({ onNavigate }) => {
               </div>
             </div>
 
-            {/* Right: Reset & Theme Toggle */}
+            {/* Right: Reset Consultation & Theme Toggle */}
             <div className="flex items-center gap-2">
               {messages.length > 0 && (
                 <button
                   onClick={handleResetConsultation}
-                  className={`px-3 py-1.5 rounded-full border text-xs font-medium transition-all cursor-pointer flex items-center gap-1.5 ${
+                  className={`px-3.5 py-1.5 rounded-full border text-xs font-medium transition-all cursor-pointer flex items-center gap-1.5 ${
                     isDark ? 'bg-white/5 border-white/10 text-gray-300 hover:bg-white/10 hover:text-white' : 'bg-white border-black/10 text-gray-700 hover:bg-gray-100 shadow-xs'
                   }`}
-                  title="Clear history and start fresh"
+                  title="Start fresh screening"
                 >
                   <RotateCcw className="w-3 h-3" />
                   <span className="hidden sm:inline">New Screening</span>
@@ -340,7 +316,7 @@ export const AskIkoliPage: React.FC<AskIkoliPageProps> = ({ onNavigate }) => {
           </div>
 
           {/* ══════════════════════════════════════════════════════════════════
-              CONVERSATION & CLINICAL REASONING STREAM (PLACED ABOVE THE INPUT BOX)
+              CONVERSATION & CLINICAL REASONING STREAM (ONLY WHEN MESSAGES EXIST)
           ══════════════════════════════════════════════════════════════════ */}
           {messages.length > 0 && (
             <div className="w-full space-y-5 pt-2 text-left">
@@ -386,14 +362,14 @@ export const AskIkoliPage: React.FC<AskIkoliPageProps> = ({ onNavigate }) => {
                       </div>
                     )}
 
-                    {/* AI Response Header with Category & Actions */}
+                    {/* AI Response Header with Clean Category & Audio/Copy Actions */}
                     {msg.sender === 'ai' && (
                       <div className={`flex items-center justify-between gap-2 mb-3 pb-2.5 border-b ${
                         isDark ? 'border-white/10' : 'border-black/5'
                       }`}>
                         <div className="flex items-center gap-2">
                           <span className="text-[11px] font-mono font-bold uppercase tracking-wider text-[#10B981]">
-                            {msg.category || 'Clinical Reasoning'}
+                            {msg.category || 'Clinical Guidance'}
                           </span>
                         </div>
                         
@@ -416,7 +392,7 @@ export const AskIkoliPage: React.FC<AskIkoliPageProps> = ({ onNavigate }) => {
                       </div>
                     )}
 
-                    {/* Formatted Markdown Content (No Raw Asterisks) with Clickable Interactive Options */}
+                    {/* Formatted Markdown Content with Clickable Interactive Options */}
                     <ClinicalMarkdown 
                       content={msg.text} 
                       onSelectOption={(optionText) => handleSend(optionText)}
@@ -473,7 +449,7 @@ export const AskIkoliPage: React.FC<AskIkoliPageProps> = ({ onNavigate }) => {
                 </div>
               ))}
 
-              {/* Live Typing / Evaluation State ("Ikoli is thinking…") */}
+              {/* Live Typing State */}
               {isTyping && (
                 <div className="flex items-center gap-3.5">
                   <div className={`w-9 h-9 rounded-full flex items-center justify-center shrink-0 border shadow-sm ${
@@ -495,7 +471,7 @@ export const AskIkoliPage: React.FC<AskIkoliPageProps> = ({ onNavigate }) => {
           )}
 
           {/* ══════════════════════════════════════════════════════════════════
-              PRIMARY CLINICAL COMPOSER CARD (POSITIONED BELOW THE CONVERSATION)
+              PRIMARY CLINICAL COMPOSER CARD
           ══════════════════════════════════════════════════════════════════ */}
           <div className="w-full relative group text-left pt-2">
             
@@ -572,7 +548,7 @@ export const AskIkoliPage: React.FC<AskIkoliPageProps> = ({ onNavigate }) => {
                       handleSend(inputQuery);
                     }
                   }}
-                  placeholder="Describe patient symptoms, lesion size, sensory loss, or ask a clinical protocol question…"
+                  placeholder="Describe patient symptoms, lesion count, sensory loss, or ask an epidemiological question…"
                   className={`w-full bg-transparent text-sm sm:text-base outline-none resize-none min-h-[75px] font-sans leading-relaxed ${
                     isDark ? 'text-white placeholder-gray-500' : 'text-[#1D1D1F] placeholder-gray-400'
                   }`}
@@ -633,11 +609,11 @@ export const AskIkoliPage: React.FC<AskIkoliPageProps> = ({ onNavigate }) => {
 
           {/* Quick Preset Diagnostic Suggestions with Magnetic Buttons */}
           <div className="flex flex-wrap items-center justify-center gap-2 pt-1 text-xs">
-            <span className={isDark ? 'text-gray-500' : 'text-gray-400'}>Suggested differentials:</span>
+            <span className={isDark ? 'text-gray-500' : 'text-gray-400'}>Suggested queries:</span>
             {[
+              'Who is the CEO of RedAid Nigeria?',
               'Staging Buruli Category I vs II',
               'Leprosy PB vs MB MDT pack',
-              'Yaws Azithromycin dosing',
               'Mile 4 Lab PCR turnaround',
             ].map((p, idx) => (
               <MagneticButton key={idx} onClick={() => handleSend(p)}>
@@ -658,7 +634,7 @@ export const AskIkoliPage: React.FC<AskIkoliPageProps> = ({ onNavigate }) => {
 
       </section>
 
-      {/* ── Completely Static, Non-Moving Footer (Prop isStatic={true}) ── */}
+      {/* ── Completely Static, Non-Moving Footer ── */}
       <Footer onNavigate={onNavigate} isStatic={true} />
 
     </main>

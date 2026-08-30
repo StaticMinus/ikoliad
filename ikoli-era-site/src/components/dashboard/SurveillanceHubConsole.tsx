@@ -11,6 +11,7 @@ import {
   FileSpreadsheet,
   FlaskConical,
   Zap,
+  ArrowUpRight,
 } from 'lucide-react';
 import {
   STATES_DATA,
@@ -759,65 +760,129 @@ export const SurveillanceHubConsole: React.FC<SurveillanceHubConsoleProps> = ({
 
           </div>
 
-          {/* ── CENTER COLUMN: HERO SENTINEL IMAGE (4 Cols) ───────────── */}
-          <div className="lg:col-span-4 bg-[#0A111E] rounded-[32px] overflow-hidden shadow-xs border border-black/5 relative min-h-[520px] flex flex-col justify-between p-4 group text-white">
+          {/* ── CENTER COLUMN: APPLE CLEAN STATE INTELLIGENCE CARD (4 Cols) ───────────── */}
+          <div className="lg:col-span-4 bg-white rounded-[28px] p-6 shadow-xs border border-black/5 flex flex-col justify-between space-y-5 text-left">
             
-            {/* Background Image: Generated Image August 27, 2026 - 1_05PM */}
-            <img
-              src="/media/dashboard-sentinel.jpg"
-              alt="Ikoli Frontline Community Healthcare AI Telemetry"
-              className="absolute inset-0 w-full h-full object-cover transition-transform duration-700 ease-[cubic-bezier(0.22,1,0.36,1)] group-hover:scale-105"
-            />
-
-            {/* Subtle Gradient Blend Vignette */}
-            <div className="absolute inset-0 bg-gradient-to-t from-black/85 via-black/20 to-black/50 pointer-events-none z-5" />
-
-            {/* Top Overlay Badge */}
-            <div className="relative z-10 p-2 flex items-center justify-between">
-              <div className="bg-black/60 backdrop-blur-md border border-white/20 px-3.5 py-1 rounded-full text-[10px] font-mono font-bold text-white flex items-center gap-1.5 shadow-sm">
-                <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse" />
-                <span>FRONTLINE SENTINEL • IKOLI AI INSIGHTS</span>
+            {/* Top Node Indicator & Status */}
+            <div className="flex items-center justify-between border-b border-black/5 pb-3.5">
+              <div className="flex items-center gap-2">
+                <span className="w-2 h-2 rounded-full bg-[#10B981] shadow-[0_0_6px_#10B981]" />
+                <span className="text-[11px] font-mono font-bold text-gray-700 uppercase tracking-wide">
+                  Sentinel Surveillance Node
+                </span>
               </div>
-
-              <span className="text-[10px] font-mono text-cyan-300 bg-black/60 backdrop-blur-md border border-white/15 px-2.5 py-1 rounded-full">
-                Live Field Feed
+              <span className="text-[10px] font-mono font-bold text-[#0071E3] bg-[#0071E3]/10 px-2.5 py-0.5 rounded-full border border-[#0071E3]/20">
+                Live State Feed
               </span>
             </div>
 
-            {/* Bottom State Information Overlay */}
-            <div className="relative z-10 p-4 bg-black/70 backdrop-blur-xl rounded-2xl border border-white/15 text-left space-y-2.5 shadow-2xl">
-              <div className="flex items-center justify-between">
-                <div>
-                  <h3 className="font-extrabold text-lg text-white tracking-tight">
-                    {currentState.name}
-                  </h3>
-                  <p className="text-[11px] text-cyan-300 font-medium">
-                    Capital: {currentState.capital} • {currentState.zone}
-                  </p>
-                </div>
-                <div className="text-right">
-                  <span className="text-2xl font-black font-mono text-[#00D2FF]">
-                    {(currentState.leprosyCases + currentState.buruliCases).toLocaleString()}
-                  </span>
-                  <span className="text-[10px] text-gray-400 block font-mono">Active Cases</span>
-                </div>
+            {/* State Title & Zone */}
+            <div className="space-y-1">
+              <div className="flex items-baseline justify-between">
+                <h3 className="font-display font-black text-2xl sm:text-3xl text-[#1D1D1F] tracking-tight">
+                  {currentState.name}
+                </h3>
+                <span className="text-xs font-mono font-bold text-emerald-600 bg-emerald-50 px-2.5 py-1 rounded-full border border-emerald-500/20">
+                  {currentState.leprosyCureRate}% Cure Rate
+                </span>
+              </div>
+              <p className="text-xs text-gray-500 font-medium">
+                Capital: {currentState.capital} • {currentState.zone}
+              </p>
+            </div>
+
+            {/* Key Metric Card: Active Cases */}
+            <div className="bg-gradient-to-br from-[#F5F9FF] to-[#EDF4FE] rounded-2xl p-4 border border-[#0071E3]/15 flex items-center justify-between">
+              <div>
+                <span className="text-[11px] font-mono font-bold uppercase tracking-wider text-[#0071E3] block">
+                  Active Clinical Staging
+                </span>
+                <span className="text-2xl sm:text-3xl font-display font-black text-[#1D1D1F] tracking-tight block">
+                  {(currentState.leprosyCases + currentState.buruliCases).toLocaleString()}
+                </span>
+                <span className="text-[10px] text-gray-500 font-medium">
+                  {currentState.leprosyCases} Leprosy + {currentState.buruliCases} Buruli Ulcer
+                </span>
               </div>
 
-              <div className="grid grid-cols-3 gap-2 pt-2 border-t border-white/15 text-[10px] font-mono">
-                <div>
-                  <span className="text-gray-400 block">LGAs Covered</span>
-                  <strong className="text-white">{currentState.lgasCovered} LGAs</strong>
-                </div>
-                <div>
-                  <span className="text-gray-400 block">Sentinel Labs</span>
-                  <strong className="text-white">{currentState.sentinelLabs} Sites</strong>
-                </div>
-                <div>
-                  <span className="text-gray-400 block">PCR Accuracy</span>
-                  <strong className="text-emerald-400">{currentState.buruliPcrRate}%</strong>
-                </div>
+              <div className="text-right space-y-1">
+                <span className="inline-block text-[10px] font-mono font-bold text-emerald-700 bg-emerald-100/80 px-2 py-0.5 rounded-md">
+                  G2D: {currentState.leprosyG2D}%
+                </span>
+                <p className="text-[10px] text-gray-400 font-mono">Target: &lt;4.8%</p>
               </div>
             </div>
+
+            {/* 3 Apple Clean Sub-Tiles */}
+            <div className="grid grid-cols-3 gap-2.5">
+              {/* Tile 1 */}
+              <div className="bg-[#F8F9FB] rounded-2xl p-3 border border-black/5 text-center space-y-0.5">
+                <span className="text-[10px] font-sans font-semibold text-gray-500 uppercase block">
+                  LGAs Covered
+                </span>
+                <span className="text-base font-black text-[#1D1D1F] block">
+                  {currentState.lgasCovered}
+                </span>
+                <span className="text-[10px] font-mono text-gray-400">100% Active</span>
+              </div>
+
+              {/* Tile 2 */}
+              <div className="bg-[#F8F9FB] rounded-2xl p-3 border border-black/5 text-center space-y-0.5">
+                <span className="text-[10px] font-sans font-semibold text-gray-500 uppercase block">
+                  Sentinel Labs
+                </span>
+                <span className="text-base font-black text-[#0071E3] block">
+                  {currentState.sentinelLabs}
+                </span>
+                <span className="text-[10px] font-mono text-gray-400">Reference Sites</span>
+              </div>
+
+              {/* Tile 3 */}
+              <div className="bg-[#F8F9FB] rounded-2xl p-3 border border-black/5 text-center space-y-0.5">
+                <span className="text-[10px] font-sans font-semibold text-gray-500 uppercase block">
+                  PCR Accuracy
+                </span>
+                <span className="text-base font-black text-emerald-600 block">
+                  {currentState.buruliPcrRate}%
+                </span>
+                <span className="text-[10px] font-mono text-gray-400">IS2404 Confirmed</span>
+              </div>
+            </div>
+
+            {/* Staging Distribution Progress */}
+            <div className="space-y-1.5 pt-1">
+              <div className="flex items-center justify-between text-[10px] font-mono text-gray-500">
+                <span>PB: {currentState.leprosyPB}</span>
+                <span>MB: {currentState.leprosyMB}</span>
+                <span>BU: {currentState.buruliCases}</span>
+              </div>
+              <div className="h-2 w-full bg-gray-100 rounded-full overflow-hidden flex">
+                <div 
+                  style={{ width: `${Math.round((currentState.leprosyPB / (currentState.leprosyCases + currentState.buruliCases || 1)) * 100)}%` }} 
+                  className="h-full bg-emerald-500" 
+                  title="PB Leprosy"
+                />
+                <div 
+                  style={{ width: `${Math.round((currentState.leprosyMB / (currentState.leprosyCases + currentState.buruliCases || 1)) * 100)}%` }} 
+                  className="h-full bg-[#0071E3]" 
+                  title="MB Leprosy"
+                />
+                <div 
+                  style={{ width: `${Math.round((currentState.buruliCases / (currentState.leprosyCases + currentState.buruliCases || 1)) * 100)}%` }} 
+                  className="h-full bg-amber-500" 
+                  title="Buruli Ulcer"
+                />
+              </div>
+            </div>
+
+            {/* Quick Action Button */}
+            <button
+              onClick={() => setSelectedMetricModal(`${currentState.name} Epidemiological Summary`)}
+              className="w-full bg-[#1D1D1F] hover:bg-[#0071E3] active:scale-[0.99] text-white py-3 rounded-2xl font-bold text-xs shadow-xs transition-all cursor-pointer flex items-center justify-center gap-2"
+            >
+              <span>Explore {currentState.name} Telemetry</span>
+              <ArrowUpRight className="w-3.5 h-3.5" />
+            </button>
 
           </div>
 
