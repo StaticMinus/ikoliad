@@ -308,10 +308,10 @@ export const AboutPage: React.FC<AboutPageProps> = ({ onNavigate }) => {
             </h2>
           </div>
 
-          {/* 8-Cell Gallery Bento Grid (4 Columns x 2 Rows - 100% Flush Zero Gap, Clean Images) */}
+          {/* 8-Cell Gallery Bento Grid (4 Columns x 2 Rows - 100% Flush Zero Gap, Editorial Color & B&W Balance) */}
           <div className="grid grid-cols-2 md:grid-cols-4 gap-0 border border-black/10 shadow-sm">
             
-            {/* Cell 1: Clinical Examination Staging */}
+            {/* Cell 1: Clinical Examination Staging (Full Vibrant Color) */}
             <div
               onClick={() => onNavigate('diseases')}
               className="relative aspect-[3/4] rounded-none overflow-hidden bg-gray-900 group cursor-pointer border-b md:border-b border-r border-black/10"
@@ -319,11 +319,11 @@ export const AboutPage: React.FC<AboutPageProps> = ({ onNavigate }) => {
               <img
                 src="/media/leprosy_clinical_exam.jpg"
                 alt="Clinical Stage I Screening"
-                className="w-full h-full object-cover filter grayscale contrast-115 group-hover:scale-106 group-hover:filter-none transition-all duration-500"
+                className="w-full h-full object-cover group-hover:scale-106 transition-transform duration-500"
               />
             </div>
 
-            {/* Cell 2: Skin Lesion Differential Diagnostic */}
+            {/* Cell 2: Skin Lesion Differential Diagnostic (Monochrome B&W) */}
             <div
               onClick={() => onNavigate('diseases')}
               className="relative aspect-[3/4] rounded-none overflow-hidden bg-gray-900 group cursor-pointer border-b md:border-b border-r md:border-r border-black/10"
@@ -331,23 +331,23 @@ export const AboutPage: React.FC<AboutPageProps> = ({ onNavigate }) => {
               <img
                 src="/media/home_pb_leprosy_hypopigmentation.jpg"
                 alt="Hypopigmentation Examination"
-                className="w-full h-full object-cover filter grayscale contrast-115 group-hover:scale-106 group-hover:filter-none transition-all duration-500"
+                className="w-full h-full object-cover filter grayscale contrast-115 group-hover:scale-106 transition-transform duration-500"
               />
             </div>
 
-            {/* Cell 3: Clinical Leadership Study */}
+            {/* Cell 3: Clinical Leadership Study (Warm Sunlit Color) */}
             <div
               onClick={() => onNavigate('about')}
               className="relative aspect-[3/4] rounded-none overflow-hidden bg-gray-900 group cursor-pointer border-b md:border-b border-r border-black/10"
             >
               <img
-                src="/media/about_tall_portrait.jpg"
+                src="/media/about_contact_creative_color.jpg"
                 alt="Clinical Leadership"
-                className="w-full h-full object-cover filter grayscale contrast-115 group-hover:scale-106 group-hover:filter-none transition-all duration-500"
+                className="w-full h-full object-cover group-hover:scale-106 transition-transform duration-500"
               />
             </div>
 
-            {/* Cell 4: Laboratory Microscopic Telemetry */}
+            {/* Cell 4: Laboratory Microscopic Telemetry (Full Vibrant Glowing Color) */}
             <div
               onClick={() => onNavigate('dashboard')}
               className="relative aspect-[3/4] rounded-none overflow-hidden bg-gray-900 group cursor-pointer border-b md:border-b border-black/10"
@@ -355,11 +355,11 @@ export const AboutPage: React.FC<AboutPageProps> = ({ onNavigate }) => {
               <img
                 src="/media/submenu_sentinel_lab.jpg"
                 alt="Microscopy Telemetry"
-                className="w-full h-full object-cover filter grayscale contrast-115 group-hover:scale-106 group-hover:filter-none transition-all duration-500"
+                className="w-full h-full object-cover group-hover:scale-106 transition-transform duration-500"
               />
             </div>
 
-            {/* Cell 5: Sensory Nerve Trunk Examination */}
+            {/* Cell 5: Sensory Nerve Trunk Examination (Monochrome B&W) */}
             <div
               onClick={() => onNavigate('diseases')}
               className="relative aspect-[3/4] rounded-none overflow-hidden bg-gray-900 group cursor-pointer border-b md:border-b-0 border-r border-black/10"
@@ -367,11 +367,11 @@ export const AboutPage: React.FC<AboutPageProps> = ({ onNavigate }) => {
               <img
                 src="/media/home_mb_leprosy_nerve_mapping.jpg"
                 alt="Peroneal Nerve Exam"
-                className="w-full h-full object-cover filter grayscale contrast-115 group-hover:scale-106 group-hover:filter-none transition-all duration-500"
+                className="w-full h-full object-cover filter grayscale contrast-115 group-hover:scale-106 transition-transform duration-500"
               />
             </div>
 
-            {/* Cell 6: Patient Dignity & Human Sanctuary */}
+            {/* Cell 6: Patient Dignity & Human Sanctuary (Lush Tropical Garden Color) */}
             <div
               onClick={() => onNavigate('about')}
               className="relative aspect-[3/4] rounded-none overflow-hidden bg-gray-900 group cursor-pointer border-b md:border-b-0 border-r border-black/10"
@@ -379,7 +379,7 @@ export const AboutPage: React.FC<AboutPageProps> = ({ onNavigate }) => {
               <img
                 src="/media/submenu_patient_dignity.jpg"
                 alt="Patient Dignity & Recovery"
-                className="w-full h-full object-cover filter grayscale contrast-115 group-hover:scale-106 group-hover:filter-none transition-all duration-500"
+                className="w-full h-full object-cover group-hover:scale-106 transition-transform duration-500"
               />
             </div>
 
@@ -416,7 +416,7 @@ export const AboutPage: React.FC<AboutPageProps> = ({ onNavigate }) => {
               </span>
             </div>
 
-            {/* Cell 8: Consortium Research Charter */}
+            {/* Cell 8: Consortium Research Charter (Full Warm Lab Color) */}
             <div
               onClick={() => onNavigate('about')}
               className="relative aspect-[3/4] rounded-none overflow-hidden bg-gray-900 group cursor-pointer"
@@ -424,7 +424,7 @@ export const AboutPage: React.FC<AboutPageProps> = ({ onNavigate }) => {
               <img
                 src="/media/female_researcher_journal.jpg"
                 alt="Consortium Research Charter"
-                className="w-full h-full object-cover filter grayscale contrast-115 group-hover:scale-106 group-hover:filter-none transition-all duration-500"
+                className="w-full h-full object-cover group-hover:scale-106 transition-transform duration-500"
               />
             </div>
 
