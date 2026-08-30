@@ -196,14 +196,11 @@ export const Navbar: React.FC<NavbarProps> = ({
               <MagneticButton magneticStrength={0.2} onClick={() => setSearchModalOpen(true)}>
                 <button
                   className="bg-black/[0.04] hover:bg-black/[0.08] active:scale-95 text-[#1D1D1F] px-2.5 sm:px-3 py-1.5 rounded-full text-xs font-semibold flex items-center gap-1.5 border border-black/5 shadow-2xs transition-all cursor-pointer group"
-                  title="Search IKOLI AI Platform (⌘K / Ctrl+K)"
+                  title="Search IKOLI AI Platform"
                   aria-label="Open Search"
                 >
                   <Search className="w-3.5 h-3.5 text-gray-600 group-hover:text-[#0071E3] transition-colors" />
                   <span className="hidden sm:inline text-[11px] font-medium text-gray-600 group-hover:text-[#1D1D1F]">Search</span>
-                  <kbd className="hidden lg:inline-flex items-center text-[9px] font-mono font-bold bg-black/10 text-gray-500 px-1.5 py-0.2 rounded ml-0.5">
-                    ⌘K
-                  </kbd>
                 </button>
               </MagneticButton>
 
@@ -440,15 +437,10 @@ export const Navbar: React.FC<NavbarProps> = ({
                   setMobileMenuOpen(false);
                   setSearchModalOpen(true);
                 }}
-                className="w-full bg-[#F5F5F7] hover:bg-[#EBEBEF] text-gray-600 px-3.5 py-2.5 rounded-2xl text-xs font-semibold flex items-center justify-between border border-black/5 transition-all cursor-pointer shadow-2xs"
+                className="w-full bg-[#F5F5F7] hover:bg-[#EBEBEF] text-gray-600 px-3.5 py-2.5 rounded-2xl text-xs font-semibold flex items-center gap-2.5 border border-black/5 transition-all cursor-pointer shadow-2xs"
               >
-                <div className="flex items-center gap-2.5">
-                  <Search className="w-3.5 h-3.5 text-gray-500" />
-                  <span>Search platform &amp; diseases...</span>
-                </div>
-                <kbd className="text-[9px] font-mono font-bold bg-white text-gray-500 px-1.5 py-0.5 rounded shadow-2xs">
-                  ⌘K
-                </kbd>
+                <Search className="w-3.5 h-3.5 text-gray-500" />
+                <span>Search platform &amp; diseases...</span>
               </button>
 
               {/* Clean Minimal Navigation Item List */}
