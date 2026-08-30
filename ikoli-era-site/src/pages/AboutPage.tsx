@@ -331,16 +331,16 @@ export const AboutPage: React.FC<AboutPageProps> = ({ onNavigate }) => {
             </h2>
           </div>
 
-          {/* 8-Cell Gallery Bento Grid (4 Columns x 2 Rows matching reference mockup 100%) */}
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-3 sm:gap-4">
+          {/* 8-Cell Gallery Bento Grid (4 Columns x 2 Rows - 100% Flush Zero Gap) */}
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-0 border border-black/10 shadow-sm">
             
             {/* Cell 1: Clinical Examination Staging */}
             <div
               onClick={() => onNavigate('diseases')}
-              className="relative aspect-[3/4] rounded-none overflow-hidden bg-gray-900 group cursor-pointer shadow-xs border border-black/5"
+              className="relative aspect-[3/4] rounded-none overflow-hidden bg-gray-900 group cursor-pointer border-b md:border-b border-r border-black/10"
             >
               <img
-                src="/media/leprosy_clinical_sensory_exam.jpg"
+                src="/media/leprosy_clinical_exam.jpg"
                 alt="Clinical Stage I Screening"
                 className="w-full h-full object-cover filter grayscale contrast-115 group-hover:scale-106 group-hover:filter-none transition-all duration-500"
               />
@@ -355,7 +355,7 @@ export const AboutPage: React.FC<AboutPageProps> = ({ onNavigate }) => {
             {/* Cell 2: Skin Lesion Differential Diagnostic */}
             <div
               onClick={() => onNavigate('diseases')}
-              className="relative aspect-[3/4] rounded-none overflow-hidden bg-gray-900 group cursor-pointer shadow-xs border border-black/5"
+              className="relative aspect-[3/4] rounded-none overflow-hidden bg-gray-900 group cursor-pointer border-b md:border-b border-r md:border-r border-black/10"
             >
               <img
                 src="/media/home_pb_leprosy_hypopigmentation.jpg"
@@ -376,7 +376,7 @@ export const AboutPage: React.FC<AboutPageProps> = ({ onNavigate }) => {
             {/* Cell 3: Clinical Leadership Study */}
             <div
               onClick={() => onNavigate('about')}
-              className="relative aspect-[3/4] rounded-none overflow-hidden bg-gray-900 group cursor-pointer shadow-xs border border-black/5"
+              className="relative aspect-[3/4] rounded-none overflow-hidden bg-gray-900 group cursor-pointer border-b md:border-b border-r border-black/10"
             >
               <img
                 src="/media/about_tall_portrait.jpg"
@@ -397,7 +397,7 @@ export const AboutPage: React.FC<AboutPageProps> = ({ onNavigate }) => {
             {/* Cell 4: Laboratory Microscopic Telemetry */}
             <div
               onClick={() => onNavigate('dashboard')}
-              className="relative aspect-[3/4] rounded-none overflow-hidden bg-gray-900 group cursor-pointer shadow-xs border border-black/5"
+              className="relative aspect-[3/4] rounded-none overflow-hidden bg-gray-900 group cursor-pointer border-b md:border-b border-black/10"
             >
               <img
                 src="/media/submenu_sentinel_lab.jpg"
@@ -418,7 +418,7 @@ export const AboutPage: React.FC<AboutPageProps> = ({ onNavigate }) => {
             {/* Cell 5: Sensory Nerve Trunk Examination */}
             <div
               onClick={() => onNavigate('diseases')}
-              className="relative aspect-[3/4] rounded-none overflow-hidden bg-gray-900 group cursor-pointer shadow-xs border border-black/5"
+              className="relative aspect-[3/4] rounded-none overflow-hidden bg-gray-900 group cursor-pointer border-b md:border-b-0 border-r border-black/10"
             >
               <img
                 src="/media/home_mb_leprosy_nerve_mapping.jpg"
@@ -439,7 +439,7 @@ export const AboutPage: React.FC<AboutPageProps> = ({ onNavigate }) => {
             {/* Cell 6: Patient Dignity & Human Sanctuary */}
             <div
               onClick={() => onNavigate('about')}
-              className="relative aspect-[3/4] rounded-none overflow-hidden bg-gray-900 group cursor-pointer shadow-xs border border-black/5"
+              className="relative aspect-[3/4] rounded-none overflow-hidden bg-gray-900 group cursor-pointer border-b md:border-b-0 border-r border-black/10"
             >
               <img
                 src="/media/submenu_patient_dignity.jpg"
@@ -460,7 +460,7 @@ export const AboutPage: React.FC<AboutPageProps> = ({ onNavigate }) => {
             {/* Cell 7: SPECIAL INTERACTIVE AUDIO CARD (100% Matching Screenshot Widget) */}
             <div
               onClick={toggleHymnAudio}
-              className="relative aspect-[3/4] rounded-none bg-[#ECECED] border border-black/5 flex flex-col items-center justify-between p-5 text-center shadow-xs cursor-pointer group hover:bg-[#E2E2E5] transition-all"
+              className="relative aspect-[3/4] rounded-none bg-[#ECECED] flex flex-col items-center justify-between p-5 text-center cursor-pointer group hover:bg-[#E2E2E5] transition-all border-b md:border-b-0 border-r border-black/10"
             >
               <span className="text-[9px] font-mono font-bold uppercase tracking-widest text-gray-500 block">
                 CHORAL HERITAGE
@@ -493,7 +493,7 @@ export const AboutPage: React.FC<AboutPageProps> = ({ onNavigate }) => {
             {/* Cell 8: Consortium Research Charter */}
             <div
               onClick={() => onNavigate('about')}
-              className="relative aspect-[3/4] rounded-none overflow-hidden bg-gray-900 group cursor-pointer shadow-xs border border-black/5"
+              className="relative aspect-[3/4] rounded-none overflow-hidden bg-gray-900 group cursor-pointer"
             >
               <img
                 src="/media/female_researcher_journal.jpg"
