@@ -241,50 +241,41 @@ export const Navbar: React.FC<NavbarProps> = ({
       <AnimatePresence>
         {apiSubmenuOpen && (
           <motion.div
-            initial={{ opacity: 0, y: -16 }}
+            initial={{ opacity: 0, y: -12 }}
             animate={{ opacity: 1, y: 0 }}
-            exit={{ opacity: 0, y: -16 }}
-            transition={{ duration: 0.26, ease: [0.16, 1, 0.3, 1] }}
+            exit={{ opacity: 0, y: -12 }}
+            transition={{ duration: 0.24, ease: [0.16, 1, 0.3, 1] }}
             onMouseEnter={handleMouseEnterApi}
             onMouseLeave={handleMouseLeaveApi}
-            className="fixed inset-0 top-0 left-0 w-screen h-screen z-40 bg-[#F4F4F6]/98 backdrop-blur-3xl overflow-y-auto pointer-events-auto flex flex-col justify-start pt-24 sm:pt-28 pb-14 px-4 sm:px-8 md:px-12 lg:px-16 select-none text-[#1D1D1F]"
+            className="fixed inset-0 top-0 left-0 w-screen h-screen z-40 bg-[#F4F4F6]/98 backdrop-blur-3xl overflow-y-auto pointer-events-auto flex flex-col justify-start pt-20 sm:pt-22 pb-8 px-4 sm:px-8 select-none text-[#1D1D1F]"
           >
-            <div className="max-w-6xl w-full mx-auto space-y-4 sm:space-y-6">
+            <div className="max-w-5xl w-full mx-auto space-y-3 sm:space-y-4">
               
-              {/* ── Top Header Bar (Search & Close Pill) ── */}
-              <div className="flex items-center justify-end gap-3 pb-2">
-                <div className="hidden sm:flex items-center gap-2 bg-white px-4 py-2 rounded-full border border-black/8 shadow-2xs text-xs text-gray-400 w-64">
-                  <span>🔍</span>
-                  <input
-                    type="text"
-                    placeholder="Search endpoints, APIs, SDKs..."
-                    className="bg-transparent outline-none w-full text-xs text-[#1D1D1F] placeholder-gray-400"
-                  />
-                </div>
-
+              {/* ── 1. Top Card: Gray Container with IKOLI Clinical Models & APIs (with Internal Close Button) ─── */}
+              <div className="relative bg-[#ECECED] rounded-[28px] sm:rounded-[32px] p-5 sm:p-7 border border-black/5 shadow-md">
+                
+                {/* Internal Close Button at Top-Right */}
                 <button
                   onClick={() => setApiSubmenuOpen(false)}
-                  className="px-3.5 py-1.5 rounded-full bg-white hover:bg-gray-100 border border-black/10 text-xs font-semibold text-gray-700 flex items-center gap-1.5 shadow-xs transition-all cursor-pointer"
+                  className="absolute top-4 right-4 sm:top-5 sm:right-5 px-3 py-1.5 rounded-full bg-white hover:bg-black/5 text-xs font-semibold text-gray-600 hover:text-black border border-black/10 shadow-2xs flex items-center gap-1.5 transition-all cursor-pointer z-10"
+                  title="Close menu (ESC)"
                 >
                   <span>Close</span>
-                  <span className="text-[10px] font-mono bg-gray-100 px-1.5 py-0.5 rounded text-gray-500">ESC</span>
-                  <X className="w-3.5 h-3.5 ml-0.5" />
+                  <span className="text-[9px] font-mono bg-black/5 px-1.5 py-0.5 rounded text-gray-500">ESC</span>
+                  <X className="w-3.5 h-3.5" />
                 </button>
-              </div>
 
-              {/* ── 1. Top Card: Gray Container with IKOLI Clinical Models & APIs ─── */}
-              <div className="bg-[#ECECED] rounded-[32px] sm:rounded-[36px] p-6 sm:p-8 md:p-10 border border-black/5 shadow-md space-y-6">
-                <div className="grid grid-cols-12 gap-8 lg:gap-12 items-start text-left">
+                <div className="grid grid-cols-12 gap-6 lg:gap-8 items-start text-left pr-6 sm:pr-10">
                   
                   {/* Left Column: Clinical Diagnostic Models (Span 4) */}
-                  <div className="col-span-12 md:col-span-4 space-y-4">
-                    <div className="border-b border-black/10 pb-2">
+                  <div className="col-span-12 md:col-span-4 space-y-3">
+                    <div className="border-b border-black/10 pb-1.5">
                       <h4 className="text-xs font-semibold text-gray-600 font-sans tracking-wide">
                         Clinical diagnostic models
                       </h4>
                     </div>
 
-                    <div className="flex flex-col gap-2.5">
+                    <div className="flex flex-col gap-2">
                       {[
                         'WHO 3-stage Buruli classification',
                         'Ridley-Jopling Leprosy staging',
@@ -295,7 +286,7 @@ export const Navbar: React.FC<NavbarProps> = ({
                         <button
                           key={item}
                           onClick={() => handleNavClick('api')}
-                          className="w-fit text-left px-5 py-2.5 rounded-full bg-white/95 border border-black/5 hover:bg-white text-xs sm:text-sm font-medium text-[#1D1D1F] shadow-2xs hover:shadow-xs transition-all cursor-pointer"
+                          className="w-fit text-left px-4 py-2 rounded-full bg-white/95 border border-black/5 hover:bg-white text-xs font-medium text-[#1D1D1F] shadow-2xs hover:shadow-xs transition-all cursor-pointer"
                         >
                           {item}
                         </button>
@@ -304,16 +295,16 @@ export const Navbar: React.FC<NavbarProps> = ({
                   </div>
 
                   {/* Right Column: Sovereign Surveillance & APIs (Span 8) */}
-                  <div className="col-span-12 md:col-span-8 space-y-4">
-                    <div className="border-b border-black/10 pb-2">
+                  <div className="col-span-12 md:col-span-8 space-y-3">
+                    <div className="border-b border-black/10 pb-1.5">
                       <h4 className="text-xs font-semibold text-gray-600 font-sans tracking-wide">
                         Surveillance &amp; APIs
                       </h4>
                     </div>
 
                     {/* 2-Column Grid of Pills */}
-                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
-                      <div className="flex flex-col gap-2.5">
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
+                      <div className="flex flex-col gap-2">
                         {[
                           'Zero-PII Tokenizer /v1/vault',
                           'Realtime Inference /v1/infer',
@@ -324,14 +315,14 @@ export const Navbar: React.FC<NavbarProps> = ({
                           <button
                             key={pill}
                             onClick={() => handleNavClick('api')}
-                            className="w-fit text-left px-5 py-2.5 rounded-full bg-white/95 border border-black/5 hover:bg-white text-xs sm:text-sm font-medium text-[#1D1D1F] shadow-2xs hover:shadow-xs transition-all cursor-pointer"
+                            className="w-fit text-left px-4 py-2 rounded-full bg-white/95 border border-black/5 hover:bg-white text-xs font-medium text-[#1D1D1F] shadow-2xs hover:shadow-xs transition-all cursor-pointer"
                           >
                             {pill}
                           </button>
                         ))}
                       </div>
 
-                      <div className="flex flex-col gap-2.5">
+                      <div className="flex flex-col gap-2">
                         {[
                           'Offline SQLite field buffer',
                           'Edge ONNX WebGPU runtime',
@@ -342,7 +333,7 @@ export const Navbar: React.FC<NavbarProps> = ({
                           <button
                             key={pill}
                             onClick={() => handleNavClick('api')}
-                            className="w-fit text-left px-5 py-2.5 rounded-full bg-white/95 border border-black/5 hover:bg-white text-xs sm:text-sm font-medium text-[#1D1D1F] shadow-2xs hover:shadow-xs transition-all cursor-pointer"
+                            className="w-fit text-left px-4 py-2 rounded-full bg-white/95 border border-black/5 hover:bg-white text-xs font-medium text-[#1D1D1F] shadow-2xs hover:shadow-xs transition-all cursor-pointer"
                           >
                             {pill}
                           </button>
@@ -353,20 +344,20 @@ export const Navbar: React.FC<NavbarProps> = ({
                     {/* Compare Diagnostic Models Banner */}
                     <div
                       onClick={() => handleNavClick('api')}
-                      className="pt-4 border-t border-black/10 flex items-center justify-between gap-6 cursor-pointer group"
+                      className="pt-2.5 border-t border-black/10 flex items-center justify-between gap-4 cursor-pointer group"
                     >
-                      <div className="space-y-1 text-left">
-                        <h4 className="font-bold text-sm sm:text-base text-[#1D1D1F] group-hover:text-[#0071E3] transition-colors">
+                      <div className="space-y-0.5 text-left">
+                        <h4 className="font-bold text-xs sm:text-sm text-[#1D1D1F] group-hover:text-[#0071E3] transition-colors">
                           Compare Diagnostic Models &amp; Protocols
                         </h4>
-                        <p className="text-xs text-gray-500 font-normal leading-relaxed max-w-xl">
+                        <p className="text-[11px] text-gray-500 font-normal leading-relaxed max-w-xl">
                           Benchmark neural sensitivity, Ridley-Jopling staging accuracy, and edge inference latency across WHO target NTD conditions.
                         </p>
                       </div>
 
                       {/* White Circular Button with Black Right Arrow */}
-                      <div className="w-10 h-10 rounded-full bg-white text-black shadow-sm border border-black/5 flex items-center justify-center shrink-0 group-hover:scale-108 group-hover:shadow-md transition-all">
-                        <ArrowRight className="w-5 h-5 stroke-[2.5] text-black" />
+                      <div className="w-9 h-9 rounded-full bg-white text-black shadow-xs border border-black/5 flex items-center justify-center shrink-0 group-hover:scale-108 group-hover:shadow-md transition-all">
+                        <ArrowRight className="w-4 h-4 stroke-[2.5] text-black" />
                       </div>
                     </div>
 
@@ -378,17 +369,17 @@ export const Navbar: React.FC<NavbarProps> = ({
               {/* ── 2. Bottom Row: Single Grand Landscape Portrait of Distinguished Black Leader ── */}
               <div
                 onClick={() => handleNavClick('about')}
-                className="relative w-full aspect-[16/6] sm:aspect-[21/8] min-h-[220px] sm:min-h-[280px] rounded-[28px] sm:rounded-[32px] overflow-hidden bg-gray-900 shadow-lg group cursor-pointer"
+                className="relative w-full aspect-[16/5] sm:aspect-[21/6] max-h-[300px] rounded-[24px] sm:rounded-[32px] overflow-hidden bg-gray-900 shadow-md group cursor-pointer"
               >
                 <img
                   src="/media/lead_clinician_hero.jpg"
                   alt="Distinguished Nigerian Clinical Leader"
-                  className="absolute inset-0 w-full h-full object-cover object-[center_20%] group-hover:scale-104 transition-transform duration-700 ease-out"
+                  className="absolute inset-0 w-full h-full object-cover object-[center_16%] group-hover:scale-104 transition-transform duration-700 ease-out"
                 />
                 
                 {/* Floating White Circular Arrow Button in Bottom Right */}
-                <div className="absolute bottom-5 sm:bottom-7 right-6 sm:right-10 flex items-center z-10">
-                  <div className="w-11 h-11 sm:w-13 sm:h-13 rounded-full bg-white text-black shadow-xl flex items-center justify-center shrink-0 group-hover:scale-110 transition-transform duration-200">
+                <div className="absolute bottom-4 sm:bottom-6 right-5 sm:right-8 flex items-center z-10">
+                  <div className="w-10 h-10 sm:w-12 sm:h-12 rounded-full bg-white text-black shadow-xl flex items-center justify-center shrink-0 group-hover:scale-110 transition-transform duration-200">
                     <ArrowRight className="w-5 h-5 stroke-[2.5] text-black" />
                   </div>
                 </div>
