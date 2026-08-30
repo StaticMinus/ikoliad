@@ -631,7 +631,7 @@ export const AboutPage: React.FC<AboutPageProps> = ({ onNavigate }) => {
               </div>
 
               {/* Inquiry Email Form (Sharp Rectangular) */}
-              <form onSubmit={handleInquirySubmit} className="space-y-3">
+              <form onSubmit={handleInquirySubmit} className="space-y-3 pt-2">
                 <div className="flex flex-col sm:flex-row items-center gap-2">
                   <input
                     type="email"
@@ -659,33 +659,6 @@ export const AboutPage: React.FC<AboutPageProps> = ({ onNavigate }) => {
                   </button>
                 </div>
               </form>
-
-              {/* Bottom 2-Column Info Strip */}
-              <div className="pt-6 border-t border-black/10 grid grid-cols-1 sm:grid-cols-2 gap-4 text-xs font-mono text-gray-600">
-                <div className="space-y-1">
-                  <span className="text-gray-400 block text-[10px] uppercase font-bold tracking-wider">
-                    HEADQUARTERS:
-                  </span>
-                  <span className="text-[#1D1D1F] font-bold block">
-                    Federal Ministry of Health &bull; Abuja
-                  </span>
-                  <span className="text-[#0071E3] font-bold block pt-0.5">
-                    clinical@ikoli.health
-                  </span>
-                </div>
-
-                <div className="space-y-1">
-                  <span className="text-gray-400 block text-[10px] uppercase font-bold tracking-wider">
-                    CONSORTIUM SECRETARIAT:
-                  </span>
-                  <span className="text-[#1D1D1F] font-bold block">
-                    Abuja, Enugu &amp; Uzuakoli, Nigeria
-                  </span>
-                  <span className="text-gray-700 font-bold block pt-0.5">
-                    TELEGRAM: @ikoliai_consortium
-                  </span>
-                </div>
-              </div>
 
             </div>
 
