@@ -319,7 +319,7 @@ export const AboutPage: React.FC<AboutPageProps> = ({ onNavigate }) => {
         {/* ══════════════════════════════════════════════════════════════════════
             3. SECTION: "THE IKOLI PORTFOLIO" (100% EXACT 8-CELL BLUEPRINT GRID)
         ══════════════════════════════════════════════════════════════════════ */}
-        <section id="portfolio" className="space-y-8">
+        <section id="portfolio" className="space-y-6 sm:space-y-8">
           
           {/* Header Row (Left: Uppercase Statement, Right: Stacked Heading) */}
           <div className="flex flex-col md:flex-row md:items-end justify-between gap-4 border-b border-black/8 pb-4">
@@ -331,13 +331,13 @@ export const AboutPage: React.FC<AboutPageProps> = ({ onNavigate }) => {
             </h2>
           </div>
 
-          {/* 8-Cell Gallery Bento Grid (4 Columns x 2 Rows matching screenshot 100%) */}
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-4 sm:gap-6">
+          {/* 8-Cell Gallery Bento Grid (4 Columns x 2 Rows matching reference mockup 100%) */}
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-3 sm:gap-4">
             
             {/* Cell 1: Clinical Examination Staging */}
             <div
               onClick={() => onNavigate('diseases')}
-              className="relative aspect-[3/4] rounded-[20px] sm:rounded-[24px] overflow-hidden bg-gray-900 border border-black/5 group cursor-pointer shadow-xs"
+              className="relative aspect-[3/4] rounded-none overflow-hidden bg-gray-900 group cursor-pointer shadow-xs border border-black/5"
             >
               <img
                 src="/media/leprosy_clinical_sensory_exam.jpg"
@@ -346,7 +346,7 @@ export const AboutPage: React.FC<AboutPageProps> = ({ onNavigate }) => {
               />
               <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-transparent pointer-events-none" />
               <div className="absolute top-3 left-3 text-white">
-                <span className="text-[9px] font-mono font-bold uppercase tracking-widest text-white/90 bg-black/40 px-2 py-0.5 rounded backdrop-blur-xs">
+                <span className="text-[9px] font-mono font-bold uppercase tracking-widest text-white/90">
                   STAGE I DETECTION
                 </span>
               </div>
@@ -355,7 +355,7 @@ export const AboutPage: React.FC<AboutPageProps> = ({ onNavigate }) => {
             {/* Cell 2: Skin Lesion Differential Diagnostic */}
             <div
               onClick={() => onNavigate('diseases')}
-              className="relative aspect-[3/4] rounded-[20px] sm:rounded-[24px] overflow-hidden bg-gray-900 border border-black/5 group cursor-pointer shadow-xs"
+              className="relative aspect-[3/4] rounded-none overflow-hidden bg-gray-900 group cursor-pointer shadow-xs border border-black/5"
             >
               <img
                 src="/media/home_pb_leprosy_hypopigmentation.jpg"
@@ -364,7 +364,7 @@ export const AboutPage: React.FC<AboutPageProps> = ({ onNavigate }) => {
               />
               <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-transparent pointer-events-none" />
               <div className="absolute bottom-3 left-3 right-3 text-white">
-                <span className="text-[9px] font-mono font-bold uppercase tracking-widest text-blue-300 block">
+                <span className="text-[9px] font-mono font-bold uppercase tracking-widest text-white/80 block">
                   PAUCIBACILLARY
                 </span>
                 <span className="font-bold text-xs leading-tight block">
@@ -376,7 +376,7 @@ export const AboutPage: React.FC<AboutPageProps> = ({ onNavigate }) => {
             {/* Cell 3: Clinical Leadership Study */}
             <div
               onClick={() => onNavigate('about')}
-              className="relative aspect-[3/4] rounded-[20px] sm:rounded-[24px] overflow-hidden bg-gray-900 border border-black/5 group cursor-pointer shadow-xs"
+              className="relative aspect-[3/4] rounded-none overflow-hidden bg-gray-900 group cursor-pointer shadow-xs border border-black/5"
             >
               <img
                 src="/media/about_tall_portrait.jpg"
@@ -385,7 +385,7 @@ export const AboutPage: React.FC<AboutPageProps> = ({ onNavigate }) => {
               />
               <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-transparent pointer-events-none" />
               <div className="absolute bottom-3 left-3 text-white">
-                <span className="text-[9px] font-mono font-bold uppercase tracking-widest text-emerald-400 block">
+                <span className="text-[9px] font-mono font-bold uppercase tracking-widest text-white/80 block">
                   CONSORTIUM
                 </span>
                 <span className="font-bold text-xs leading-tight block">
@@ -397,7 +397,7 @@ export const AboutPage: React.FC<AboutPageProps> = ({ onNavigate }) => {
             {/* Cell 4: Laboratory Microscopic Telemetry */}
             <div
               onClick={() => onNavigate('dashboard')}
-              className="relative aspect-[3/4] rounded-[20px] sm:rounded-[24px] overflow-hidden bg-gray-900 border border-black/5 group cursor-pointer shadow-xs"
+              className="relative aspect-[3/4] rounded-none overflow-hidden bg-gray-900 group cursor-pointer shadow-xs border border-black/5"
             >
               <img
                 src="/media/submenu_sentinel_lab.jpg"
@@ -406,7 +406,7 @@ export const AboutPage: React.FC<AboutPageProps> = ({ onNavigate }) => {
               />
               <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-transparent pointer-events-none" />
               <div className="absolute bottom-3 left-3 text-white">
-                <span className="text-[9px] font-mono font-bold uppercase tracking-widest text-purple-300 block">
+                <span className="text-[9px] font-mono font-bold uppercase tracking-widest text-white/80 block">
                   SENTINEL TELEMETRY
                 </span>
                 <span className="font-bold text-xs leading-tight block">
@@ -418,7 +418,7 @@ export const AboutPage: React.FC<AboutPageProps> = ({ onNavigate }) => {
             {/* Cell 5: Sensory Nerve Trunk Examination */}
             <div
               onClick={() => onNavigate('diseases')}
-              className="relative aspect-[3/4] rounded-[20px] sm:rounded-[24px] overflow-hidden bg-gray-900 border border-black/5 group cursor-pointer shadow-xs"
+              className="relative aspect-[3/4] rounded-none overflow-hidden bg-gray-900 group cursor-pointer shadow-xs border border-black/5"
             >
               <img
                 src="/media/home_mb_leprosy_nerve_mapping.jpg"
@@ -427,7 +427,7 @@ export const AboutPage: React.FC<AboutPageProps> = ({ onNavigate }) => {
               />
               <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-transparent pointer-events-none" />
               <div className="absolute bottom-3 left-3 text-white">
-                <span className="text-[9px] font-mono font-bold uppercase tracking-widest text-amber-300 block">
+                <span className="text-[9px] font-mono font-bold uppercase tracking-widest text-white/80 block">
                   MULTIBACILLARY
                 </span>
                 <span className="font-bold text-xs leading-tight block">
@@ -439,7 +439,7 @@ export const AboutPage: React.FC<AboutPageProps> = ({ onNavigate }) => {
             {/* Cell 6: Patient Dignity & Human Sanctuary */}
             <div
               onClick={() => onNavigate('about')}
-              className="relative aspect-[3/4] rounded-[20px] sm:rounded-[24px] overflow-hidden bg-gray-900 border border-black/5 group cursor-pointer shadow-xs"
+              className="relative aspect-[3/4] rounded-none overflow-hidden bg-gray-900 group cursor-pointer shadow-xs border border-black/5"
             >
               <img
                 src="/media/submenu_patient_dignity.jpg"
@@ -448,7 +448,7 @@ export const AboutPage: React.FC<AboutPageProps> = ({ onNavigate }) => {
               />
               <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-transparent pointer-events-none" />
               <div className="absolute bottom-3 left-3 text-white">
-                <span className="text-[9px] font-mono font-bold uppercase tracking-widest text-emerald-300 block">
+                <span className="text-[9px] font-mono font-bold uppercase tracking-widest text-white/80 block">
                   HUMAN DIGNITY
                 </span>
                 <span className="font-bold text-xs leading-tight block">
@@ -460,7 +460,7 @@ export const AboutPage: React.FC<AboutPageProps> = ({ onNavigate }) => {
             {/* Cell 7: SPECIAL INTERACTIVE AUDIO CARD (100% Matching Screenshot Widget) */}
             <div
               onClick={toggleHymnAudio}
-              className="relative aspect-[3/4] rounded-[20px] sm:rounded-[24px] bg-[#ECECED] border border-black/5 flex flex-col items-center justify-between p-5 text-center shadow-xs cursor-pointer group hover:bg-[#E2E2E5] transition-all"
+              className="relative aspect-[3/4] rounded-none bg-[#ECECED] border border-black/5 flex flex-col items-center justify-between p-5 text-center shadow-xs cursor-pointer group hover:bg-[#E2E2E5] transition-all"
             >
               <span className="text-[9px] font-mono font-bold uppercase tracking-widest text-gray-500 block">
                 CHORAL HERITAGE
@@ -486,14 +486,14 @@ export const AboutPage: React.FC<AboutPageProps> = ({ onNavigate }) => {
               </div>
 
               <span className="text-[10px] font-mono text-gray-500 font-bold uppercase tracking-wider">
-                {isPlayingHymn ? 'PLAYING "ATULA EGWU"' : 'CLICK TO PLAY'}
+                {isPlayingHymn ? 'PLAYING AUDIO' : 'CLICK TO PLAY'}
               </span>
             </div>
 
             {/* Cell 8: Consortium Research Charter */}
             <div
               onClick={() => onNavigate('about')}
-              className="relative aspect-[3/4] rounded-[20px] sm:rounded-[24px] overflow-hidden bg-gray-900 border border-black/5 group cursor-pointer shadow-xs"
+              className="relative aspect-[3/4] rounded-none overflow-hidden bg-gray-900 group cursor-pointer shadow-xs border border-black/5"
             >
               <img
                 src="/media/female_researcher_journal.jpg"
@@ -502,7 +502,7 @@ export const AboutPage: React.FC<AboutPageProps> = ({ onNavigate }) => {
               />
               <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-transparent pointer-events-none" />
               <div className="absolute bottom-3 right-3 text-right text-white">
-                <span className="text-[9px] font-mono font-bold uppercase tracking-widest text-blue-300 block">
+                <span className="text-[9px] font-mono font-bold uppercase tracking-widest text-white/80 block">
                   CONSORTIUM CHARTER
                 </span>
                 <span className="font-bold text-xs leading-tight block">
@@ -518,7 +518,7 @@ export const AboutPage: React.FC<AboutPageProps> = ({ onNavigate }) => {
         {/* ══════════════════════════════════════════════════════════════════════
             4. SECTION: "ЭТАПЫ РАБОТЫ" / "WORK PROCESS & CLINICAL PIPELINE" (100% REPLICATION)
         ══════════════════════════════════════════════════════════════════════ */}
-        <section id="process" className="space-y-8 pt-4">
+        <section id="process" className="space-y-6 sm:space-y-8 pt-4">
           
           <div className="flex flex-col sm:flex-row sm:items-baseline justify-between gap-2 border-b border-black/8 pb-4">
             <h2 className="font-display font-black text-3xl sm:text-4xl md:text-5xl tracking-tight text-[#1D1D1F] uppercase">
@@ -555,7 +555,7 @@ export const AboutPage: React.FC<AboutPageProps> = ({ onNavigate }) => {
             ].map((stage) => (
               <div
                 key={stage.step}
-                className="py-7 sm:py-9 flex flex-col sm:flex-row sm:items-start justify-between gap-6 hover:bg-black/[0.015] px-3 sm:px-4 rounded-2xl transition-colors group cursor-default"
+                className="py-6 sm:py-8 flex flex-col sm:flex-row sm:items-start justify-between gap-6 hover:bg-black/[0.015] px-2 rounded-none transition-colors group cursor-default"
               >
                 <div className="flex items-center gap-6 sm:gap-8 shrink-0 sm:w-2/5">
                   <span className="font-mono text-base sm:text-lg font-bold text-gray-400 group-hover:text-[#0071E3] transition-colors">
@@ -582,12 +582,12 @@ export const AboutPage: React.FC<AboutPageProps> = ({ onNavigate }) => {
         ══════════════════════════════════════════════════════════════════════ */}
         <section className="space-y-6 pt-4">
           
-          {/* 4 Cards in a Row with Captions Directly Underneath */}
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-4 sm:gap-6">
+          {/* 4 Cards in a Row with Captions Directly Underneath (Strictly Square rounded-none) */}
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-3 sm:gap-4">
             
             {/* Card 1: Clinical Research (Vibrant Creative Color) */}
             <div className="space-y-2.5 text-center group cursor-pointer">
-              <div className="relative aspect-[3/4] rounded-[24px] overflow-hidden bg-gray-900 border border-black/5 shadow-xs">
+              <div className="relative aspect-[3/4] rounded-none overflow-hidden bg-gray-900 border border-black/5 shadow-xs">
                 <img
                   src="/media/submenu_chew_screening.jpg"
                   alt="Clinical Research"
@@ -602,7 +602,7 @@ export const AboutPage: React.FC<AboutPageProps> = ({ onNavigate }) => {
 
             {/* Card 2: Neural Inference (IKOLI AI Man Editorial) */}
             <div className="space-y-2.5 text-center group cursor-pointer">
-              <div className="relative aspect-[3/4] rounded-[24px] overflow-hidden bg-gray-900 border border-black/5 shadow-xs">
+              <div className="relative aspect-[3/4] rounded-none overflow-hidden bg-gray-900 border border-black/5 shadow-xs">
                 <img
                   src="/media/ikoli_ai_man_editorial.jpg"
                   alt="Neural Inference"
@@ -617,7 +617,7 @@ export const AboutPage: React.FC<AboutPageProps> = ({ onNavigate }) => {
 
             {/* Card 3: Consortium Leadership (Vibrant Creative Color in Sunlit Gallery) */}
             <div className="space-y-2.5 text-center group cursor-pointer">
-              <div className="relative aspect-[3/4] rounded-[24px] overflow-hidden bg-gray-900 border border-black/5 shadow-xs">
+              <div className="relative aspect-[3/4] rounded-none overflow-hidden bg-gray-900 border border-black/5 shadow-xs">
                 <img
                   src="/media/about_contact_creative_color.jpg"
                   alt="Consortium Leadership"
@@ -632,7 +632,7 @@ export const AboutPage: React.FC<AboutPageProps> = ({ onNavigate }) => {
 
             {/* Card 4: Sacred Hymnody Manuscript */}
             <div className="space-y-2.5 text-center group cursor-pointer">
-              <div className="relative aspect-[3/4] rounded-[24px] overflow-hidden bg-gray-900 border border-black/5 shadow-xs">
+              <div className="relative aspect-[3/4] rounded-none overflow-hidden bg-gray-900 border border-black/5 shadow-xs">
                 <img
                   src="/media/about_manuscript_wide.jpg"
                   alt="Sacred Hymnody"
@@ -648,7 +648,7 @@ export const AboutPage: React.FC<AboutPageProps> = ({ onNavigate }) => {
           </div>
 
           {/* Sub-Header Banner underneath the 4 cards (@IKOLICONSORTIUM & Manifesto) */}
-          <div className="pt-6 sm:pt-8 flex flex-col md:flex-row md:items-center justify-between gap-4 border-t border-black/5">
+          <div className="pt-6 sm:pt-8 flex flex-col md:flex-row md:items-center justify-between gap-4 border-t border-black/8">
             <div className="space-y-0.5">
               <h2 className="font-display font-black text-2xl sm:text-3xl md:text-4xl text-[#1D1D1F] tracking-tight uppercase">
                 @IKOLICONSORTIUM
@@ -669,7 +669,7 @@ export const AboutPage: React.FC<AboutPageProps> = ({ onNavigate }) => {
         ══════════════════════════════════════════════════════════════════════ */}
         <section className="pt-4">
           
-          <div className="relative rounded-[28px] sm:rounded-[36px] overflow-hidden bg-[#18191C] border border-black/10 shadow-2xl aspect-[16/8] sm:aspect-[21/9] lg:aspect-[24/9] flex items-end p-6 sm:p-10 md:p-14 text-white group cursor-pointer">
+          <div className="relative rounded-none overflow-hidden bg-[#18191C] border border-black/10 shadow-2xl aspect-[16/8] sm:aspect-[21/9] lg:aspect-[24/9] flex items-end p-6 sm:p-10 md:p-14 text-white group cursor-pointer">
             {/* Rich Creative Color Panoramic Photograph */}
             <img
               src="/media/about_panoramic_creative_color.jpg"
@@ -698,10 +698,10 @@ export const AboutPage: React.FC<AboutPageProps> = ({ onNavigate }) => {
         {/* ══════════════════════════════════════════════════════════════════════
             6. SECTION: "CONTACTS / WANT TO COLLABORATE WITH IKOLI AI?" (100% REPLICATION)
         ══════════════════════════════════════════════════════════════════════ */}
-        <section className="space-y-8 pt-4">
+        <section className="space-y-6 sm:space-y-8 pt-4">
           
           {/* Header Row */}
-          <div className="flex flex-col sm:flex-row sm:items-baseline justify-between gap-2 border-b border-black/5 pb-4">
+          <div className="flex flex-col sm:flex-row sm:items-baseline justify-between gap-2 border-b border-black/8 pb-4">
             <h2 className="font-display font-black text-3xl sm:text-4xl md:text-5xl tracking-tight text-[#1D1D1F] uppercase">
               CONTACTS
             </h2>
@@ -710,36 +710,36 @@ export const AboutPage: React.FC<AboutPageProps> = ({ onNavigate }) => {
             </span>
           </div>
 
-          {/* 2-Column Split Bento Card */}
-          <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 sm:gap-8 items-stretch">
+          {/* 2-Column Split Bento Card (Zero Rounded Radiuses) */}
+          <div className="grid grid-cols-1 lg:grid-cols-12 gap-0 border border-black/10 items-stretch shadow-sm">
             
-            {/* Left Area (Span 7): Top Gray Box + Bottom Info Strip + Form */}
-            <div className="lg:col-span-7 flex flex-col justify-between space-y-6">
+            {/* Left Area (Span 7 or 8): Top Gray Box + Bottom Info Strip + Form */}
+            <div className="lg:col-span-7 xl:col-span-8 flex flex-col justify-between space-y-6 p-6 sm:p-10 border-b lg:border-b-0 lg:border-r border-black/10 bg-white">
               
               {/* Top Gray Card */}
-              <div className="rounded-[28px] sm:rounded-[32px] bg-[#9A9DA3] p-8 sm:p-10 text-white shadow-sm space-y-4">
-                <h3 className="font-display font-black text-2xl sm:text-3xl md:text-4xl text-white tracking-tight uppercase leading-tight">
+              <div className="bg-[#8E9197] p-6 sm:p-8 text-white rounded-none space-y-3">
+                <h3 className="font-display font-black text-xl sm:text-2xl md:text-3xl text-white tracking-tight uppercase leading-tight">
                   WANT TO COLLABORATE<br />WITH IKOLI AI?
                 </h3>
-                <p className="text-xs sm:text-sm text-white/90 font-medium uppercase tracking-wider leading-relaxed max-w-lg">
+                <p className="text-xs sm:text-[13px] text-white/90 font-mono uppercase tracking-wider leading-relaxed max-w-lg">
                   OPEN FOR HEALTHCARE SYSTEMS, STATE MINISTRIES OF HEALTH, RESEARCH INSTITUTES &amp; GLOBAL NTD ELIMINATION PARTNERS.
                 </p>
               </div>
 
-              {/* Inquiry Email Form */}
+              {/* Inquiry Email Form (Sharp Rectangular) */}
               <form onSubmit={handleInquirySubmit} className="space-y-3">
-                <div className="flex flex-col sm:flex-row items-center gap-3">
+                <div className="flex flex-col sm:flex-row items-center gap-2">
                   <input
                     type="email"
                     required
                     value={inquiryEmail}
                     onChange={(e) => setInquiryEmail(e.target.value)}
-                    placeholder="Enter your institutional email (e.g. info@health.gov.ng)"
-                    className="w-full bg-[#F5F5F7] border border-black/8 rounded-full px-5 py-3.5 text-xs text-[#1D1D1F] placeholder-gray-400 focus:outline-none focus:border-[#0071E3] shadow-2xs"
+                    placeholder="Enter institutional email (e.g. info@health.gov.ng)"
+                    className="w-full bg-[#F5F5F7] border border-black/15 rounded-none px-4 py-3 text-xs text-[#1D1D1F] placeholder-gray-400 focus:outline-none focus:border-[#0071E3]"
                   />
                   <button
                     type="submit"
-                    className="w-full sm:w-auto shrink-0 bg-[#1D1D1F] hover:bg-black active:scale-95 text-white font-bold text-xs px-7 py-3.5 rounded-full flex items-center justify-center gap-2 shadow-sm transition-all cursor-pointer"
+                    className="w-full sm:w-auto shrink-0 bg-[#1D1D1F] hover:bg-black active:scale-98 text-white font-bold text-xs px-6 py-3 rounded-none flex items-center justify-center gap-2 transition-all cursor-pointer"
                   >
                     {inquirySent ? (
                       <>
@@ -757,7 +757,7 @@ export const AboutPage: React.FC<AboutPageProps> = ({ onNavigate }) => {
               </form>
 
               {/* Bottom 2-Column Info Strip */}
-              <div className="pt-6 border-t border-black/8 grid grid-cols-1 sm:grid-cols-2 gap-4 text-xs font-mono text-gray-600">
+              <div className="pt-6 border-t border-black/10 grid grid-cols-1 sm:grid-cols-2 gap-4 text-xs font-mono text-gray-600">
                 <div className="space-y-1">
                   <span className="text-gray-400 block text-[10px] uppercase font-bold tracking-wider">
                     HEADQUARTERS:
@@ -765,7 +765,7 @@ export const AboutPage: React.FC<AboutPageProps> = ({ onNavigate }) => {
                   <span className="text-[#1D1D1F] font-bold block">
                     Federal Ministry of Health &bull; Abuja
                   </span>
-                  <span className="text-[#0071E3] font-bold block pt-1">
+                  <span className="text-[#0071E3] font-bold block pt-0.5">
                     clinical@ikoli.health
                   </span>
                 </div>
@@ -777,7 +777,7 @@ export const AboutPage: React.FC<AboutPageProps> = ({ onNavigate }) => {
                   <span className="text-[#1D1D1F] font-bold block">
                     Abuja, Enugu &amp; Uzuakoli, Nigeria
                   </span>
-                  <span className="text-gray-700 font-bold block pt-1">
+                  <span className="text-gray-700 font-bold block pt-0.5">
                     TELEGRAM: @ikoliai_consortium
                   </span>
                 </div>
@@ -785,8 +785,8 @@ export const AboutPage: React.FC<AboutPageProps> = ({ onNavigate }) => {
 
             </div>
 
-            {/* Right Area (Span 5): Tall Creative Colored Editorial Portrait */}
-            <div className="lg:col-span-5 rounded-[28px] sm:rounded-[32px] overflow-hidden bg-gray-900 min-h-[440px] relative border border-black/5 shadow-md group cursor-pointer">
+            {/* Right Area (Span 5 or 4): Tall Creative Colored Editorial Portrait */}
+            <div className="lg:col-span-5 xl:col-span-4 rounded-none overflow-hidden bg-gray-900 min-h-[440px] relative group cursor-pointer">
               <img
                 src="/media/about_contact_creative_color.jpg"
                 alt="IKOLI Consortium Leadership"
@@ -812,9 +812,9 @@ export const AboutPage: React.FC<AboutPageProps> = ({ onNavigate }) => {
         </section>
 
         {/* ══════════════════════════════════════════════════════════════════════
-            8. SECTION: "CONNECT WITH IKOLI" HIGH-CONTRAST FOOTER BANNER (100% REPLICATION)
+            7. SECTION: "CONNECT WITH IKOLI" HIGH-CONTRAST FOOTER BANNER (100% REPLICATION)
         ══════════════════════════════════════════════════════════════════════ */}
-        <section className="bg-[#0E0F11] rounded-[32px] sm:rounded-[36px] p-8 sm:p-14 text-white space-y-10 border border-white/10 shadow-2xl">
+        <section className="bg-[#0E0F11] rounded-none p-8 sm:p-14 text-white space-y-10 border border-white/10 shadow-2xl">
           
           {/* Top Links Bar */}
           <div className="flex flex-wrap items-center justify-between gap-4 text-xs font-mono tracking-widest text-gray-400 uppercase border-b border-white/10 pb-6">
@@ -848,13 +848,13 @@ export const AboutPage: React.FC<AboutPageProps> = ({ onNavigate }) => {
             <div className="flex items-center gap-3">
               <button
                 onClick={() => onNavigate('dashboard')}
-                className="bg-white hover:bg-gray-100 text-[#0E0F11] font-bold text-xs px-6 py-3 rounded-full shadow-md transition-all cursor-pointer active:scale-95"
+                className="bg-white hover:bg-gray-100 text-[#0E0F11] font-bold text-xs px-6 py-3 rounded-none shadow-md transition-all cursor-pointer active:scale-95"
               >
                 Surveillance Console
               </button>
               <button
                 onClick={() => onNavigate('api')}
-                className="bg-white/10 hover:bg-white/20 text-white font-bold text-xs px-6 py-3 rounded-full border border-white/15 backdrop-blur-md transition-all cursor-pointer active:scale-95"
+                className="bg-white/10 hover:bg-white/20 text-white font-bold text-xs px-6 py-3 rounded-none border border-white/15 backdrop-blur-md transition-all cursor-pointer active:scale-95"
               >
                 Developer APIs
               </button>
