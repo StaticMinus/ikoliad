@@ -215,7 +215,7 @@ export const AboutPage: React.FC<AboutPageProps> = ({ onNavigate }) => {
         {/* ══════════════════════════════════════════════════════════════════════
             2. SECTION: "ABOUT IKOLI" (100% EXACT BLUEPRINT REPLICATION)
         ══════════════════════════════════════════════════════════════════════ */}
-        <section id="biography" className="space-y-8">
+        <section id="biography" className="space-y-6">
           
           {/* Header Row (Left: ABOUT IKOLI, Right: Uppercase Manifesto) */}
           <div className="flex flex-col md:flex-row md:items-end justify-between gap-4 border-b border-black/8 pb-4">
@@ -227,45 +227,50 @@ export const AboutPage: React.FC<AboutPageProps> = ({ onNavigate }) => {
             </p>
           </div>
 
-          {/* Main 2-Column Asymmetric Bento Grid */}
-          <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 items-stretch">
+          {/* Main 2-Column Asymmetric Bento Grid (Left 2-Row Stack + Right Tall Card) */}
+          <div className="grid grid-cols-1 lg:grid-cols-12 gap-4 sm:gap-5 items-stretch">
             
-            {/* Left 2/3 Area (Span 8) */}
-            <div className="lg:col-span-8 flex flex-col justify-between space-y-6">
+            {/* Left Area (Span 7 or 8): Unified Gray Box on Top + Wide Photo on Bottom */}
+            <div className="lg:col-span-7 xl:col-span-8 flex flex-col justify-between gap-4 sm:gap-5">
               
-              {/* Top Row: 2 Gray Cards Side-by-Side */}
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 sm:gap-6">
-                
-                {/* Card A: 1905 - 1932 */}
-                <div className="bg-[#ECECED] rounded-[24px] sm:rounded-[28px] p-6 sm:p-7 border border-black/5 space-y-3 text-left shadow-2xs">
-                  <span className="text-[10px] font-mono font-bold uppercase tracking-widest text-[#0071E3] block">
-                    1905 &ndash; 1932 &bull; ORIGINS &amp; RESILIENCE
-                  </span>
-                  <h3 className="font-display font-bold text-base sm:text-lg text-[#1D1D1F] uppercase leading-snug">
-                    ABONNEMA &amp; EARLY AWAKENING
-                  </h3>
-                  <p className="text-xs text-gray-600 font-mono uppercase tracking-wider leading-relaxed font-normal">
-                    DIAGNOSED WITH LEPROSY AT AGE 14 IN 1919, IKOLI REFUSED RETREAT INTO DESPAIR. PLAYING FLUTE AND BRASS, HE HARNESSED MUSIC AS A SACRED FORCE FOR DIGNITY.
-                  </p>
-                </div>
+              {/* 1. Unified Medium-Gray Container (White Text + Vertical Divider) */}
+              <div className="bg-[#8E9197] text-white rounded-[24px] sm:rounded-[28px] p-6 sm:p-8 shadow-sm">
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-6 sm:gap-8 divide-y sm:divide-y-0 sm:divide-x divide-white/20 text-left">
+                  
+                  {/* Left Column: 1905 - 1932 */}
+                  <div className="space-y-3 sm:pr-6">
+                    <span className="text-[10px] sm:text-[11px] font-mono font-bold uppercase tracking-widest text-white/80 block">
+                      1905 &ndash; 1932
+                    </span>
+                    <h3 className="font-display font-black text-sm sm:text-base uppercase tracking-tight text-white leading-snug">
+                      ABONNEMA &amp; EARLY AWAKENING
+                    </h3>
+                    <p className="text-xs sm:text-[13px] text-white/90 font-mono uppercase tracking-wider leading-relaxed font-normal">
+                      DIAGNOSED WITH LEPROSY AT AGE 14 IN 1919, IKOLI REFUSED RETREAT INTO DESPAIR.
+                    </p>
+                    <p className="text-xs sm:text-[13px] text-white/90 font-mono uppercase tracking-wider leading-relaxed font-normal pt-1">
+                      PLAYING FLUTE AND BRASS, HE HARNESSED MUSIC AS A SACRED FORCE FOR HUMAN DIGNITY.
+                    </p>
+                  </div>
 
-                {/* Card B: 1932 - 1977 */}
-                <div className="bg-[#ECECED] rounded-[24px] sm:rounded-[28px] p-6 sm:p-7 border border-black/5 space-y-3 text-left shadow-2xs">
-                  <span className="text-[10px] font-mono font-bold uppercase tracking-widest text-[#0071E3] block">
-                    1932 &ndash; 1977 &bull; THE SANCTUARY
-                  </span>
-                  <h3 className="font-display font-bold text-base sm:text-lg text-[#1D1D1F] uppercase leading-snug">
-                    UZUAKOLI CHORAL SANCTUARY
-                  </h3>
-                  <p className="text-xs text-gray-600 font-mono uppercase tracking-wider leading-relaxed font-normal">
-                    AT UZUAKOLI HOSPITAL, HE COMPOSED OVER 200 SACRED IGBO HYMNS. HIS CHOIR TOURED GLOBALLY, PROVING THE IMMORTAL INTELLECT OF PATIENTS.
-                  </p>
-                </div>
+                  {/* Right Column: 1932 - 1977 */}
+                  <div className="space-y-3 sm:pl-6 pt-4 sm:pt-0">
+                    <span className="text-[10px] sm:text-[11px] font-mono font-bold uppercase tracking-widest text-white/80 block">
+                      1932 &ndash; 1977
+                    </span>
+                    <p className="text-xs sm:text-[13px] text-white/90 font-mono uppercase tracking-wider leading-relaxed font-normal">
+                      AT UZUAKOLI HOSPITAL, HE COMPOSED OVER 200 SACRED IGBO HYMNS PERFORMED ACAPPELLA.
+                    </p>
+                    <p className="text-xs sm:text-[13px] text-white/90 font-mono uppercase tracking-wider leading-relaxed font-normal pt-1">
+                      HIS WORLD-RENOWNED CHOIR TOURED GLOBALLY, PROVING THE IMMORTAL INTELLECT OF PATIENTS DESPITE PHYSICAL EXILE.
+                    </p>
+                  </div>
 
+                </div>
               </div>
 
-              {/* Bottom Row: Wide Panoramic Manuscript Photo */}
-              <div className="relative aspect-[16/9] sm:aspect-[21/9] rounded-[24px] sm:rounded-[28px] overflow-hidden bg-gray-900 border border-black/5 shadow-md group cursor-pointer">
+              {/* 2. Bottom Wide Photographic Card */}
+              <div className="relative aspect-[16/9] sm:aspect-[21/9] rounded-[24px] sm:rounded-[28px] overflow-hidden bg-gray-900 shadow-md group cursor-pointer border border-black/5">
                 <img
                   src="/media/about_manuscript_wide.jpg"
                   alt="Harcourt Whyte Sacred Choral Manuscript"
@@ -274,14 +279,14 @@ export const AboutPage: React.FC<AboutPageProps> = ({ onNavigate }) => {
                 <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-transparent pointer-events-none" />
                 <div className="absolute bottom-4 left-6 right-6 flex items-end justify-between text-white">
                   <div>
-                    <span className="text-[10px] font-mono uppercase tracking-widest text-[#0071E3] font-bold block">
+                    <span className="text-[10px] font-mono uppercase tracking-widest text-emerald-300 font-bold block">
                       ARCHIVAL HERITAGE
                     </span>
                     <span className="font-bold text-sm sm:text-base leading-tight block">
                       Original Handwritten Scores &bull; Uzuakoli Choral Suite (1932–1977)
                     </span>
                   </div>
-                  <span className="text-[10px] font-mono text-gray-400 bg-white/10 px-2.5 py-1 rounded-full backdrop-blur-md">
+                  <span className="text-[10px] font-mono text-white/90 bg-black/40 px-2.5 py-1 rounded-full backdrop-blur-md">
                     200+ ANTHEMS
                   </span>
                 </div>
@@ -289,8 +294,8 @@ export const AboutPage: React.FC<AboutPageProps> = ({ onNavigate }) => {
 
             </div>
 
-            {/* Right 1/3 Area: Tall Vertical Editorial Card (Span 4) */}
-            <div className="lg:col-span-4 relative rounded-[24px] sm:rounded-[28px] overflow-hidden bg-gray-900 border border-black/5 shadow-md group cursor-pointer min-h-[480px]">
+            {/* Right Area (Span 5 or 4): Tall Vertical Editorial Card */}
+            <div className="lg:col-span-5 xl:col-span-4 relative rounded-[24px] sm:rounded-[28px] overflow-hidden bg-gray-900 shadow-md group cursor-pointer min-h-[440px] border border-black/5">
               <img
                 src="/media/about_tall_portrait.jpg"
                 alt="Ikoli Living Succession"
@@ -298,7 +303,7 @@ export const AboutPage: React.FC<AboutPageProps> = ({ onNavigate }) => {
               />
               <div className="absolute inset-0 bg-gradient-to-t from-black/85 via-black/20 to-transparent pointer-events-none" />
               <div className="absolute bottom-6 left-6 right-6 text-white space-y-1 text-left">
-                <span className="text-[10px] font-mono text-[#0071E3] font-bold uppercase tracking-widest block">
+                <span className="text-[10px] font-mono text-emerald-300 font-bold uppercase tracking-widest block">
                   THE LIVING SUCCESSION
                 </span>
                 <h4 className="font-bold text-base sm:text-lg text-white leading-snug">
