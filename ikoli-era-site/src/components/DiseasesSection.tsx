@@ -160,7 +160,7 @@ export const DiseasesSection: React.FC<DiseasesSectionProps> = ({ onOpenDiseases
                 {/* Footer Metadata */}
                 <div className="pt-3 border-t border-black/5 flex items-center justify-between mt-auto">
                   <span className="rounded-full text-[#1D1D1F] text-[10px] font-mono font-bold px-2.5 py-1 bg-[#F5F5F7] border border-black/5 group-hover:bg-[#1D1D1F] group-hover:text-white transition-colors flex items-center gap-1.5">
-                    <span className="w-1.5 h-1.5 rounded-full bg-blue-500" />
+                    <span className="w-1.5 h-1.5 rounded-full bg-emerald-500" />
                     <span>{disease.category}</span>
                   </span>
 
