@@ -99,33 +99,6 @@ export const AboutPage: React.FC<AboutPageProps> = ({ onNavigate }) => {
     }, 4000);
   };
 
-  const chronologyMilestones = [
-    {
-      step: '01',
-      years: '1905 – 1924',
-      title: 'Childhood in Abonnema & Early Leprosy Diagnosis',
-      desc: 'Born into a Kalabari family in Abonnema (Rivers State), Ikoli showed early brilliance playing flute and side-drum in his school brass band. In 1919, at age 14, he was diagnosed with leprosy, leading to severe social ostracization and loss of schooling.',
-    },
-    {
-      step: '02',
-      years: '1932 – 1948',
-      title: 'Uzuakoli Settlement Sanctuary & The Choral Revolution',
-      desc: 'Transferred to the Uzuakoli Leprosy Hospital in Abia State in 1932. Mentored by British missionary physician Dr. T.F. Davey, he studied music theory and founded the world-renowned Uzuakoli Leprosy Choir, composing over 200 sacred Igbo hymns performed acappella.',
-    },
-    {
-      step: '03',
-      years: '1949 – 1977',
-      title: 'Clinical Cure, De-stigmatization & National Icon',
-      desc: 'Formally cured of leprosy in 1949 following early Dapsone clinical trials, Whyte voluntarily chose to remain at Uzuakoli for the rest of his life, dedicating his voice to caring for patients. His hymn "Atula Egwu" (Never Fear) became an anthem of solace during the Nigerian Civil War.',
-    },
-    {
-      step: '04',
-      years: '2026 & Beyond',
-      title: 'The Living Digital Legacy: IKOLI AI Platform',
-      desc: 'Nigeria’s national Neglected Tropical Skin Diseases clinical intelligence platform is named in his everlasting honor. Developed by the IKOLI Consortium, it unites computer vision with zero-PII epidemiology to eliminate physical disability forever.',
-    },
-  ];
-
   return (
     <div className="w-full bg-[#FFFFFF] text-[#1D1D1F] min-h-screen font-sans selection:bg-[#0071E3] selection:text-white">
       
@@ -542,112 +515,86 @@ export const AboutPage: React.FC<AboutPageProps> = ({ onNavigate }) => {
         </section>
 
         {/* ══════════════════════════════════════════════════════════════════════
-            4. SECTION: "CHRONOLOGY & MILESTONES"
+            4. SECTION: "4-CARD EDITORIAL REEL & @IKOLICONSORTIUM BANNER" (100% REPLICATION)
         ══════════════════════════════════════════════════════════════════════ */}
-        <section className="space-y-8">
+        <section className="space-y-6 pt-4">
           
-          <div className="flex flex-col sm:flex-row sm:items-baseline justify-between gap-2 border-b border-black/5 pb-4">
-            <h2 className="font-display font-black text-2xl sm:text-3xl tracking-tight text-[#1D1D1F] uppercase">
-              LIFE CHRONOLOGY &bull; 1905 TO 2026
-            </h2>
-            <span className="text-xs font-mono text-gray-400 font-semibold tracking-wider">
-              1905 &ndash; 2026 Historical Arc
-            </span>
-          </div>
-
-          {/* 4 Numbered Horizontal Rows */}
-          <div className="divide-y divide-black/10 border-y border-black/10">
-            {chronologyMilestones.map((stage) => (
-              <div
-                key={stage.step}
-                className="py-6 sm:py-7 flex flex-col sm:flex-row sm:items-start justify-between gap-4 hover:bg-black/[0.015] px-2 rounded-xl transition-colors"
-              >
-                <div className="flex items-center gap-6 shrink-0 sm:w-1/3">
-                  <span className="font-mono text-xs font-bold text-gray-400">
-                    {stage.step}
-                  </span>
-                  <div>
-                    <span className="font-mono text-[11px] font-bold text-[#0071E3] block">
-                      {stage.years}
-                    </span>
-                    <span className="font-display font-bold text-sm sm:text-base text-[#1D1D1F] leading-snug">
-                      {stage.title}
-                    </span>
-                  </div>
-                </div>
-
-                <div className="sm:w-2/3 pl-0 sm:pl-8">
-                  <p className="text-xs sm:text-sm text-gray-600 font-normal leading-relaxed">
-                    {stage.desc}
-                  </p>
-                </div>
-              </div>
-            ))}
-          </div>
-
-        </section>
-
-        {/* ══════════════════════════════════════════════════════════════════════
-            5. SECTION: "4-IMAGE HISTORICAL GALLERY"
-        ══════════════════════════════════════════════════════════════════════ */}
-        <section className="space-y-8">
-          
+          {/* 4 Cards in a Row with Captions Directly Underneath */}
           <div className="grid grid-cols-2 md:grid-cols-4 gap-4 sm:gap-6">
-            {[
-              { label: 'UZUAKOLI SANCTUARY', image: '/media/leprosy_clinical_exam.jpg' },
-              { label: 'CHORAL ARCHIVE', image: '/media/medical_journal_thumb.jpg' },
-              { label: 'METHODIST MISSION', image: '/media/who_clinical_guide_cover.jpg' },
-              { label: 'AI RESURRECTION', image: '/media/tablet-diagnostics.jpg' },
-            ].map((item) => (
-              <div key={item.label} className="space-y-2 text-center group cursor-pointer">
-                <div className="relative aspect-[3/4] rounded-[24px] overflow-hidden bg-gray-200 border border-black/5 shadow-xs">
-                  <img
-                    src={item.image}
-                    alt={item.label}
-                    className="w-full h-full object-cover filter grayscale contrast-110 group-hover:scale-105 group-hover:filter-none transition-all duration-500"
-                  />
-                </div>
-                <span className="text-[10px] font-mono font-bold tracking-widest text-gray-500 uppercase block group-hover:text-[#0071E3] transition-colors">
-                  {item.label}
-                </span>
-              </div>
-            ))}
-          </div>
-
-        </section>
-
-        {/* ══════════════════════════════════════════════════════════════════════
-            6. SECTION: "PANORAMIC BANNER / SACRED CHORAL HERITAGE"
-        ══════════════════════════════════════════════════════════════════════ */}
-        <section className="space-y-6">
-          
-          <div className="flex items-center justify-between">
-            <h3 className="font-display font-black text-xl sm:text-2xl text-[#1D1D1F] tracking-tight uppercase">
-              SACRED CHORAL HERITAGE &bull; UZUAKOLI HYMNS
-            </h3>
-            <span className="text-xs font-mono text-gray-400 font-semibold">
-              Uzuakoli &bull; Abia State &bull; Nigeria
-            </span>
-          </div>
-
-          {/* Ultra-Wide Panoramic Black & White Banner */}
-          <div className="relative rounded-[36px] overflow-hidden bg-[#18191C] border border-black/10 shadow-2xl aspect-[16/7] sm:aspect-[21/9] flex items-end p-6 sm:p-12 text-white group">
-            <img
-              src="/media/about_panoramic_banner.jpg"
-              alt="Ikoli Harcourt Whyte Heritage Choir"
-              className="absolute inset-0 w-full h-full object-cover filter grayscale contrast-120 opacity-80 group-hover:scale-103 transition-transform duration-700"
-            />
-            <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/35 to-transparent pointer-events-none" />
             
-            <div className="relative z-10 max-w-2xl space-y-2">
-              <span className="text-[10px] font-mono text-[#0071E3] font-bold uppercase tracking-wider block">
-                The Everlasting Anthem
+            {/* Card 1: Clinical Research (Vibrant Creative Color) */}
+            <div className="space-y-2.5 text-center group cursor-pointer">
+              <div className="relative aspect-[3/4] rounded-[24px] overflow-hidden bg-gray-900 border border-black/5 shadow-xs">
+                <img
+                  src="/media/submenu_chew_screening.jpg"
+                  alt="Clinical Research"
+                  className="w-full h-full object-cover group-hover:scale-106 transition-transform duration-700 ease-out"
+                />
+                <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent pointer-events-none" />
+              </div>
+              <span className="text-[10px] sm:text-[11px] font-mono font-bold tracking-widest text-gray-500 uppercase block group-hover:text-[#0071E3] transition-colors">
+                PORTRAIT / RESEARCH
               </span>
-              <h4 className="font-display font-black text-xl sm:text-3xl text-white leading-tight">
-                "Even in our deepest afflictions, our voices shall rise across generations until leprosy and disability are no more."
-              </h4>
-              <p className="text-xs sm:text-sm text-gray-300 font-light">
-                Composed at Uzuakoli Leprosy Hospital, immortalized in Nigeria's National Clinical Surveillance AI.
+            </div>
+
+            {/* Card 2: Neural Inference (IKOLI AI Man Editorial) */}
+            <div className="space-y-2.5 text-center group cursor-pointer">
+              <div className="relative aspect-[3/4] rounded-[24px] overflow-hidden bg-gray-900 border border-black/5 shadow-xs">
+                <img
+                  src="/media/ikoli_ai_man_editorial.jpg"
+                  alt="Neural Inference"
+                  className="w-full h-full object-cover filter grayscale contrast-110 group-hover:scale-106 transition-transform duration-700 ease-out"
+                />
+                <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent pointer-events-none" />
+              </div>
+              <span className="text-[10px] sm:text-[11px] font-mono font-bold tracking-widest text-gray-500 uppercase block group-hover:text-[#0071E3] transition-colors">
+                NEURAL INFERENCE
+              </span>
+            </div>
+
+            {/* Card 3: Consortium Leadership (Vibrant Creative Color in Sunlit Gallery) */}
+            <div className="space-y-2.5 text-center group cursor-pointer">
+              <div className="relative aspect-[3/4] rounded-[24px] overflow-hidden bg-gray-900 border border-black/5 shadow-xs">
+                <img
+                  src="/media/about_contact_creative_color.jpg"
+                  alt="Consortium Leadership"
+                  className="w-full h-full object-cover group-hover:scale-106 transition-transform duration-700 ease-out"
+                />
+                <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent pointer-events-none" />
+              </div>
+              <span className="text-[10px] sm:text-[11px] font-mono font-bold tracking-widest text-gray-500 uppercase block group-hover:text-[#0071E3] transition-colors">
+                UZUAKOLI SANCTUARY
+              </span>
+            </div>
+
+            {/* Card 4: Sacred Hymnody Manuscript */}
+            <div className="space-y-2.5 text-center group cursor-pointer">
+              <div className="relative aspect-[3/4] rounded-[24px] overflow-hidden bg-gray-900 border border-black/5 shadow-xs">
+                <img
+                  src="/media/about_manuscript_wide.jpg"
+                  alt="Sacred Hymnody"
+                  className="w-full h-full object-cover filter grayscale contrast-115 group-hover:scale-106 transition-transform duration-700 ease-out"
+                />
+                <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent pointer-events-none" />
+              </div>
+              <span className="text-[10px] sm:text-[11px] font-mono font-bold tracking-widest text-gray-500 uppercase block group-hover:text-[#0071E3] transition-colors">
+                SACRED HYMNODY
+              </span>
+            </div>
+
+          </div>
+
+          {/* Sub-Header Banner underneath the 4 cards (@IKOLICONSORTIUM & Manifesto) */}
+          <div className="pt-6 sm:pt-8 flex flex-col md:flex-row md:items-center justify-between gap-4 border-t border-black/5">
+            <div className="space-y-0.5">
+              <h2 className="font-display font-black text-2xl sm:text-3xl md:text-4xl text-[#1D1D1F] tracking-tight uppercase">
+                @IKOLICONSORTIUM
+              </h2>
+            </div>
+
+            <div className="max-w-xl text-left md:text-right">
+              <p className="text-xs sm:text-[13px] text-gray-500 font-medium uppercase tracking-wider leading-relaxed">
+                CONNECTING HISTORICAL HUMANITARIAN DIGNITY WITH SOVEREIGN NEURAL DIAGNOSTICS FOR OVER 200 MILLION NIGERIANS.
               </p>
             </div>
           </div>
@@ -655,38 +602,69 @@ export const AboutPage: React.FC<AboutPageProps> = ({ onNavigate }) => {
         </section>
 
         {/* ══════════════════════════════════════════════════════════════════════
-            7. SECTION: "LEGACY & CONSORTIUM CONTACT"
+            5. SECTION: "MASSIVE ULTRA-WIDE PANORAMIC CINEMATIC COLOR BANNER" (100% REPLICATION)
         ══════════════════════════════════════════════════════════════════════ */}
-        <section className="space-y-8">
+        <section className="pt-4">
           
+          <div className="relative rounded-[28px] sm:rounded-[36px] overflow-hidden bg-[#18191C] border border-black/10 shadow-2xl aspect-[16/8] sm:aspect-[21/9] lg:aspect-[24/9] flex items-end p-6 sm:p-10 md:p-14 text-white group cursor-pointer">
+            {/* Rich Creative Color Panoramic Photograph */}
+            <img
+              src="/media/about_panoramic_creative_color.jpg"
+              alt="IKOLI Clinical AI Innovation Lab Panorama"
+              className="absolute inset-0 w-full h-full object-cover group-hover:scale-104 transition-transform duration-1000 ease-out"
+            />
+            {/* Cinematic Gradient Vignette */}
+            <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/30 to-black/10 pointer-events-none" />
+            
+            {/* Quote Overlay in Bottom-Left */}
+            <div className="relative z-10 max-w-2xl space-y-2 text-left">
+              <span className="text-[10px] sm:text-[11px] font-mono text-emerald-300 font-bold uppercase tracking-widest block drop-shadow-sm">
+                IKOLI CONSORTIUM CHARTER &bull; 2026
+              </span>
+              <h3 className="font-display font-bold text-base sm:text-xl md:text-2xl lg:text-3xl text-white leading-snug drop-shadow-md">
+                "WHEN CLINICAL PRECISION MEETS HUMAN DIGNITY, PREVENTABLE DISABILITY CEASES TO EXIST."
+              </h3>
+              <p className="text-xs sm:text-sm text-gray-200 font-light drop-shadow-sm">
+                RedAid Nigeria &bull; DAHW Germany &bull; Digital Dreams &bull; FMOH/NTBLCP
+              </p>
+            </div>
+          </div>
+
+        </section>
+
+        {/* ══════════════════════════════════════════════════════════════════════
+            6. SECTION: "CONTACTS / WANT TO COLLABORATE WITH IKOLI AI?" (100% REPLICATION)
+        ══════════════════════════════════════════════════════════════════════ */}
+        <section className="space-y-8 pt-4">
+          
+          {/* Header Row */}
           <div className="flex flex-col sm:flex-row sm:items-baseline justify-between gap-2 border-b border-black/5 pb-4">
-            <h2 className="font-display font-black text-2xl sm:text-3xl tracking-tight text-[#1D1D1F] uppercase">
-              LEGACY &amp; DEPLOYMENT &bull; CONSORTIUM LIAISON
+            <h2 className="font-display font-black text-3xl sm:text-4xl md:text-5xl tracking-tight text-[#1D1D1F] uppercase">
+              CONTACTS
             </h2>
-            <span className="text-xs font-mono text-gray-400 font-semibold tracking-wider">
-              RedAid Nigeria &bull; DAHW &bull; FMOH
+            <span className="text-xs font-mono text-gray-400 font-semibold tracking-wider uppercase">
+              DIRECT CONSORTIUM SECRETARIAT &amp; PARTNERSHIP CHANNELS
             </span>
           </div>
 
-          {/* Split Container: Left Form + Right Tall Portrait */}
-          <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 rounded-[36px] overflow-hidden bg-[#F5F5F7] p-8 sm:p-12 border border-black/5">
+          {/* 2-Column Split Bento Card */}
+          <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 sm:gap-8 items-stretch">
             
-            {/* Left Box: Form & Contact Info (Span 7) */}
-            <div className="lg:col-span-7 space-y-6 flex flex-col justify-between">
-              <div className="space-y-4">
-                <span className="text-[10px] font-mono font-bold uppercase tracking-wider text-[#0071E3] block">
-                  Preserving Heritage &bull; Advancing Science
-                </span>
-                <h3 className="font-display font-bold text-2xl sm:text-3xl text-[#1D1D1F] leading-tight">
-                  Support the Ikoli Mission or Inquire on National Deployment
+            {/* Left Area (Span 7): Top Gray Box + Bottom Info Strip + Form */}
+            <div className="lg:col-span-7 flex flex-col justify-between space-y-6">
+              
+              {/* Top Gray Card */}
+              <div className="rounded-[28px] sm:rounded-[32px] bg-[#9A9DA3] p-8 sm:p-10 text-white shadow-sm space-y-4">
+                <h3 className="font-display font-black text-2xl sm:text-3xl md:text-4xl text-white tracking-tight uppercase leading-tight">
+                  WANT TO COLLABORATE<br />WITH IKOLI AI?
                 </h3>
-                <p className="text-xs sm:text-sm text-gray-600 leading-relaxed font-normal">
-                  Collaborate with the IKOLI Consortium (RedAid Nigeria, DAHW Germany, Digital Dreams, FMOH/NTBLCP, VRC-UNN, IDEA) to support leprosy care and deploy the AI diagnostic network across Africa.
+                <p className="text-xs sm:text-sm text-white/90 font-medium uppercase tracking-wider leading-relaxed max-w-lg">
+                  OPEN FOR HEALTHCARE SYSTEMS, STATE MINISTRIES OF HEALTH, RESEARCH INSTITUTES &amp; GLOBAL NTD ELIMINATION PARTNERS.
                 </p>
               </div>
 
               {/* Inquiry Email Form */}
-              <form onSubmit={handleInquirySubmit} className="space-y-3 pt-2">
+              <form onSubmit={handleInquirySubmit} className="space-y-3">
                 <div className="flex flex-col sm:flex-row items-center gap-3">
                   <input
                     type="email"
@@ -694,11 +672,11 @@ export const AboutPage: React.FC<AboutPageProps> = ({ onNavigate }) => {
                     value={inquiryEmail}
                     onChange={(e) => setInquiryEmail(e.target.value)}
                     placeholder="Enter your institutional email (e.g. info@health.gov.ng)"
-                    className="w-full bg-white border border-black/10 rounded-full px-5 py-3 text-xs text-[#1D1D1F] placeholder-gray-400 focus:outline-none focus:border-[#0071E3] shadow-xs"
+                    className="w-full bg-[#F5F5F7] border border-black/8 rounded-full px-5 py-3.5 text-xs text-[#1D1D1F] placeholder-gray-400 focus:outline-none focus:border-[#0071E3] shadow-2xs"
                   />
                   <button
                     type="submit"
-                    className="w-full sm:w-auto shrink-0 bg-[#1D1D1F] hover:bg-black active:scale-95 text-white font-bold text-xs px-6 py-3 rounded-full flex items-center justify-center gap-2 shadow-sm transition-all cursor-pointer"
+                    className="w-full sm:w-auto shrink-0 bg-[#1D1D1F] hover:bg-black active:scale-95 text-white font-bold text-xs px-7 py-3.5 rounded-full flex items-center justify-center gap-2 shadow-sm transition-all cursor-pointer"
                   >
                     {inquirySent ? (
                       <>
@@ -713,42 +691,55 @@ export const AboutPage: React.FC<AboutPageProps> = ({ onNavigate }) => {
                     )}
                   </button>
                 </div>
-                <span className="text-[10px] font-mono text-gray-400 block pl-2">
-                  Direct routing to RedAid Nigeria &bull; Country Rep: Dr. Daniel Nze Egbule.
-                </span>
               </form>
 
-              {/* Direct Details Strip */}
-              <div className="pt-6 border-t border-black/10 grid grid-cols-1 sm:grid-cols-2 gap-4 text-xs font-mono text-gray-600">
-                <div>
-                  <span className="text-gray-400 block text-[10px] uppercase font-bold">Historical Archive:</span>
-                  <span className="text-[#1D1D1F] font-bold">archive@ikoli.health.ng</span>
+              {/* Bottom 2-Column Info Strip */}
+              <div className="pt-6 border-t border-black/8 grid grid-cols-1 sm:grid-cols-2 gap-4 text-xs font-mono text-gray-600">
+                <div className="space-y-1">
+                  <span className="text-gray-400 block text-[10px] uppercase font-bold tracking-wider">
+                    HEADQUARTERS:
+                  </span>
+                  <span className="text-[#1D1D1F] font-bold block">
+                    Federal Ministry of Health &bull; Abuja
+                  </span>
+                  <span className="text-[#0071E3] font-bold block pt-1">
+                    clinical@ikoli.health
+                  </span>
                 </div>
-                <div>
-                  <span className="text-gray-400 block text-[10px] uppercase font-bold">Zonal Secretariat:</span>
-                  <span className="text-[#1D1D1F] font-bold">Enugu &bull; Abuja &bull; Würzburg</span>
+
+                <div className="space-y-1">
+                  <span className="text-gray-400 block text-[10px] uppercase font-bold tracking-wider">
+                    CONSORTIUM SECRETARIAT:
+                  </span>
+                  <span className="text-[#1D1D1F] font-bold block">
+                    Abuja, Enugu &amp; Uzuakoli, Nigeria
+                  </span>
+                  <span className="text-gray-700 font-bold block pt-1">
+                    TELEGRAM: @ikoliai_consortium
+                  </span>
                 </div>
               </div>
 
             </div>
 
-            {/* Right Box: Tall Vertical Studio Portrait (Span 5) */}
-            <div className="lg:col-span-5 rounded-[28px] overflow-hidden bg-[#18191C] aspect-[3/4] sm:aspect-auto min-h-[360px] relative border border-black/5 shadow-xs group">
+            {/* Right Area (Span 5): Tall Creative Colored Editorial Portrait */}
+            <div className="lg:col-span-5 rounded-[28px] sm:rounded-[32px] overflow-hidden bg-gray-900 min-h-[440px] relative border border-black/5 shadow-md group cursor-pointer">
               <img
-                src="/media/about_contact_clinician.jpg"
-                alt="IKOLI AI Clinical Governance"
-                className="w-full h-full object-cover filter grayscale contrast-115 group-hover:scale-105 group-hover:filter-none transition-all duration-700"
+                src="/media/about_contact_creative_color.jpg"
+                alt="IKOLI Consortium Leadership"
+                className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700 ease-out"
               />
-              <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-transparent pointer-events-none" />
+              <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent pointer-events-none" />
+              
               <div className="absolute bottom-6 left-6 right-6 text-white space-y-1">
-                <span className="text-[10px] font-mono text-[#0071E3] font-bold uppercase tracking-wider block">
-                  Consortium Leadership
+                <span className="text-[10px] font-mono text-emerald-300 font-bold uppercase tracking-wider block">
+                  Consortium Director &bull; Field Operations
                 </span>
                 <h4 className="font-bold text-sm sm:text-base text-white">
-                  RedAid Nigeria &amp; Consortium Partners
+                  RedAid Nigeria &amp; DAHW Partnership
                 </h4>
                 <p className="text-xs text-gray-300 font-light">
-                  DAHW &bull; Digital Dreams &bull; FMOH/NTBLCP &bull; VRC-UNN &bull; IDEA
+                  Directing 774 LGA surveillance, training CHEWs, and restoring patient dignity.
                 </p>
               </div>
             </div>
