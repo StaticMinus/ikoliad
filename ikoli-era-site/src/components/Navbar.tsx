@@ -12,6 +12,8 @@ import {
   ChevronDown,
   Sparkles,
   ArrowRight,
+  Search,
+  FileText,
 } from 'lucide-react';
 import { MagneticButton } from './ui/MagneticButton';
 
@@ -26,12 +28,19 @@ export const Navbar: React.FC<NavbarProps> = ({
 }) => {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [apiSubmenuOpen, setApiSubmenuOpen] = useState(false);
+  const [searchModalOpen, setSearchModalOpen] = useState(false);
+  const [searchQuery, setSearchQuery] = useState('');
   const closeTimeoutRef = useRef<number | null>(null);
 
+  // Global Keyboard Shortcuts (Cmd+K / Ctrl+K / Escape)
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
-      if (e.key === 'Escape') {
+      if ((e.metaKey || e.ctrlKey) && e.key.toLowerCase() === 'k') {
+        e.preventDefault();
+        setSearchModalOpen((prev) => !prev);
+      } else if (e.key === 'Escape') {
         setApiSubmenuOpen(false);
+        setSearchModalOpen(false);
       }
     };
     window.addEventListener('keydown', handleKeyDown);
@@ -40,6 +49,7 @@ export const Navbar: React.FC<NavbarProps> = ({
 
   const handleNavClick = (pageId: string) => {
     setApiSubmenuOpen(false);
+    setSearchModalOpen(false);
     onNavigate?.(pageId as any);
     setMobileMenuOpen(false);
   };
@@ -86,6 +96,30 @@ export const Navbar: React.FC<NavbarProps> = ({
     },
   ];
 
+  // Search Index for Global Search
+  const searchIndex = [
+    { title: "Leprosy (Hansen's Disease)", category: 'Disease', page: 'diseases', desc: 'Paucibacillary & Multibacillary differential staging, nerve mapping', icon: Shield },
+    { title: 'Buruli Ulcer (M. ulcerans)', category: 'Disease', page: 'diseases', desc: 'WHO Category I/II/III classification and necrotic margin inspection', icon: Shield },
+    { title: 'Yaws Treponematosis', category: 'Disease', page: 'diseases', desc: 'Primary papilloma & osteoperiostitis rapid serological triage', icon: Shield },
+    { title: 'Trachoma (C. trachomatis)', category: 'Disease', page: 'diseases', desc: 'Autonomous upper eyelid eversion follicle identification', icon: Shield },
+    { title: 'Cutaneous Leishmaniasis', category: 'Disease', page: 'diseases', desc: 'Volcano ulcer margin morphology & amastigote detection', icon: Shield },
+    { title: 'Ask Ikoli AI (Neural Diagnostics)', category: 'Tool', page: 'ask', desc: 'Multimodal clinical computer vision & WHO staging inference engine', icon: Sparkles },
+    { title: 'Sentinel Surveillance Console', category: 'Console', page: 'dashboard', desc: 'State-by-state disease registry across 36 Nigerian states & FCT', icon: LayoutDashboard },
+    { title: 'WHO Protocols & Governance', category: 'Governance', page: 'protocols', desc: 'WHO NTD 2030 Roadmap metrics, clinical safety charter', icon: FileText },
+    { title: 'REST API & TypeScript/Python SDKs', category: 'Developers', page: 'api', desc: 'Autonomous inference endpoints, batch surveillance ingestion', icon: Code2 },
+    { title: 'Ikoli Harcourt Whyte & Uzuakoli Heritage', category: 'About', page: 'about', desc: 'Historical humanitarian legacy, sacred hymnody & consortium history', icon: Info },
+  ];
+
+  const filteredSearchResults = searchIndex.filter((item) => {
+    if (!searchQuery.trim()) return true;
+    const q = searchQuery.toLowerCase();
+    return (
+      item.title.toLowerCase().includes(q) ||
+      item.desc.toLowerCase().includes(q) ||
+      item.category.toLowerCase().includes(q)
+    );
+  });
+
   return (
     <>
       {/* ── Fixed Floating Top Capsule Dock ───────────────────────────────── */}
@@ -93,7 +127,7 @@ export const Navbar: React.FC<NavbarProps> = ({
         <div className="relative flex items-center justify-center w-full">
           
           {/* Capsule Dock */}
-          <div className="pointer-events-auto bg-white/85 backdrop-blur-2xl border border-black/5 rounded-full p-1.5 sm:p-2 shadow-[0_12px_40px_rgba(0,0,0,0.08)] flex items-center justify-between gap-2 sm:gap-4 w-full max-w-4xl transition-all duration-300 hover:shadow-[0_16px_48px_rgba(0,0,0,0.12)] relative z-50">
+          <div className="pointer-events-auto bg-white/85 backdrop-blur-2xl border border-black/5 rounded-full p-1.5 sm:p-2 shadow-[0_12px_40px_rgba(0,0,0,0.08)] flex items-center justify-between gap-2 sm:gap-3 w-full max-w-4xl transition-all duration-300 hover:shadow-[0_16px_48px_rgba(0,0,0,0.12)] relative z-50">
             
             {/* 1. Left: Hardware-Grade Typographic Logo Mark */}
             <div
@@ -121,7 +155,7 @@ export const Navbar: React.FC<NavbarProps> = ({
                     >
                       <MagneticButton magneticStrength={0.2} onClick={() => setApiSubmenuOpen(!apiSubmenuOpen)}>
                         <button
-                          className={`px-4 py-1.5 rounded-full text-xs font-semibold transition-all duration-200 cursor-pointer flex items-center gap-1.5 ${
+                          className={`px-3.5 py-1.5 rounded-full text-xs font-semibold transition-all duration-200 cursor-pointer flex items-center gap-1.5 ${
                             isActive || apiSubmenuOpen
                               ? 'bg-white text-[#1D1D1F] shadow-xs font-bold'
                               : 'text-[#1D1D1F]/70 hover:text-[#1D1D1F] hover:bg-white/60'
@@ -142,7 +176,7 @@ export const Navbar: React.FC<NavbarProps> = ({
                 return (
                   <MagneticButton key={item.id} magneticStrength={0.2} onClick={() => handleNavClick(item.id)}>
                     <button
-                      className={`px-4 py-1.5 rounded-full text-xs font-semibold transition-all duration-200 cursor-pointer ${
+                      className={`px-3.5 py-1.5 rounded-full text-xs font-semibold transition-all duration-200 cursor-pointer ${
                         isActive
                           ? 'bg-white text-[#1D1D1F] shadow-xs font-bold'
                           : 'text-[#1D1D1F]/70 hover:text-[#1D1D1F] hover:bg-white/60'
@@ -155,9 +189,24 @@ export const Navbar: React.FC<NavbarProps> = ({
               })}
             </nav>
 
-            {/* 3. Right: Apple Blue CTA Pill ("Ask Ikoli ↗") + Mobile Toggle */}
-            <div className="flex items-center gap-2 shrink-0 pr-0.5">
+            {/* 3. Right: Search Button + Apple Blue CTA Pill ("Ask Ikoli ↗") + Mobile Toggle */}
+            <div className="flex items-center gap-1.5 sm:gap-2 shrink-0 pr-0.5">
               
+              {/* Search Trigger Button */}
+              <MagneticButton magneticStrength={0.2} onClick={() => setSearchModalOpen(true)}>
+                <button
+                  className="bg-black/[0.04] hover:bg-black/[0.08] active:scale-95 text-[#1D1D1F] px-2.5 sm:px-3 py-1.5 rounded-full text-xs font-semibold flex items-center gap-1.5 border border-black/5 shadow-2xs transition-all cursor-pointer group"
+                  title="Search IKOLI AI Platform (⌘K / Ctrl+K)"
+                  aria-label="Open Search"
+                >
+                  <Search className="w-3.5 h-3.5 text-gray-600 group-hover:text-[#0071E3] transition-colors" />
+                  <span className="hidden sm:inline text-[11px] font-medium text-gray-600 group-hover:text-[#1D1D1F]">Search</span>
+                  <kbd className="hidden lg:inline-flex items-center text-[9px] font-mono font-bold bg-black/10 text-gray-500 px-1.5 py-0.2 rounded ml-0.5">
+                    ⌘K
+                  </kbd>
+                </button>
+              </MagneticButton>
+
               {/* Action CTA Pill with White Circular Arrow Badge */}
               <MagneticButton magneticStrength={0.3} onClick={() => handleNavClick('ask')}>
                 <button
@@ -404,6 +453,23 @@ export const Navbar: React.FC<NavbarProps> = ({
                 </button>
               </div>
 
+              {/* Search Bar in Mobile Menu */}
+              <button
+                onClick={() => {
+                  setMobileMenuOpen(false);
+                  setSearchModalOpen(true);
+                }}
+                className="w-full bg-[#F5F5F7] hover:bg-[#EBEBEF] text-gray-600 px-3.5 py-2.5 rounded-2xl text-xs font-semibold flex items-center justify-between border border-black/5 transition-all cursor-pointer shadow-2xs"
+              >
+                <div className="flex items-center gap-2.5">
+                  <Search className="w-3.5 h-3.5 text-gray-500" />
+                  <span>Search platform &amp; diseases...</span>
+                </div>
+                <kbd className="text-[9px] font-mono font-bold bg-white text-gray-500 px-1.5 py-0.5 rounded shadow-2xs">
+                  ⌘K
+                </kbd>
+              </button>
+
               {/* Clean Minimal Navigation Item List */}
               <div className="space-y-2">
                 {navItems.map((item) => {
@@ -458,6 +524,119 @@ export const Navbar: React.FC<NavbarProps> = ({
                 </button>
               </div>
             </motion.div>
+          </>
+        )}
+      </AnimatePresence>
+
+      {/* ── 4. GLOBAL SPOTLIGHT SEARCH MODAL (APPLE-CLEAN SPATIAL DIALOG) ────────── */}
+      <AnimatePresence>
+        {searchModalOpen && (
+          <>
+            {/* Backdrop */}
+            <motion.div
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              transition={{ duration: 0.2 }}
+              onClick={() => setSearchModalOpen(false)}
+              className="fixed inset-0 z-50 bg-black/60 backdrop-blur-md"
+            />
+
+            {/* Modal Dialog */}
+            <div className="fixed inset-0 z-50 flex items-start justify-center pt-20 sm:pt-28 px-4 pointer-events-none">
+              <motion.div
+                initial={{ opacity: 0, scale: 0.96, y: -10 }}
+                animate={{ opacity: 1, scale: 1, y: 0 }}
+                exit={{ opacity: 0, scale: 0.96, y: -10 }}
+                transition={{ duration: 0.22, ease: [0.16, 1, 0.3, 1] }}
+                className="pointer-events-auto w-full max-w-2xl bg-white rounded-[28px] sm:rounded-[32px] shadow-[0_24px_70px_rgba(0,0,0,0.25)] border border-black/10 overflow-hidden flex flex-col max-h-[80vh]"
+              >
+                {/* Search Input Header */}
+                <div className="p-4 sm:p-5 border-b border-black/8 flex items-center gap-3 bg-[#FBFBFD]">
+                  <Search className="w-5 h-5 text-[#0071E3] shrink-0" />
+                  <input
+                    type="text"
+                    autoFocus
+                    value={searchQuery}
+                    onChange={(e) => setSearchQuery(e.target.value)}
+                    placeholder="Search diseases, WHO protocols, APIs, hymnal heritage..."
+                    className="w-full bg-transparent text-sm sm:text-base text-[#1D1D1F] placeholder-gray-400 outline-none font-sans font-medium"
+                  />
+                  {searchQuery ? (
+                    <button
+                      onClick={() => setSearchQuery('')}
+                      className="p-1 rounded-full hover:bg-black/5 text-gray-400 hover:text-black transition-colors"
+                    >
+                      <X className="w-4 h-4" />
+                    </button>
+                  ) : (
+                    <kbd className="hidden sm:inline-flex text-[10px] font-mono font-bold bg-black/5 text-gray-500 px-2 py-0.5 rounded shadow-2xs">
+                      ESC
+                    </kbd>
+                  )}
+                </div>
+
+                {/* Results List */}
+                <div className="overflow-y-auto p-3 sm:p-4 space-y-1.5 divide-y divide-black/5 max-h-[55vh]">
+                  {filteredSearchResults.length === 0 ? (
+                    <div className="py-12 text-center space-y-2">
+                      <p className="text-sm font-semibold text-gray-700">No results found for &ldquo;{searchQuery}&rdquo;</p>
+                      <p className="text-xs text-gray-400 font-mono">Try searching &ldquo;Leprosy&rdquo;, &ldquo;Buruli&rdquo;, &ldquo;API&rdquo;, or &ldquo;Hymns&rdquo;</p>
+                    </div>
+                  ) : (
+                    filteredSearchResults.map((result, idx) => {
+                      const ResultIcon = result.icon;
+                      return (
+                        <div
+                          key={idx}
+                          onClick={() => handleNavClick(result.page)}
+                          className="pt-1.5 first:pt-0 group flex items-center justify-between p-3 rounded-2xl hover:bg-[#F5F5F7] transition-all cursor-pointer text-left"
+                        >
+                          <div className="flex items-start gap-3.5 pr-2">
+                            <div className="w-9 h-9 rounded-xl bg-black/[0.04] group-hover:bg-[#0071E3] group-hover:text-white text-gray-700 border border-black/5 flex items-center justify-center shrink-0 transition-colors shadow-2xs mt-0.5">
+                              <ResultIcon className="w-4 h-4" />
+                            </div>
+                            <div className="space-y-0.5">
+                              <div className="flex items-center gap-2">
+                                <span className="font-bold text-xs sm:text-sm text-[#1D1D1F] group-hover:text-[#0071E3] transition-colors">
+                                  {result.title}
+                                </span>
+                                <span className="text-[9px] font-mono font-bold uppercase tracking-wider bg-black/[0.05] text-gray-600 px-1.5 py-0.2 rounded-full">
+                                  {result.category}
+                                </span>
+                              </div>
+                              <p className="text-[11px] sm:text-xs text-gray-500 line-clamp-1">
+                                {result.desc}
+                              </p>
+                            </div>
+                          </div>
+
+                          <div className="shrink-0 pl-2">
+                            <div className="w-7 h-7 rounded-full bg-white group-hover:bg-[#0071E3] group-hover:text-white text-gray-400 border border-black/5 flex items-center justify-center transition-all shadow-2xs">
+                              <ArrowRight className="w-3.5 h-3.5" />
+                            </div>
+                          </div>
+                        </div>
+                      );
+                    })
+                  )}
+                </div>
+
+                {/* Footer Telemetry & Navigation Hints */}
+                <div className="px-5 py-3 bg-[#FBFBFD] border-t border-black/8 flex items-center justify-between text-[11px] font-mono text-gray-500">
+                  <div className="flex items-center gap-3">
+                    <span className="flex items-center gap-1">
+                      <span className="text-[#0071E3] font-bold">&bull;</span>
+                      <span>{filteredSearchResults.length} resources available</span>
+                    </span>
+                  </div>
+                  <div className="hidden sm:flex items-center gap-3 text-gray-400">
+                    <span>Press <kbd className="bg-black/5 px-1.5 py-0.5 rounded text-gray-600 font-bold">↵</kbd> to jump</span>
+                    <span>Press <kbd className="bg-black/5 px-1.5 py-0.5 rounded text-gray-600 font-bold">ESC</kbd> to exit</span>
+                  </div>
+                </div>
+              </motion.div>
+            </div>
           </>
         )}
       </AnimatePresence>
