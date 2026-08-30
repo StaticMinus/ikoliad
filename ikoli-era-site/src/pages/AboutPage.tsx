@@ -269,47 +269,24 @@ export const AboutPage: React.FC<AboutPageProps> = ({ onNavigate }) => {
                 </div>
               </div>
 
-              {/* 2. Bottom Wide Photographic Card (Flush, Zero Gap, Square Corners) */}
+              {/* 2. Bottom Wide Photographic Card (Flush, Zero Gap, Square Corners, Clean No Text) */}
               <div className="relative aspect-[16/9] sm:aspect-[21/9] rounded-none overflow-hidden bg-gray-900 group cursor-pointer border-t border-black/10">
                 <img
                   src="/media/about_manuscript_wide.jpg"
                   alt="Harcourt Whyte Sacred Choral Manuscript"
                   className="w-full h-full object-cover group-hover:scale-104 transition-transform duration-700 ease-out"
                 />
-                <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-transparent pointer-events-none" />
-                <div className="absolute bottom-4 left-6 right-6 flex items-end justify-between text-white">
-                  <div>
-                    <span className="text-[10px] font-mono uppercase tracking-widest text-white/80 font-bold block">
-                      ARCHIVAL HERITAGE
-                    </span>
-                    <span className="font-bold text-sm sm:text-base leading-tight block">
-                      Original Handwritten Scores &bull; Uzuakoli Choral Suite (1932–1977)
-                    </span>
-                  </div>
-                </div>
               </div>
 
             </div>
 
-            {/* Right Area (Span 4): Tall Vertical Editorial Card (Flush, Zero Gap, Square Corners) */}
+            {/* Right Area (Span 4): Tall Vertical Editorial Card (Flush, Zero Gap, Square Corners, Clean No Text) */}
             <div className="lg:col-span-4 relative rounded-none overflow-hidden bg-gray-900 group cursor-pointer min-h-[440px]">
               <img
                 src="/media/about_tall_portrait.jpg"
                 alt="Ikoli Living Succession"
                 className="w-full h-full object-cover object-top group-hover:scale-104 transition-transform duration-700 ease-out"
               />
-              <div className="absolute inset-0 bg-gradient-to-t from-black/85 via-black/20 to-transparent pointer-events-none" />
-              <div className="absolute bottom-6 left-6 right-6 text-white space-y-1 text-left">
-                <span className="text-[10px] font-mono text-white/80 font-bold uppercase tracking-widest block">
-                  THE LIVING SUCCESSION
-                </span>
-                <h4 className="font-bold text-base sm:text-lg text-white leading-snug">
-                  From Uzuakoli Sanctuary to National Clinical Intelligence
-                </h4>
-                <p className="text-xs text-gray-300 font-light leading-relaxed">
-                  Transforming his historic message of hope into Nigeria's autonomous Skin NTD diagnostic network.
-                </p>
-              </div>
             </div>
 
           </div>
@@ -331,7 +308,7 @@ export const AboutPage: React.FC<AboutPageProps> = ({ onNavigate }) => {
             </h2>
           </div>
 
-          {/* 8-Cell Gallery Bento Grid (4 Columns x 2 Rows - 100% Flush Zero Gap) */}
+          {/* 8-Cell Gallery Bento Grid (4 Columns x 2 Rows - 100% Flush Zero Gap, Clean Images) */}
           <div className="grid grid-cols-2 md:grid-cols-4 gap-0 border border-black/10 shadow-sm">
             
             {/* Cell 1: Clinical Examination Staging */}
@@ -344,12 +321,6 @@ export const AboutPage: React.FC<AboutPageProps> = ({ onNavigate }) => {
                 alt="Clinical Stage I Screening"
                 className="w-full h-full object-cover filter grayscale contrast-115 group-hover:scale-106 group-hover:filter-none transition-all duration-500"
               />
-              <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-transparent pointer-events-none" />
-              <div className="absolute top-3 left-3 text-white">
-                <span className="text-[9px] font-mono font-bold uppercase tracking-widest text-white/90">
-                  STAGE I DETECTION
-                </span>
-              </div>
             </div>
 
             {/* Cell 2: Skin Lesion Differential Diagnostic */}
@@ -362,15 +333,6 @@ export const AboutPage: React.FC<AboutPageProps> = ({ onNavigate }) => {
                 alt="Hypopigmentation Examination"
                 className="w-full h-full object-cover filter grayscale contrast-115 group-hover:scale-106 group-hover:filter-none transition-all duration-500"
               />
-              <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-transparent pointer-events-none" />
-              <div className="absolute bottom-3 left-3 right-3 text-white">
-                <span className="text-[9px] font-mono font-bold uppercase tracking-widest text-white/80 block">
-                  PAUCIBACILLARY
-                </span>
-                <span className="font-bold text-xs leading-tight block">
-                  Sensory Mapping
-                </span>
-              </div>
             </div>
 
             {/* Cell 3: Clinical Leadership Study */}
@@ -383,15 +345,6 @@ export const AboutPage: React.FC<AboutPageProps> = ({ onNavigate }) => {
                 alt="Clinical Leadership"
                 className="w-full h-full object-cover filter grayscale contrast-115 group-hover:scale-106 group-hover:filter-none transition-all duration-500"
               />
-              <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-transparent pointer-events-none" />
-              <div className="absolute bottom-3 left-3 text-white">
-                <span className="text-[9px] font-mono font-bold uppercase tracking-widest text-white/80 block">
-                  CONSORTIUM
-                </span>
-                <span className="font-bold text-xs leading-tight block">
-                  Expert Clinicians
-                </span>
-              </div>
             </div>
 
             {/* Cell 4: Laboratory Microscopic Telemetry */}
@@ -404,15 +357,6 @@ export const AboutPage: React.FC<AboutPageProps> = ({ onNavigate }) => {
                 alt="Microscopy Telemetry"
                 className="w-full h-full object-cover filter grayscale contrast-115 group-hover:scale-106 group-hover:filter-none transition-all duration-500"
               />
-              <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-transparent pointer-events-none" />
-              <div className="absolute bottom-3 left-3 text-white">
-                <span className="text-[9px] font-mono font-bold uppercase tracking-widest text-white/80 block">
-                  SENTINEL TELEMETRY
-                </span>
-                <span className="font-bold text-xs leading-tight block">
-                  Abuja Lab Network
-                </span>
-              </div>
             </div>
 
             {/* Cell 5: Sensory Nerve Trunk Examination */}
@@ -425,15 +369,6 @@ export const AboutPage: React.FC<AboutPageProps> = ({ onNavigate }) => {
                 alt="Peroneal Nerve Exam"
                 className="w-full h-full object-cover filter grayscale contrast-115 group-hover:scale-106 group-hover:filter-none transition-all duration-500"
               />
-              <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-transparent pointer-events-none" />
-              <div className="absolute bottom-3 left-3 text-white">
-                <span className="text-[9px] font-mono font-bold uppercase tracking-widest text-white/80 block">
-                  MULTIBACILLARY
-                </span>
-                <span className="font-bold text-xs leading-tight block">
-                  Nerve Thickening
-                </span>
-              </div>
             </div>
 
             {/* Cell 6: Patient Dignity & Human Sanctuary */}
@@ -446,15 +381,6 @@ export const AboutPage: React.FC<AboutPageProps> = ({ onNavigate }) => {
                 alt="Patient Dignity & Recovery"
                 className="w-full h-full object-cover filter grayscale contrast-115 group-hover:scale-106 group-hover:filter-none transition-all duration-500"
               />
-              <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-transparent pointer-events-none" />
-              <div className="absolute bottom-3 left-3 text-white">
-                <span className="text-[9px] font-mono font-bold uppercase tracking-widest text-white/80 block">
-                  HUMAN DIGNITY
-                </span>
-                <span className="font-bold text-xs leading-tight block">
-                  Zero Suffering
-                </span>
-              </div>
             </div>
 
             {/* Cell 7: SPECIAL INTERACTIVE AUDIO CARD (100% Matching Screenshot Widget) */}
@@ -500,15 +426,6 @@ export const AboutPage: React.FC<AboutPageProps> = ({ onNavigate }) => {
                 alt="Consortium Research Charter"
                 className="w-full h-full object-cover filter grayscale contrast-115 group-hover:scale-106 group-hover:filter-none transition-all duration-500"
               />
-              <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-transparent pointer-events-none" />
-              <div className="absolute bottom-3 right-3 text-right text-white">
-                <span className="text-[9px] font-mono font-bold uppercase tracking-widest text-white/80 block">
-                  CONSORTIUM CHARTER
-                </span>
-                <span className="font-bold text-xs leading-tight block">
-                  NDPA 2023 &bull; v1.1
-                </span>
-              </div>
             </div>
 
           </div>
@@ -676,21 +593,6 @@ export const AboutPage: React.FC<AboutPageProps> = ({ onNavigate }) => {
               alt="IKOLI Clinical AI Innovation Lab Panorama"
               className="absolute inset-0 w-full h-full object-cover group-hover:scale-104 transition-transform duration-1000 ease-out"
             />
-            {/* Cinematic Gradient Vignette */}
-            <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/30 to-black/10 pointer-events-none" />
-            
-            {/* Quote Overlay in Bottom-Left */}
-            <div className="relative z-10 max-w-2xl space-y-2 text-left">
-              <span className="text-[10px] sm:text-[11px] font-mono text-emerald-300 font-bold uppercase tracking-widest block drop-shadow-sm">
-                IKOLI CONSORTIUM CHARTER &bull; 2026
-              </span>
-              <h3 className="font-display font-bold text-base sm:text-xl md:text-2xl lg:text-3xl text-white leading-snug drop-shadow-md">
-                "WHEN CLINICAL PRECISION MEETS HUMAN DIGNITY, PREVENTABLE DISABILITY CEASES TO EXIST."
-              </h3>
-              <p className="text-xs sm:text-sm text-gray-200 font-light drop-shadow-sm">
-                RedAid Nigeria &bull; DAHW Germany &bull; Digital Dreams &bull; FMOH/NTBLCP
-              </p>
-            </div>
           </div>
 
         </section>
@@ -785,26 +687,13 @@ export const AboutPage: React.FC<AboutPageProps> = ({ onNavigate }) => {
 
             </div>
 
-            {/* Right Area (Span 5 or 4): Tall Creative Colored Editorial Portrait */}
+            {/* Right Area (Span 5 or 4): Tall Creative Colored Editorial Portrait (Clean No Text) */}
             <div className="lg:col-span-5 xl:col-span-4 rounded-none overflow-hidden bg-gray-900 min-h-[440px] relative group cursor-pointer">
               <img
                 src="/media/about_contact_creative_color.jpg"
                 alt="IKOLI Consortium Leadership"
                 className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700 ease-out"
               />
-              <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent pointer-events-none" />
-              
-              <div className="absolute bottom-6 left-6 right-6 text-white space-y-1">
-                <span className="text-[10px] font-mono text-emerald-300 font-bold uppercase tracking-wider block">
-                  Consortium Director &bull; Field Operations
-                </span>
-                <h4 className="font-bold text-sm sm:text-base text-white">
-                  RedAid Nigeria &amp; DAHW Partnership
-                </h4>
-                <p className="text-xs text-gray-300 font-light">
-                  Directing 774 LGA surveillance, training CHEWs, and restoring patient dignity.
-                </p>
-              </div>
             </div>
 
           </div>
