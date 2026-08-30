@@ -112,7 +112,7 @@ export const AboutPage: React.FC<AboutPageProps> = ({ onNavigate }) => {
         {/* 1. Full-Bleed Archival / Editorial Portrait Background */}
         <div className="absolute inset-0 z-0">
           <img
-            src="/media/about_ikoli_editorial_hero.jpg"
+            src="/media/about_hero_editorial.jpg"
             alt="Ikoli Harcourt Whyte (1905–1977)"
             className="w-full h-full object-cover object-center filter grayscale contrast-115 brightness-95"
           />
