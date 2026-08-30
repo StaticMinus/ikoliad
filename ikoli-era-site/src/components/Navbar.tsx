@@ -188,7 +188,7 @@ export const Navbar: React.FC<NavbarProps> = ({
         </div>
       </header>
 
-      {/* ── IMMERSIVE FULL-SCREEN MEGA SUB-MENU OVERLAY (100% GOODFOLIO BLUEPRINT REPLICATION) ─── */}
+      {/* ── IMMERSIVE FULL-SCREEN MEGA SUB-MENU OVERLAY (BLACK BACKDROP & IKOLI CLINICAL CONTENTS) ─── */}
       <AnimatePresence>
         {apiSubmenuOpen && (
           <motion.div
@@ -198,66 +198,55 @@ export const Navbar: React.FC<NavbarProps> = ({
             transition={{ duration: 0.26, ease: [0.16, 1, 0.3, 1] }}
             onMouseEnter={handleMouseEnterApi}
             onMouseLeave={handleMouseLeaveApi}
-            className="fixed inset-0 top-0 left-0 w-screen h-screen z-40 bg-[#F4F4F6]/98 backdrop-blur-3xl overflow-y-auto pointer-events-auto flex flex-col justify-start pt-24 sm:pt-28 pb-14 px-4 sm:px-8 md:px-12 lg:px-16 select-none"
+            className="fixed inset-0 top-0 left-0 w-screen h-screen z-40 bg-black/95 backdrop-blur-3xl overflow-y-auto pointer-events-auto flex flex-col justify-start pt-24 sm:pt-28 pb-14 px-4 sm:px-8 md:px-12 lg:px-16 select-none text-white"
           >
             <div className="max-w-6xl w-full mx-auto space-y-4 sm:space-y-6">
               
-              {/* ── Top Header / Search / Close Bar ────────────────────────── */}
-              <div className="flex items-center justify-between gap-4 pb-2">
-                <div className="flex items-center gap-3">
-                  <span className="font-display font-black text-lg tracking-tight text-[#1D1D1F]">
-                    IKOLI <span className="text-[#0071E3]">AI</span>
-                  </span>
-                  <span className="text-[11px] font-mono font-bold text-gray-500 bg-black/5 px-2.5 py-0.5 rounded-full">
-                    API Platform &bull; v1.1
-                  </span>
+              {/* ── Top Header Bar (IKOLI AI removed from top left as requested) ── */}
+              <div className="flex items-center justify-end gap-3 pb-2">
+                <div className="hidden sm:flex items-center gap-2 bg-white/10 px-4 py-2 rounded-full border border-white/15 shadow-2xs text-xs text-gray-300 w-64 backdrop-blur-md">
+                  <span>🔍</span>
+                  <input
+                    type="text"
+                    placeholder="Search endpoints, APIs, SDKs..."
+                    className="bg-transparent outline-none w-full text-xs text-white placeholder-gray-400"
+                  />
                 </div>
 
-                <div className="flex items-center gap-3">
-                  <div className="hidden sm:flex items-center gap-2 bg-white px-4 py-2 rounded-full border border-black/8 shadow-2xs text-xs text-gray-400 w-64">
-                    <span>🔍</span>
-                    <input
-                      type="text"
-                      placeholder="Search endpoints, APIs, SDKs..."
-                      className="bg-transparent outline-none w-full text-xs text-[#1D1D1F] placeholder-gray-400"
-                    />
-                  </div>
-
-                  <button
-                    onClick={() => setApiSubmenuOpen(false)}
-                    className="px-3.5 py-1.5 rounded-full bg-white hover:bg-gray-100 border border-black/10 text-xs font-semibold text-gray-700 flex items-center gap-1.5 shadow-xs transition-all cursor-pointer"
-                  >
-                    <span>Close</span>
-                    <span className="text-[10px] font-mono bg-gray-100 px-1.5 py-0.5 rounded text-gray-500">ESC</span>
-                    <X className="w-3.5 h-3.5 ml-0.5" />
-                  </button>
-                </div>
+                <button
+                  onClick={() => setApiSubmenuOpen(false)}
+                  className="px-3.5 py-1.5 rounded-full bg-white/15 hover:bg-white/25 border border-white/20 text-xs font-semibold text-white flex items-center gap-1.5 shadow-xs transition-all cursor-pointer backdrop-blur-md"
+                >
+                  <span>Close</span>
+                  <span className="text-[10px] font-mono bg-white/20 px-1.5 py-0.5 rounded text-gray-200">ESC</span>
+                  <X className="w-3.5 h-3.5 ml-0.5" />
+                </button>
               </div>
 
-              {/* ── 1. Top Card: Gray Container with Model Portfolio & ETFs ─── */}
-              <div className="bg-[#ECECED] rounded-[32px] sm:rounded-[36px] p-6 sm:p-8 md:p-10 border border-black/5 shadow-md space-y-6">
+              {/* ── 1. Top Card: Spatial Dark Container with IKOLI Clinical Models & APIs ─── */}
+              <div className="bg-[#16181D] rounded-[32px] sm:rounded-[36px] p-6 sm:p-8 md:p-10 border border-white/10 shadow-2xl space-y-6">
                 <div className="grid grid-cols-12 gap-8 lg:gap-12 items-start text-left">
                   
-                  {/* Left Column: Model portfolio (Span 4) */}
+                  {/* Left Column: Clinical Diagnostic Models (Span 4) */}
                   <div className="col-span-12 md:col-span-4 space-y-4">
-                    <div className="border-b border-black/10 pb-2">
-                      <h4 className="text-xs font-semibold text-gray-600 font-sans">
-                        Model portfolio
+                    <div className="border-b border-white/10 pb-2">
+                      <h4 className="text-xs font-semibold text-gray-300 font-sans tracking-wide">
+                        Clinical diagnostic models
                       </h4>
                     </div>
 
                     <div className="flex flex-col gap-2.5">
                       {[
-                        'Socially responsible quick start',
-                        'Ethical growth',
-                        'Water tilt',
-                        'Emmission tilt',
-                        'Clean tech tilt',
+                        'WHO 3-stage Buruli classification',
+                        'Ridley-Jopling Leprosy staging',
+                        'Sub-mm Necrosis demarcation',
+                        'Sensory Nerve trunk mapping',
+                        'Yaws osteoperiostitis screening',
                       ].map((item) => (
                         <button
                           key={item}
                           onClick={() => handleNavClick('api')}
-                          className="w-fit text-left px-5 py-2.5 rounded-full bg-white/95 border border-black/5 hover:bg-white text-xs sm:text-sm font-medium text-[#1D1D1F] shadow-2xs hover:shadow-xs transition-all cursor-pointer"
+                          className="w-fit text-left px-5 py-2.5 rounded-full bg-white/10 border border-white/15 hover:bg-white/20 hover:border-white/30 text-xs sm:text-sm font-medium text-white shadow-2xs transition-all cursor-pointer"
                         >
                           {item}
                         </button>
@@ -265,11 +254,11 @@ export const Navbar: React.FC<NavbarProps> = ({
                     </div>
                   </div>
 
-                  {/* Right Column: ETFs & Compare ETFs (Span 8) */}
+                  {/* Right Column: Sovereign Surveillance & APIs (Span 8) */}
                   <div className="col-span-12 md:col-span-8 space-y-4">
-                    <div className="border-b border-black/10 pb-2">
-                      <h4 className="text-xs font-semibold text-gray-600 font-sans">
-                        ETFs
+                    <div className="border-b border-white/10 pb-2">
+                      <h4 className="text-xs font-semibold text-gray-300 font-sans tracking-wide">
+                        Surveillance &amp; APIs
                       </h4>
                     </div>
 
@@ -277,16 +266,16 @@ export const Navbar: React.FC<NavbarProps> = ({
                     <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
                       <div className="flex flex-col gap-2.5">
                         {[
-                          'All in one ETFs',
-                          'Equity ETFs',
-                          'Doing more good ETFs',
-                          'Bond ETFs',
-                          'Social responsible investing',
+                          'Zero-PII Tokenizer /v1/vault',
+                          'Realtime Inference /v1/infer',
+                          'Spatial Cluster /v1/telemetry',
+                          'DHIS2 Tracker webhook sync',
+                          'FHIR / HL7 clinical bridge',
                         ].map((pill) => (
                           <button
                             key={pill}
                             onClick={() => handleNavClick('api')}
-                            className="w-fit text-left px-5 py-2.5 rounded-full bg-white/95 border border-black/5 hover:bg-white text-xs sm:text-sm font-medium text-[#1D1D1F] shadow-2xs hover:shadow-xs transition-all cursor-pointer"
+                            className="w-fit text-left px-5 py-2.5 rounded-full bg-white/10 border border-white/15 hover:bg-white/20 hover:border-white/30 text-xs sm:text-sm font-medium text-white shadow-2xs transition-all cursor-pointer"
                           >
                             {pill}
                           </button>
@@ -295,16 +284,16 @@ export const Navbar: React.FC<NavbarProps> = ({
 
                       <div className="flex flex-col gap-2.5">
                         {[
-                          'Reduce pollution',
-                          'Clean technologies',
-                          'Water',
-                          'Invest women leaders',
-                          'Influencing companies',
+                          'Offline SQLite field buffer',
+                          'Edge ONNX WebGPU runtime',
+                          'HMAC-SHA256 authenticated',
+                          '774 LGA surveillance sync',
+                          'OpenAPI 3.1 schema specs',
                         ].map((pill) => (
                           <button
                             key={pill}
                             onClick={() => handleNavClick('api')}
-                            className="w-fit text-left px-5 py-2.5 rounded-full bg-white/95 border border-black/5 hover:bg-white text-xs sm:text-sm font-medium text-[#1D1D1F] shadow-2xs hover:shadow-xs transition-all cursor-pointer"
+                            className="w-fit text-left px-5 py-2.5 rounded-full bg-white/10 border border-white/15 hover:bg-white/20 hover:border-white/30 text-xs sm:text-sm font-medium text-white shadow-2xs transition-all cursor-pointer"
                           >
                             {pill}
                           </button>
@@ -312,22 +301,22 @@ export const Navbar: React.FC<NavbarProps> = ({
                       </div>
                     </div>
 
-                    {/* Compare ETFs Banner (Exact Blueprint Match) */}
+                    {/* Compare Diagnostic Models Banner */}
                     <div
                       onClick={() => handleNavClick('api')}
-                      className="pt-4 border-t border-black/10 flex items-center justify-between gap-6 cursor-pointer group"
+                      className="pt-4 border-t border-white/10 flex items-center justify-between gap-6 cursor-pointer group"
                     >
                       <div className="space-y-1 text-left">
-                        <h4 className="font-bold text-sm sm:text-base text-[#1D1D1F] group-hover:text-[#0071E3] transition-colors">
-                          Compare ETFs
+                        <h4 className="font-bold text-sm sm:text-base text-white group-hover:text-[#0071E3] transition-colors">
+                          Compare Diagnostic Models &amp; Protocols
                         </h4>
-                        <p className="text-xs text-gray-500 font-normal leading-relaxed max-w-xl">
-                          Generally, socially responsible investment indices benchmark different types of firms hailing from diverse industries and sectors.
+                        <p className="text-xs text-gray-400 font-normal leading-relaxed max-w-xl">
+                          Benchmark neural sensitivity, Ridley-Jopling staging accuracy, and edge inference latency across WHO target NTD conditions.
                         </p>
                       </div>
 
                       {/* White Circular Button with Black Right Arrow */}
-                      <div className="w-10 h-10 rounded-full bg-white text-black shadow-sm border border-black/5 flex items-center justify-center shrink-0 group-hover:scale-108 group-hover:shadow-md transition-all">
+                      <div className="w-10 h-10 rounded-full bg-white text-black shadow-md flex items-center justify-center shrink-0 group-hover:scale-108 transition-all">
                         <ArrowRight className="w-5 h-5 stroke-[2.5] text-black" />
                       </div>
                     </div>
@@ -337,24 +326,24 @@ export const Navbar: React.FC<NavbarProps> = ({
                 </div>
               </div>
 
-              {/* ── 2. Bottom Row: 3 Independent Photographic Cards (Exact Images & Arrow Buttons) ── */}
+              {/* ── 2. Bottom Row: 3 Grand Photographic Cards (Authentic IKOLI Imagery & Content) ── */}
               <div className="grid grid-cols-1 md:grid-cols-3 gap-4 sm:gap-6">
                 
-                {/* Card 1: Fight deforestation (Forest Photo) */}
+                {/* Card 1: Eliminate skin NTDs (CHEW Field Screening Photo) */}
                 <div
                   onClick={() => handleNavClick('diseases')}
-                  className="relative aspect-[4/3] rounded-[28px] sm:rounded-[32px] overflow-hidden bg-gray-900 shadow-lg group cursor-pointer"
+                  className="relative aspect-[4/3] rounded-[28px] sm:rounded-[32px] overflow-hidden bg-gray-900 shadow-lg group cursor-pointer border border-white/10"
                 >
                   <img
-                    src="/media/submenu_forest.jpg"
-                    alt="Fight deforestation"
+                    src="/media/submenu_chew_screening.jpg"
+                    alt="Eliminate skin NTDs"
                     className="absolute inset-0 w-full h-full object-cover group-hover:scale-106 transition-transform duration-700 ease-out"
                   />
-                  <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-transparent pointer-events-none" />
+                  <div className="absolute inset-0 bg-gradient-to-t from-black/85 via-black/20 to-transparent pointer-events-none" />
                   
                   <div className="absolute bottom-5 left-6 right-6 flex items-end justify-between text-white">
                     <h3 className="text-lg sm:text-xl md:text-2xl font-bold leading-tight drop-shadow-md text-left">
-                      Fight<br />deforestation
+                      Eliminate<br />skin NTDs
                     </h3>
                     
                     {/* White Circular Arrow Button */}
@@ -364,21 +353,21 @@ export const Navbar: React.FC<NavbarProps> = ({
                   </div>
                 </div>
 
-                {/* Card 2: Invest in ocean health (Ocean Wave Photo) */}
+                {/* Card 2: National sentinel network (Laboratory Surveillance Photo) */}
                 <div
                   onClick={() => handleNavClick('dashboard')}
-                  className="relative aspect-[4/3] rounded-[28px] sm:rounded-[32px] overflow-hidden bg-gray-900 shadow-lg group cursor-pointer"
+                  className="relative aspect-[4/3] rounded-[28px] sm:rounded-[32px] overflow-hidden bg-gray-900 shadow-lg group cursor-pointer border border-white/10"
                 >
                   <img
-                    src="/media/submenu_ocean.jpg"
-                    alt="Invest in ocean health"
+                    src="/media/submenu_sentinel_lab.jpg"
+                    alt="National sentinel network"
                     className="absolute inset-0 w-full h-full object-cover group-hover:scale-106 transition-transform duration-700 ease-out"
                   />
-                  <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-transparent pointer-events-none" />
+                  <div className="absolute inset-0 bg-gradient-to-t from-black/85 via-black/20 to-transparent pointer-events-none" />
                   
                   <div className="absolute bottom-5 left-6 right-6 flex items-end justify-between text-white">
                     <h3 className="text-lg sm:text-xl md:text-2xl font-bold leading-tight drop-shadow-md text-left">
-                      Invest in<br />ocean health
+                      National<br />sentinel network
                     </h3>
                     
                     {/* White Circular Arrow Button */}
@@ -388,21 +377,21 @@ export const Navbar: React.FC<NavbarProps> = ({
                   </div>
                 </div>
 
-                {/* Card 3: Support animal welfare (Highland Cow Photo) */}
+                {/* Card 3: Restore human dignity (Patient Dignity Photo) */}
                 <div
                   onClick={() => handleNavClick('about')}
-                  className="relative aspect-[4/3] rounded-[28px] sm:rounded-[32px] overflow-hidden bg-gray-900 shadow-lg group cursor-pointer"
+                  className="relative aspect-[4/3] rounded-[28px] sm:rounded-[32px] overflow-hidden bg-gray-900 shadow-lg group cursor-pointer border border-white/10"
                 >
                   <img
-                    src="/media/submenu_cow.jpg"
-                    alt="Support animal welfare"
+                    src="/media/submenu_patient_dignity.jpg"
+                    alt="Restore human dignity"
                     className="absolute inset-0 w-full h-full object-cover group-hover:scale-106 transition-transform duration-700 ease-out"
                   />
-                  <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-transparent pointer-events-none" />
+                  <div className="absolute inset-0 bg-gradient-to-t from-black/85 via-black/20 to-transparent pointer-events-none" />
                   
                   <div className="absolute bottom-5 left-6 right-6 flex items-end justify-between text-white">
                     <h3 className="text-lg sm:text-xl md:text-2xl font-bold leading-tight drop-shadow-md text-left">
-                      Support<br />animal welfare
+                      Restore<br />human dignity
                     </h3>
                     
                     {/* White Circular Arrow Button */}
