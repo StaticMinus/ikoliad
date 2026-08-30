@@ -702,58 +702,6 @@ export const AboutPage: React.FC<AboutPageProps> = ({ onNavigate }) => {
 
         </section>
 
-        {/* ══════════════════════════════════════════════════════════════════════
-            7. SECTION: "CONNECT WITH IKOLI" HIGH-CONTRAST FOOTER BANNER (100% REPLICATION)
-        ══════════════════════════════════════════════════════════════════════ */}
-        <section className="bg-[#0E0F11] rounded-none p-8 sm:p-14 text-white space-y-10 border border-white/10 shadow-2xl">
-          
-          {/* Top Links Bar */}
-          <div className="flex flex-wrap items-center justify-between gap-4 text-xs font-mono tracking-widest text-gray-400 uppercase border-b border-white/10 pb-6">
-            <div className="flex items-center gap-6">
-              <a href="#biography" className="hover:text-white transition-colors cursor-pointer">BIOGRAPHY</a>
-              <a href="#portfolio" className="hover:text-white transition-colors cursor-pointer">PORTFOLIO</a>
-              <a href="#process" className="hover:text-white transition-colors cursor-pointer">WORK PROCESS</a>
-            </div>
-            <div className="flex items-center gap-4">
-              <span className="text-[#0071E3] font-bold">IKOLI AI &bull; SOVEREIGN HEALTH</span>
-            </div>
-          </div>
-
-          {/* Huge Centered Typography (Matching Russian Mockup 'СВЯЖИТЕСЬ СО МНОЙ' in Clean English) */}
-          <div className="text-center py-4 sm:py-8 space-y-4">
-            <span className="text-[10px] sm:text-[11px] font-mono text-[#0071E3] font-bold uppercase tracking-widest block">
-              NATIONAL HEALTHCARE &bull; RESEARCH &bull; GLOBAL NTD ADVOCACY
-            </span>
-            <h2 className="font-display font-black text-3xl sm:text-5xl md:text-6xl lg:text-7xl tracking-tight text-white uppercase select-none leading-none">
-              CONNECT WITH IKOLI
-            </h2>
-          </div>
-
-          {/* Bottom Action & Telemetry Strip */}
-          <div className="flex flex-col sm:flex-row items-center justify-between gap-6 pt-6 border-t border-white/10">
-            <div className="text-left text-xs font-mono text-gray-400">
-              <span className="block text-white font-bold">clinical@ikoli.health &bull; Abuja &amp; Uzuakoli</span>
-              <span className="block text-[11px] text-gray-500 pt-0.5">&copy; 2026 IKOLI Consortium &bull; RedAid Nigeria &bull; DAHW</span>
-            </div>
-
-            <div className="flex items-center gap-3">
-              <button
-                onClick={() => onNavigate('dashboard')}
-                className="bg-white hover:bg-gray-100 text-[#0E0F11] font-bold text-xs px-6 py-3 rounded-none shadow-md transition-all cursor-pointer active:scale-95"
-              >
-                Surveillance Console
-              </button>
-              <button
-                onClick={() => onNavigate('api')}
-                className="bg-white/10 hover:bg-white/20 text-white font-bold text-xs px-6 py-3 rounded-none border border-white/15 backdrop-blur-md transition-all cursor-pointer active:scale-95"
-              >
-                Developer APIs
-              </button>
-            </div>
-          </div>
-
-        </section>
-
       </main>
 
       {/* ── Universal Full-Width Footer ──────────────────────────────────── */}
