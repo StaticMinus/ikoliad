@@ -109,12 +109,12 @@ export const AboutPage: React.FC<AboutPageProps> = ({ onNavigate }) => {
       ══════════════════════════════════════════════════════════════════════ */}
       <section className="relative w-full min-h-screen bg-black text-white flex flex-col justify-between overflow-hidden select-none">
         
-        {/* 1. Full-Bleed Archival / Editorial Portrait Background (Authentic Ikoli Harcourt Whyte) */}
+        {/* 1. Full-Bleed Archival / Editorial Portrait Background */}
         <div className="absolute inset-0 z-0">
           <img
-            src="/media/ikoli_harcourt_whyte_authentic.png"
+            src="/media/about_hero_editorial.jpg"
             alt="Ikoli Harcourt Whyte (1905–1977)"
-            className="w-full h-full object-cover object-[center_12%] filter grayscale contrast-115 brightness-95"
+            className="w-full h-full object-cover object-center filter grayscale contrast-115 brightness-95"
           />
           {/* Spatial Atmospheric Vignette Overlays for High-Contrast Readability */}
           <div className="absolute inset-0 bg-gradient-to-t from-black via-transparent to-black/60 pointer-events-none" />
@@ -280,12 +280,12 @@ export const AboutPage: React.FC<AboutPageProps> = ({ onNavigate }) => {
 
             </div>
 
-            {/* Right Area (Span 4): Tall Vertical Editorial Card (Authentic Ikoli Portrait in Color) */}
+            {/* Right Area (Span 4): Tall Vertical Editorial Card (Flush, Zero Gap, Square Corners, Clean No Text) */}
             <div className="lg:col-span-4 relative rounded-none overflow-hidden bg-gray-900 group cursor-pointer min-h-[440px]">
               <img
-                src="/media/ikoli_harcourt_whyte_authentic.png"
-                alt="Ikoli Harcourt Whyte Authentic Portrait"
-                className="w-full h-full object-cover object-[center_12%] group-hover:scale-104 transition-transform duration-700 ease-out"
+                src="/media/about_tall_portrait.jpg"
+                alt="Ikoli Living Succession"
+                className="w-full h-full object-cover object-top group-hover:scale-104 transition-transform duration-700 ease-out"
               />
             </div>
 
