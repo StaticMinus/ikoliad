@@ -375,30 +375,20 @@ export const Navbar: React.FC<NavbarProps> = ({
                 </div>
               </div>
 
-              {/* ── 2. Bottom Row: Single Grand Photographic Card (Full Width) ── */}
+              {/* ── 2. Bottom Row: Single Grand Realistic Photographic Card (Clean No Text) ── */}
               <div
                 onClick={() => handleNavClick('about')}
                 className="relative w-full aspect-[16/6] sm:aspect-[21/7] rounded-[28px] sm:rounded-[32px] overflow-hidden bg-gray-900 shadow-lg group cursor-pointer"
               >
                 <img
-                  src="/media/about_panoramic_creative_color.jpg"
-                  alt="Restoring Human Dignity Across 200 Million Nigerians"
+                  src="/media/about_contact_creative_color.jpg"
+                  alt="IKOLI Sovereign Healthcare AI Consortium"
                   className="absolute inset-0 w-full h-full object-cover group-hover:scale-104 transition-transform duration-700 ease-out"
                 />
-                <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent pointer-events-none" />
                 
-                <div className="absolute bottom-5 sm:bottom-7 left-6 sm:left-10 right-6 sm:right-10 flex items-end justify-between text-white">
-                  <div className="space-y-1 text-left">
-                    <span className="text-[10px] sm:text-xs font-mono uppercase tracking-widest text-emerald-400 font-bold block">
-                      SOVEREIGN HEALTHCARE &bull; ELIMINATE SKIN NTDs
-                    </span>
-                    <h3 className="text-lg sm:text-2xl md:text-3xl font-bold leading-tight drop-shadow-md">
-                      Restore Human Dignity Across 200 Million Nigerians
-                    </h3>
-                  </div>
-                  
-                  {/* White Circular Arrow Button */}
-                  <div className="w-11 h-11 sm:w-13 sm:h-13 rounded-full bg-white text-black shadow-xl flex items-center justify-center shrink-0 group-hover:scale-110 transition-transform duration-200 ml-4">
+                {/* Floating White Circular Arrow Button in Bottom Right */}
+                <div className="absolute bottom-5 sm:bottom-7 right-6 sm:right-10 flex items-center">
+                  <div className="w-11 h-11 sm:w-13 sm:h-13 rounded-full bg-white text-black shadow-xl flex items-center justify-center shrink-0 group-hover:scale-110 transition-transform duration-200">
                     <ArrowRight className="w-5 h-5 stroke-[2.5] text-black" />
                   </div>
                 </div>
