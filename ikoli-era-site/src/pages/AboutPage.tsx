@@ -8,7 +8,6 @@ import {
   Check,
   Send,
   Sparkles,
-  Volume2,
 } from 'lucide-react';
 
 interface AboutPageProps {
@@ -242,104 +241,99 @@ export const AboutPage: React.FC<AboutPageProps> = ({ onNavigate }) => {
       <main className="max-w-7xl mx-auto px-5 sm:px-10 md:px-16 space-y-24 sm:space-y-32 pt-20 sm:pt-28 text-left">
         
         {/* ══════════════════════════════════════════════════════════════════════
-            2. SECTION: "ABOUT IKOLI HARCOURT WHYTE" (Editorial Split Bento Grid)
+            2. SECTION: "ABOUT IKOLI" (100% EXACT BLUEPRINT REPLICATION)
         ══════════════════════════════════════════════════════════════════════ */}
-        <section className="space-y-8">
+        <section id="biography" className="space-y-8">
           
-          <div className="flex flex-col sm:flex-row sm:items-baseline justify-between gap-2 border-b border-black/5 pb-4">
-            <h2 className="font-display font-black text-2xl sm:text-3xl tracking-tight text-[#1D1D1F] uppercase">
-              ABOUT IKOLI HARCOURT WHYTE &bull; HISTORICAL BIOGRAPHY
+          {/* Header Row (Left: ABOUT IKOLI, Right: Uppercase Manifesto) */}
+          <div className="flex flex-col md:flex-row md:items-end justify-between gap-4 border-b border-black/8 pb-4">
+            <h2 className="font-display font-black text-3xl sm:text-4xl md:text-5xl tracking-tight text-[#1D1D1F] uppercase">
+              ABOUT IKOLI
             </h2>
-            <span className="text-xs font-mono text-gray-400 font-semibold tracking-wider">
-              Wikipedia Standard &bull; Historical Biography
-            </span>
+            <p className="max-w-md text-[11px] sm:text-xs font-mono font-medium tracking-wider text-gray-500 uppercase leading-relaxed text-left md:text-right">
+              WE HONOR IKOLI HARCOURT WHYTE (1905–1977), WHOSE SACRED HYMNODY AND HUMANITARIAN VALOR TRANSFORMED LEPROSY EXILE INTO IMMORTAL HOPE &amp; DIGNITY.
+            </p>
           </div>
 
-          {/* 3-Column Bento Grid */}
+          {/* Main 2-Column Asymmetric Bento Grid */}
           <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 items-stretch">
             
-            {/* Left Box: Gray Card with Biographical Overview (Span 4) */}
-            <div className="lg:col-span-4 bg-[#F5F5F7] rounded-[28px] p-6 sm:p-8 flex flex-col justify-between border border-black/5 space-y-6">
-              <div className="space-y-4">
-                <span className="text-[10px] font-mono font-bold uppercase tracking-wider text-[#0071E3] block">
-                  Biographical Record
-                </span>
-                <h3 className="font-display font-bold text-lg sm:text-xl text-[#1D1D1F] leading-snug">
-                  From Leprosy Stigma to Transcendent Musical Immortality.
-                </h3>
-                <p className="text-xs sm:text-sm text-gray-600 leading-relaxed font-normal">
-                  Ikoli Harcourt Whyte was a seminal Nigerian composer and humanitarian. Stricken with leprosy at age 14 in 1919, he turned the physical suffering of illness into a fountain of over 200 sacred Igbo choral anthems at the Uzuakoli Leprosy Hospital, creating a legacy that echoes globally.
-                </p>
-              </div>
-
-              <div className="pt-4 border-t border-black/5 space-y-2 text-xs font-mono text-gray-500">
-                <div className="flex justify-between">
-                  <span className="text-gray-400">Born:</span>
-                  <span className="font-bold text-[#1D1D1F]">1905, Abonnema, Nigeria</span>
-                </div>
-                <div className="flex justify-between">
-                  <span className="text-gray-400">Resting:</span>
-                  <span className="font-bold text-[#1D1D1F]">1977, Uzuakoli, Nigeria</span>
-                </div>
-                <div className="flex justify-between">
-                  <span className="text-gray-400">Works:</span>
-                  <span className="font-bold text-[#0071E3]">200+ Sacred Hymns</span>
-                </div>
-              </div>
-            </div>
-
-            {/* Center Box: 2-Stack Container (Tenets + Photographic Close-up) (Span 4) */}
-            <div className="lg:col-span-4 flex flex-col gap-6 justify-between">
+            {/* Left 2/3 Area (Span 8) */}
+            <div className="lg:col-span-8 flex flex-col justify-between space-y-6">
               
-              {/* Center Top: Values & Philosophy */}
-              <div className="bg-[#F5F5F7] rounded-[28px] p-6 sm:p-7 border border-black/5 space-y-3">
-                <span className="text-[10px] font-mono font-bold uppercase tracking-wider text-gray-400 block">
-                  Musical &amp; Humanitarian Philosophy
-                </span>
-                <ul className="space-y-2.5 text-xs text-gray-600 font-medium">
-                  <li className="flex items-start gap-2">
-                    <span className="w-1.5 h-1.5 rounded-full bg-[#0071E3] mt-1.5 shrink-0" />
-                    <span><strong>A Cappella Choral Purity:</strong> Insisted on zero instrumentation so the spiritual lyricism reigned supreme.</span>
-                  </li>
-                  <li className="flex items-start gap-2">
-                    <span className="w-1.5 h-1.5 rounded-full bg-[#0071E3] mt-1.5 shrink-0" />
-                    <span><strong>De-Stigmatization Through Song:</strong> Proved to the world that leprosy patients possessed profound intellectual dignity.</span>
-                  </li>
-                  <li className="flex items-start gap-2">
-                    <span className="w-1.5 h-1.5 rounded-full bg-[#0071E3] mt-1.5 shrink-0" />
-                    <span><strong>Voluntary Lifelong Service:</strong> Chose to stay at Uzuakoli even after his clinical cure in 1949.</span>
-                  </li>
-                </ul>
+              {/* Top Row: 2 Gray Cards Side-by-Side */}
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 sm:gap-6">
+                
+                {/* Card A: 1905 - 1932 */}
+                <div className="bg-[#ECECED] rounded-[24px] sm:rounded-[28px] p-6 sm:p-7 border border-black/5 space-y-3 text-left shadow-2xs">
+                  <span className="text-[10px] font-mono font-bold uppercase tracking-widest text-[#0071E3] block">
+                    1905 &ndash; 1932 &bull; ORIGINS &amp; RESILIENCE
+                  </span>
+                  <h3 className="font-display font-bold text-base sm:text-lg text-[#1D1D1F] uppercase leading-snug">
+                    ABONNEMA &amp; EARLY AWAKENING
+                  </h3>
+                  <p className="text-xs text-gray-600 font-mono uppercase tracking-wider leading-relaxed font-normal">
+                    DIAGNOSED WITH LEPROSY AT AGE 14 IN 1919, IKOLI REFUSED RETREAT INTO DESPAIR. PLAYING FLUTE AND BRASS, HE HARNESSED MUSIC AS A SACRED FORCE FOR DIGNITY.
+                  </p>
+                </div>
+
+                {/* Card B: 1932 - 1977 */}
+                <div className="bg-[#ECECED] rounded-[24px] sm:rounded-[28px] p-6 sm:p-7 border border-black/5 space-y-3 text-left shadow-2xs">
+                  <span className="text-[10px] font-mono font-bold uppercase tracking-widest text-[#0071E3] block">
+                    1932 &ndash; 1977 &bull; THE SANCTUARY
+                  </span>
+                  <h3 className="font-display font-bold text-base sm:text-lg text-[#1D1D1F] uppercase leading-snug">
+                    UZUAKOLI CHORAL SANCTUARY
+                  </h3>
+                  <p className="text-xs text-gray-600 font-mono uppercase tracking-wider leading-relaxed font-normal">
+                    AT UZUAKOLI HOSPITAL, HE COMPOSED OVER 200 SACRED IGBO HYMNS. HIS CHOIR TOURED GLOBALLY, PROVING THE IMMORTAL INTELLECT OF PATIENTS.
+                  </p>
+                </div>
+
               </div>
 
-              {/* Center Bottom: Archival Photo Square */}
-              <div className="relative rounded-[28px] overflow-hidden aspect-[4/3] bg-gray-200 border border-black/5 shadow-xs">
+              {/* Bottom Row: Wide Panoramic Manuscript Photo */}
+              <div className="relative aspect-[16/9] sm:aspect-[21/9] rounded-[24px] sm:rounded-[28px] overflow-hidden bg-gray-900 border border-black/5 shadow-md group cursor-pointer">
                 <img
-                  src="/media/female_researcher_journal.jpg"
-                  alt="Archival Choral Manuscript Study"
-                  className="w-full h-full object-cover filter grayscale contrast-115 hover:scale-105 transition-transform duration-500"
+                  src="/media/about_manuscript_wide.jpg"
+                  alt="Harcourt Whyte Sacred Choral Manuscript"
+                  className="w-full h-full object-cover group-hover:scale-104 transition-transform duration-700 ease-out"
                 />
+                <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-transparent pointer-events-none" />
+                <div className="absolute bottom-4 left-6 right-6 flex items-end justify-between text-white">
+                  <div>
+                    <span className="text-[10px] font-mono uppercase tracking-widest text-[#0071E3] font-bold block">
+                      ARCHIVAL HERITAGE
+                    </span>
+                    <span className="font-bold text-sm sm:text-base leading-tight block">
+                      Original Handwritten Scores &bull; Uzuakoli Choral Suite (1932–1977)
+                    </span>
+                  </div>
+                  <span className="text-[10px] font-mono text-gray-400 bg-white/10 px-2.5 py-1 rounded-full backdrop-blur-md">
+                    200+ ANTHEMS
+                  </span>
+                </div>
               </div>
 
             </div>
 
-            {/* Right Box: Tall Vertical Photographic Card (Span 4) */}
-            <div className="lg:col-span-4 rounded-[28px] overflow-hidden relative min-h-[420px] bg-[#16171A] border border-black/5 shadow-xs group">
+            {/* Right 1/3 Area: Tall Vertical Editorial Card (Span 4) */}
+            <div className="lg:col-span-4 relative rounded-[24px] sm:rounded-[28px] overflow-hidden bg-gray-900 border border-black/5 shadow-md group cursor-pointer min-h-[480px]">
               <img
-                src="/media/lead_clinician_hero.jpg"
-                alt="Clinical Leadership Continuing Harcourt Whyte's Mission"
-                className="w-full h-full object-cover filter grayscale contrast-115 group-hover:scale-105 group-hover:filter-none transition-all duration-700"
+                src="/media/about_tall_portrait.jpg"
+                alt="Ikoli Living Succession"
+                className="w-full h-full object-cover object-top group-hover:scale-104 transition-transform duration-700 ease-out"
               />
               <div className="absolute inset-0 bg-gradient-to-t from-black/85 via-black/20 to-transparent pointer-events-none" />
-              <div className="absolute bottom-6 left-6 right-6 text-white space-y-1">
-                <span className="text-[10px] font-mono text-[#0071E3] font-bold uppercase tracking-wider block">
-                  The Living Succession
+              <div className="absolute bottom-6 left-6 right-6 text-white space-y-1 text-left">
+                <span className="text-[10px] font-mono text-[#0071E3] font-bold uppercase tracking-widest block">
+                  THE LIVING SUCCESSION
                 </span>
-                <h4 className="font-bold text-base text-white">
-                  From Uzuakoli Choir to National Clinical AI
+                <h4 className="font-bold text-base sm:text-lg text-white leading-snug">
+                  From Uzuakoli Sanctuary to National Clinical Intelligence
                 </h4>
-                <p className="text-xs text-gray-300 font-light">
-                  Transforming his message of hope into Nigeria's autonomous Skin NTD diagnostic network.
+                <p className="text-xs text-gray-300 font-light leading-relaxed">
+                  Transforming his historic message of hope into Nigeria's autonomous Skin NTD diagnostic network.
                 </p>
               </div>
             </div>
@@ -349,125 +343,197 @@ export const AboutPage: React.FC<AboutPageProps> = ({ onNavigate }) => {
         </section>
 
         {/* ══════════════════════════════════════════════════════════════════════
-            3. SECTION: "HISTORICAL WORKS & ARCHIVE"
+            3. SECTION: "THE IKOLI PORTFOLIO" (100% EXACT 8-CELL BLUEPRINT GRID)
         ══════════════════════════════════════════════════════════════════════ */}
-        <section className="space-y-8">
+        <section id="portfolio" className="space-y-8">
           
-          <div className="flex flex-col sm:flex-row sm:items-baseline justify-between gap-2 border-b border-black/5 pb-4">
-            <h2 className="font-display font-black text-2xl sm:text-3xl tracking-tight text-[#1D1D1F] uppercase">
-              HISTORICAL ARCHIVE &amp; HYMNODY &bull; SACRED WORKS
+          {/* Header Row (Left: Uppercase Statement, Right: Stacked Heading) */}
+          <div className="flex flex-col md:flex-row md:items-end justify-between gap-4 border-b border-black/8 pb-4">
+            <p className="max-w-md text-[11px] sm:text-xs font-mono font-medium tracking-wider text-gray-500 uppercase leading-relaxed text-left">
+              A LIVING REPOSITORY UNITING HISTORICAL SACRED HYMNODY, ZERO-PII NEURAL INFERENCE, AND CLINICAL DERMATOLOGY ACROSS NIGERIA.
+            </p>
+            <h2 className="font-display font-black text-3xl sm:text-4xl md:text-5xl tracking-tight text-[#1D1D1F] uppercase text-left md:text-right leading-[0.92]">
+              THE IKOLI<br />PORTFOLIO
             </h2>
-            <span className="text-xs font-mono text-gray-400 font-semibold tracking-wider">
-              06 Historical Milestones
-            </span>
           </div>
 
-          {/* 7-Card Asymmetric Mosaic Gallery */}
+          {/* 8-Cell Gallery Bento Grid (4 Columns x 2 Rows matching screenshot 100%) */}
           <div className="grid grid-cols-2 md:grid-cols-4 gap-4 sm:gap-6">
             
-            {/* Card 1: Uzuakoli Sanctuary */}
-            <div className="relative aspect-[3/4] rounded-[24px] overflow-hidden bg-gray-200 border border-black/5 group cursor-pointer shadow-xs">
-              <img
-                src="/media/sensory-mapping-consult.jpg"
-                alt="Uzuakoli Leprosy Hospital"
-                className="w-full h-full object-cover filter grayscale contrast-115 group-hover:scale-105 group-hover:filter-none transition-all duration-500"
-              />
-              <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-transparent pointer-events-none" />
-              <div className="absolute bottom-4 left-4 right-4 text-white">
-                <span className="text-[9px] font-mono uppercase tracking-widest text-[#0071E3] font-bold block">1932 Sanctuary</span>
-                <span className="font-bold text-xs sm:text-sm leading-tight block">Uzuakoli Leprosy Centre</span>
-              </div>
-            </div>
-
-            {/* Card 2: 200+ Igbo Hymns */}
-            <div className="relative aspect-[3/4] rounded-[24px] overflow-hidden bg-gray-200 border border-black/5 group cursor-pointer shadow-xs">
-              <img
-                src="/media/medical_journal_thumb.jpg"
-                alt="Sacred Igbo Hymnody Scores"
-                className="w-full h-full object-cover filter grayscale contrast-115 group-hover:scale-105 group-hover:filter-none transition-all duration-500"
-              />
-              <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-transparent pointer-events-none" />
-              <div className="absolute bottom-4 left-4 right-4 text-white">
-                <span className="text-[9px] font-mono uppercase tracking-widest text-emerald-400 font-bold block">Choral Opus</span>
-                <span className="font-bold text-xs sm:text-sm leading-tight block">200+ Sacred Hymns</span>
-              </div>
-            </div>
-
-            {/* Card 3: The Uzuakoli Choir */}
-            <div className="relative aspect-[3/4] rounded-[24px] overflow-hidden bg-gray-200 border border-black/5 group cursor-pointer shadow-xs">
-              <img
-                src="/media/reference-team.jpg"
-                alt="The Historic Uzuakoli Choir"
-                className="w-full h-full object-cover filter grayscale contrast-115 group-hover:scale-105 group-hover:filter-none transition-all duration-500"
-              />
-              <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-transparent pointer-events-none" />
-              <div className="absolute bottom-4 left-4 right-4 text-white">
-                <span className="text-[9px] font-mono uppercase tracking-widest text-purple-400 font-bold block">Acappella Voice</span>
-                <span className="font-bold text-xs sm:text-sm leading-tight block">The Uzuakoli Choir</span>
-              </div>
-            </div>
-
-            {/* Card 4: Dapsone Clinical Cure */}
-            <div className="relative aspect-[3/4] rounded-[24px] overflow-hidden bg-gray-200 border border-black/5 group cursor-pointer shadow-xs">
-              <img
-                src="/media/microscope_detail_thumb.jpg"
-                alt="1949 Dapsone Clinical Cure"
-                className="w-full h-full object-cover filter grayscale contrast-115 group-hover:scale-105 group-hover:filter-none transition-all duration-500"
-              />
-              <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-transparent pointer-events-none" />
-              <div className="absolute bottom-4 left-4 right-4 text-white">
-                <span className="text-[9px] font-mono uppercase tracking-widest text-amber-400 font-bold block">1949 Breakthrough</span>
-                <span className="font-bold text-xs sm:text-sm leading-tight block">Clinical Cure With Dapsone</span>
-              </div>
-            </div>
-
-            {/* Card 5: Dr. T.F. Davey Mentorship */}
-            <div className="relative aspect-[3/4] rounded-[24px] overflow-hidden bg-gray-200 border border-black/5 group cursor-pointer shadow-xs">
-              <img
-                src="/media/leprosy_clinical_exam.jpg"
-                alt="Dr. T.F. Davey & Clinical Trials"
-                className="w-full h-full object-cover filter grayscale contrast-115 group-hover:scale-105 group-hover:filter-none transition-all duration-500"
-              />
-              <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-transparent pointer-events-none" />
-              <div className="absolute bottom-4 left-4 right-4 text-white">
-                <span className="text-[9px] font-mono uppercase tracking-widest text-[#0071E3] font-bold block">Mentorship</span>
-                <span className="font-bold text-xs sm:text-sm leading-tight block">Dr. T.F. Davey &amp; Lepra</span>
-              </div>
-            </div>
-
-            {/* Center Capsule Card: Interactive Choral Suite Trigger */}
+            {/* Cell 1: Clinical Examination Staging */}
             <div
-              onClick={toggleHymnAudio}
-              className="relative aspect-[3/4] rounded-[24px] overflow-hidden bg-[#18191C] border border-black/10 flex flex-col items-center justify-center p-6 text-center text-white cursor-pointer group hover:bg-[#222428] transition-all shadow-md"
+              onClick={() => onNavigate('diseases')}
+              className="relative aspect-[3/4] rounded-[20px] sm:rounded-[24px] overflow-hidden bg-gray-900 border border-black/5 group cursor-pointer shadow-xs"
             >
-              <div className="w-14 h-14 rounded-full bg-white/10 group-hover:bg-[#0071E3] text-white flex items-center justify-center transition-colors mb-3">
-                <Volume2 className="w-5 h-5" />
+              <img
+                src="/media/leprosy_clinical_sensory_exam.jpg"
+                alt="Clinical Stage I Screening"
+                className="w-full h-full object-cover filter grayscale contrast-115 group-hover:scale-106 group-hover:filter-none transition-all duration-500"
+              />
+              <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-transparent pointer-events-none" />
+              <div className="absolute top-3 left-3 text-white">
+                <span className="text-[9px] font-mono font-bold uppercase tracking-widest text-white/90 bg-black/40 px-2 py-0.5 rounded backdrop-blur-xs">
+                  STAGE I DETECTION
+                </span>
               </div>
-              <span className="text-xs font-mono font-bold tracking-wider uppercase text-gray-400 group-hover:text-white block">
-                SACRED CHORAL HYMNS
-              </span>
-              <span className="font-bold text-sm text-white block mt-1">
-                {isPlayingHymn ? 'Stop Choral Audio' : 'Play "Atula Egwu"'}
-              </span>
             </div>
 
-            {/* Card 7: Living Inspiration (Wide Banner) */}
+            {/* Cell 2: Skin Lesion Differential Diagnostic */}
+            <div
+              onClick={() => onNavigate('diseases')}
+              className="relative aspect-[3/4] rounded-[20px] sm:rounded-[24px] overflow-hidden bg-gray-900 border border-black/5 group cursor-pointer shadow-xs"
+            >
+              <img
+                src="/media/home_pb_leprosy_hypopigmentation.jpg"
+                alt="Hypopigmentation Examination"
+                className="w-full h-full object-cover filter grayscale contrast-115 group-hover:scale-106 group-hover:filter-none transition-all duration-500"
+              />
+              <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-transparent pointer-events-none" />
+              <div className="absolute bottom-3 left-3 right-3 text-white">
+                <span className="text-[9px] font-mono font-bold uppercase tracking-widest text-blue-300 block">
+                  PAUCIBACILLARY
+                </span>
+                <span className="font-bold text-xs leading-tight block">
+                  Sensory Mapping
+                </span>
+              </div>
+            </div>
+
+            {/* Cell 3: Clinical Leadership Study */}
+            <div
+              onClick={() => onNavigate('about')}
+              className="relative aspect-[3/4] rounded-[20px] sm:rounded-[24px] overflow-hidden bg-gray-900 border border-black/5 group cursor-pointer shadow-xs"
+            >
+              <img
+                src="/media/about_tall_portrait.jpg"
+                alt="Clinical Leadership"
+                className="w-full h-full object-cover filter grayscale contrast-115 group-hover:scale-106 group-hover:filter-none transition-all duration-500"
+              />
+              <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-transparent pointer-events-none" />
+              <div className="absolute bottom-3 left-3 text-white">
+                <span className="text-[9px] font-mono font-bold uppercase tracking-widest text-emerald-400 block">
+                  CONSORTIUM
+                </span>
+                <span className="font-bold text-xs leading-tight block">
+                  Expert Clinicians
+                </span>
+              </div>
+            </div>
+
+            {/* Cell 4: Laboratory Microscopic Telemetry */}
             <div
               onClick={() => onNavigate('dashboard')}
-              className="col-span-2 relative aspect-[2/1] rounded-[24px] overflow-hidden bg-gray-200 border border-black/5 group cursor-pointer shadow-xs"
+              className="relative aspect-[3/4] rounded-[20px] sm:rounded-[24px] overflow-hidden bg-gray-900 border border-black/5 group cursor-pointer shadow-xs"
             >
               <img
-                src="/media/dashboard-sentinel.jpg"
-                alt="IKOLI AI Sovereign Platform"
-                className="w-full h-full object-cover filter grayscale contrast-115 group-hover:scale-105 group-hover:filter-none transition-all duration-500"
+                src="/media/submenu_sentinel_lab.jpg"
+                alt="Microscopy Telemetry"
+                className="w-full h-full object-cover filter grayscale contrast-115 group-hover:scale-106 group-hover:filter-none transition-all duration-500"
               />
-              <div className="absolute inset-0 bg-gradient-to-t from-black/85 via-black/30 to-transparent pointer-events-none" />
-              <div className="absolute bottom-4 left-6 right-6 text-white flex items-end justify-between">
-                <div>
-                  <span className="text-[9px] font-mono uppercase tracking-widest text-[#0071E3] font-bold block">2026 Sovereign AI</span>
-                  <span className="font-bold text-sm sm:text-base leading-tight block">IKOLI AI &bull; National Surveillance Network</span>
+              <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-transparent pointer-events-none" />
+              <div className="absolute bottom-3 left-3 text-white">
+                <span className="text-[9px] font-mono font-bold uppercase tracking-widest text-purple-300 block">
+                  SENTINEL TELEMETRY
+                </span>
+                <span className="font-bold text-xs leading-tight block">
+                  Abuja Lab Network
+                </span>
+              </div>
+            </div>
+
+            {/* Cell 5: Sensory Nerve Trunk Examination */}
+            <div
+              onClick={() => onNavigate('diseases')}
+              className="relative aspect-[3/4] rounded-[20px] sm:rounded-[24px] overflow-hidden bg-gray-900 border border-black/5 group cursor-pointer shadow-xs"
+            >
+              <img
+                src="/media/home_mb_leprosy_nerve_mapping.jpg"
+                alt="Peroneal Nerve Exam"
+                className="w-full h-full object-cover filter grayscale contrast-115 group-hover:scale-106 group-hover:filter-none transition-all duration-500"
+              />
+              <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-transparent pointer-events-none" />
+              <div className="absolute bottom-3 left-3 text-white">
+                <span className="text-[9px] font-mono font-bold uppercase tracking-widest text-amber-300 block">
+                  MULTIBACILLARY
+                </span>
+                <span className="font-bold text-xs leading-tight block">
+                  Nerve Thickening
+                </span>
+              </div>
+            </div>
+
+            {/* Cell 6: Patient Dignity & Human Sanctuary */}
+            <div
+              onClick={() => onNavigate('about')}
+              className="relative aspect-[3/4] rounded-[20px] sm:rounded-[24px] overflow-hidden bg-gray-900 border border-black/5 group cursor-pointer shadow-xs"
+            >
+              <img
+                src="/media/submenu_patient_dignity.jpg"
+                alt="Patient Dignity & Recovery"
+                className="w-full h-full object-cover filter grayscale contrast-115 group-hover:scale-106 group-hover:filter-none transition-all duration-500"
+              />
+              <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-transparent pointer-events-none" />
+              <div className="absolute bottom-3 left-3 text-white">
+                <span className="text-[9px] font-mono font-bold uppercase tracking-widest text-emerald-300 block">
+                  HUMAN DIGNITY
+                </span>
+                <span className="font-bold text-xs leading-tight block">
+                  Zero Suffering
+                </span>
+              </div>
+            </div>
+
+            {/* Cell 7: SPECIAL INTERACTIVE AUDIO CARD (100% Matching Screenshot Widget) */}
+            <div
+              onClick={toggleHymnAudio}
+              className="relative aspect-[3/4] rounded-[20px] sm:rounded-[24px] bg-[#ECECED] border border-black/5 flex flex-col items-center justify-between p-5 text-center shadow-xs cursor-pointer group hover:bg-[#E2E2E5] transition-all"
+            >
+              <span className="text-[9px] font-mono font-bold uppercase tracking-widest text-gray-500 block">
+                CHORAL HERITAGE
+              </span>
+              
+              <div className="space-y-3 flex flex-col items-center">
+                <h3 className="font-display font-black text-lg sm:text-xl text-[#1D1D1F] uppercase leading-tight tracking-tight">
+                  SACRED<br />HYMNS
+                </h3>
+
+                {/* Circular Play / Pause Widget matching screenshot */}
+                <div className={`w-11 h-11 rounded-full border flex items-center justify-center shadow-md transition-transform duration-200 group-hover:scale-110 ${
+                  isPlayingHymn
+                    ? 'bg-[#0071E3] text-white border-[#0071E3]'
+                    : 'bg-white text-black border-black/10'
+                }`}>
+                  {isPlayingHymn ? (
+                    <Pause className="w-4 h-4 fill-current text-white" />
+                  ) : (
+                    <Play className="w-4 h-4 fill-current translate-x-0.5 text-black" />
+                  )}
                 </div>
-                <ArrowUpRight className="w-4 h-4 text-white/80 group-hover:translate-x-0.5 group-hover:-translate-y-0.5 transition-transform" />
+              </div>
+
+              <span className="text-[10px] font-mono text-gray-500 font-bold uppercase tracking-wider">
+                {isPlayingHymn ? 'PLAYING "ATULA EGWU"' : 'CLICK TO PLAY'}
+              </span>
+            </div>
+
+            {/* Cell 8: Consortium Research Charter */}
+            <div
+              onClick={() => onNavigate('about')}
+              className="relative aspect-[3/4] rounded-[20px] sm:rounded-[24px] overflow-hidden bg-gray-900 border border-black/5 group cursor-pointer shadow-xs"
+            >
+              <img
+                src="/media/female_researcher_journal.jpg"
+                alt="Consortium Research Charter"
+                className="w-full h-full object-cover filter grayscale contrast-115 group-hover:scale-106 group-hover:filter-none transition-all duration-500"
+              />
+              <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-transparent pointer-events-none" />
+              <div className="absolute bottom-3 right-3 text-right text-white">
+                <span className="text-[9px] font-mono font-bold uppercase tracking-widest text-blue-300 block">
+                  CONSORTIUM CHARTER
+                </span>
+                <span className="font-bold text-xs leading-tight block">
+                  NDPA 2023 &bull; v1.1
+                </span>
               </div>
             </div>
 
