@@ -326,81 +326,33 @@ export const Navbar: React.FC<NavbarProps> = ({
                 </div>
               </div>
 
-              {/* ── 2. Bottom Row: 3 Grand Photographic Cards (Authentic IKOLI Imagery & Content) ── */}
-              <div className="grid grid-cols-1 md:grid-cols-3 gap-4 sm:gap-6">
+              {/* ── 2. Bottom Row: Single Grand Photographic Card (Full Width) ── */}
+              <div
+                onClick={() => handleNavClick('about')}
+                className="relative w-full aspect-[16/6] sm:aspect-[21/7] rounded-[28px] sm:rounded-[32px] overflow-hidden bg-gray-900 shadow-lg group cursor-pointer"
+              >
+                <img
+                  src="/media/about_panoramic_creative_color.jpg"
+                  alt="Restoring Human Dignity Across 200 Million Nigerians"
+                  className="absolute inset-0 w-full h-full object-cover group-hover:scale-104 transition-transform duration-700 ease-out"
+                />
+                <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent pointer-events-none" />
                 
-                {/* Card 1: Eliminate skin NTDs (CHEW Field Screening Photo) */}
-                <div
-                  onClick={() => handleNavClick('diseases')}
-                  className="relative aspect-[4/3] rounded-[28px] sm:rounded-[32px] overflow-hidden bg-gray-900 shadow-lg group cursor-pointer"
-                >
-                  <img
-                    src="/media/submenu_chew_screening.jpg"
-                    alt="Eliminate skin NTDs"
-                    className="absolute inset-0 w-full h-full object-cover group-hover:scale-106 transition-transform duration-700 ease-out"
-                  />
-                  <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-transparent pointer-events-none" />
-                  
-                  <div className="absolute bottom-5 left-6 right-6 flex items-end justify-between text-white">
-                    <h3 className="text-lg sm:text-xl md:text-2xl font-bold leading-tight drop-shadow-md text-left">
-                      Eliminate<br />skin NTDs
+                <div className="absolute bottom-5 sm:bottom-7 left-6 sm:left-10 right-6 sm:right-10 flex items-end justify-between text-white">
+                  <div className="space-y-1 text-left">
+                    <span className="text-[10px] sm:text-xs font-mono uppercase tracking-widest text-emerald-400 font-bold block">
+                      SOVEREIGN HEALTHCARE &bull; ELIMINATE SKIN NTDs
+                    </span>
+                    <h3 className="text-lg sm:text-2xl md:text-3xl font-bold leading-tight drop-shadow-md">
+                      Restore Human Dignity Across 200 Million Nigerians
                     </h3>
-                    
-                    {/* White Circular Arrow Button */}
-                    <div className="w-11 h-11 rounded-full bg-white text-black shadow-xl flex items-center justify-center shrink-0 group-hover:scale-110 transition-transform duration-200 ml-3">
-                      <ArrowRight className="w-5 h-5 stroke-[2.5] text-black" />
-                    </div>
+                  </div>
+                  
+                  {/* White Circular Arrow Button */}
+                  <div className="w-11 h-11 sm:w-13 sm:h-13 rounded-full bg-white text-black shadow-xl flex items-center justify-center shrink-0 group-hover:scale-110 transition-transform duration-200 ml-4">
+                    <ArrowRight className="w-5 h-5 stroke-[2.5] text-black" />
                   </div>
                 </div>
-
-                {/* Card 2: National sentinel network (Laboratory Surveillance Photo) */}
-                <div
-                  onClick={() => handleNavClick('dashboard')}
-                  className="relative aspect-[4/3] rounded-[28px] sm:rounded-[32px] overflow-hidden bg-gray-900 shadow-lg group cursor-pointer"
-                >
-                  <img
-                    src="/media/submenu_sentinel_lab.jpg"
-                    alt="National sentinel network"
-                    className="absolute inset-0 w-full h-full object-cover group-hover:scale-106 transition-transform duration-700 ease-out"
-                  />
-                  <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-transparent pointer-events-none" />
-                  
-                  <div className="absolute bottom-5 left-6 right-6 flex items-end justify-between text-white">
-                    <h3 className="text-lg sm:text-xl md:text-2xl font-bold leading-tight drop-shadow-md text-left">
-                      National<br />sentinel network
-                    </h3>
-                    
-                    {/* White Circular Arrow Button */}
-                    <div className="w-11 h-11 rounded-full bg-white text-black shadow-xl flex items-center justify-center shrink-0 group-hover:scale-110 transition-transform duration-200 ml-3">
-                      <ArrowRight className="w-5 h-5 stroke-[2.5] text-black" />
-                    </div>
-                  </div>
-                </div>
-
-                {/* Card 3: Restore human dignity (Patient Dignity Photo) */}
-                <div
-                  onClick={() => handleNavClick('about')}
-                  className="relative aspect-[4/3] rounded-[28px] sm:rounded-[32px] overflow-hidden bg-gray-900 shadow-lg group cursor-pointer"
-                >
-                  <img
-                    src="/media/submenu_patient_dignity.jpg"
-                    alt="Restore human dignity"
-                    className="absolute inset-0 w-full h-full object-cover group-hover:scale-106 transition-transform duration-700 ease-out"
-                  />
-                  <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-transparent pointer-events-none" />
-                  
-                  <div className="absolute bottom-5 left-6 right-6 flex items-end justify-between text-white">
-                    <h3 className="text-lg sm:text-xl md:text-2xl font-bold leading-tight drop-shadow-md text-left">
-                      Restore<br />human dignity
-                    </h3>
-                    
-                    {/* White Circular Arrow Button */}
-                    <div className="w-11 h-11 rounded-full bg-white text-black shadow-xl flex items-center justify-center shrink-0 group-hover:scale-110 transition-transform duration-200 ml-3">
-                      <ArrowRight className="w-5 h-5 stroke-[2.5] text-black" />
-                    </div>
-                  </div>
-                </div>
-
               </div>
 
             </div>
