@@ -213,9 +213,9 @@ export const AboutPage: React.FC<AboutPageProps> = ({ onNavigate }) => {
       <main className="max-w-7xl mx-auto px-5 sm:px-10 md:px-16 space-y-24 sm:space-y-32 pt-20 sm:pt-28 text-left">
         
         {/* ══════════════════════════════════════════════════════════════════════
-            2. SECTION: "ABOUT IKOLI" (100% EXACT BLUEPRINT REPLICATION)
+            2. SECTION: "ABOUT IKOLI" (100% EXACT BLUEPRINT REPLICATION - FLUSH ZERO GAP, SQUARE CORNERS)
         ══════════════════════════════════════════════════════════════════════ */}
-        <section id="biography" className="space-y-6">
+        <section id="biography" className="space-y-4 sm:space-y-6">
           
           {/* Header Row (Left: ABOUT IKOLI, Right: Uppercase Manifesto) */}
           <div className="flex flex-col md:flex-row md:items-end justify-between gap-4 border-b border-black/8 pb-4">
@@ -227,14 +227,14 @@ export const AboutPage: React.FC<AboutPageProps> = ({ onNavigate }) => {
             </p>
           </div>
 
-          {/* Main 2-Column Asymmetric Bento Grid (Left 2-Row Stack + Right Tall Card) */}
-          <div className="grid grid-cols-1 lg:grid-cols-12 gap-4 sm:gap-5 items-stretch">
+          {/* Main Architectural Flush Grid (Zero Gap, Zero Rounded Corners, Zero Pills) */}
+          <div className="grid grid-cols-1 lg:grid-cols-12 gap-0 border border-black/10 shadow-sm items-stretch">
             
-            {/* Left Area (Span 7 or 8): Unified Gray Box on Top + Wide Photo on Bottom */}
-            <div className="lg:col-span-7 xl:col-span-8 flex flex-col justify-between gap-4 sm:gap-5">
+            {/* Left Area (Span 8): Unified Gray Box on Top + Flush Photo on Bottom */}
+            <div className="lg:col-span-8 flex flex-col gap-0 border-b lg:border-b-0 lg:border-r border-black/10">
               
-              {/* 1. Unified Medium-Gray Container (White Text + Vertical Divider) */}
-              <div className="bg-[#8E9197] text-white rounded-[24px] sm:rounded-[28px] p-6 sm:p-8 shadow-sm">
+              {/* 1. Unified Medium-Gray Container (White Text + Vertical Divider + Sharp Corners) */}
+              <div className="bg-[#8E9197] text-white p-6 sm:p-8 rounded-none">
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-6 sm:gap-8 divide-y sm:divide-y-0 sm:divide-x divide-white/20 text-left">
                   
                   {/* Left Column: 1905 - 1932 */}
@@ -269,8 +269,8 @@ export const AboutPage: React.FC<AboutPageProps> = ({ onNavigate }) => {
                 </div>
               </div>
 
-              {/* 2. Bottom Wide Photographic Card */}
-              <div className="relative aspect-[16/9] sm:aspect-[21/9] rounded-[24px] sm:rounded-[28px] overflow-hidden bg-gray-900 shadow-md group cursor-pointer border border-black/5">
+              {/* 2. Bottom Wide Photographic Card (Flush, Zero Gap, Square Corners) */}
+              <div className="relative aspect-[16/9] sm:aspect-[21/9] rounded-none overflow-hidden bg-gray-900 group cursor-pointer border-t border-black/10">
                 <img
                   src="/media/about_manuscript_wide.jpg"
                   alt="Harcourt Whyte Sacred Choral Manuscript"
@@ -279,23 +279,20 @@ export const AboutPage: React.FC<AboutPageProps> = ({ onNavigate }) => {
                 <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-transparent pointer-events-none" />
                 <div className="absolute bottom-4 left-6 right-6 flex items-end justify-between text-white">
                   <div>
-                    <span className="text-[10px] font-mono uppercase tracking-widest text-emerald-300 font-bold block">
+                    <span className="text-[10px] font-mono uppercase tracking-widest text-white/80 font-bold block">
                       ARCHIVAL HERITAGE
                     </span>
                     <span className="font-bold text-sm sm:text-base leading-tight block">
                       Original Handwritten Scores &bull; Uzuakoli Choral Suite (1932–1977)
                     </span>
                   </div>
-                  <span className="text-[10px] font-mono text-white/90 bg-black/40 px-2.5 py-1 rounded-full backdrop-blur-md">
-                    200+ ANTHEMS
-                  </span>
                 </div>
               </div>
 
             </div>
 
-            {/* Right Area (Span 5 or 4): Tall Vertical Editorial Card */}
-            <div className="lg:col-span-5 xl:col-span-4 relative rounded-[24px] sm:rounded-[28px] overflow-hidden bg-gray-900 shadow-md group cursor-pointer min-h-[440px] border border-black/5">
+            {/* Right Area (Span 4): Tall Vertical Editorial Card (Flush, Zero Gap, Square Corners) */}
+            <div className="lg:col-span-4 relative rounded-none overflow-hidden bg-gray-900 group cursor-pointer min-h-[440px]">
               <img
                 src="/media/about_tall_portrait.jpg"
                 alt="Ikoli Living Succession"
@@ -303,7 +300,7 @@ export const AboutPage: React.FC<AboutPageProps> = ({ onNavigate }) => {
               />
               <div className="absolute inset-0 bg-gradient-to-t from-black/85 via-black/20 to-transparent pointer-events-none" />
               <div className="absolute bottom-6 left-6 right-6 text-white space-y-1 text-left">
-                <span className="text-[10px] font-mono text-emerald-300 font-bold uppercase tracking-widest block">
+                <span className="text-[10px] font-mono text-white/80 font-bold uppercase tracking-widest block">
                   THE LIVING SUCCESSION
                 </span>
                 <h4 className="font-bold text-base sm:text-lg text-white leading-snug">
