@@ -3,7 +3,6 @@ import { motion, AnimatePresence } from 'framer-motion';
 import {
   LayoutDashboard,
   Shield,
-  ShieldCheck,
   Info,
   Code2,
   ArrowUpRight,
@@ -42,12 +41,6 @@ export const Navbar: React.FC<NavbarProps> = ({
       label: 'Diseases',
       title: 'Diseases',
       icon: Shield,
-    },
-    {
-      id: 'protocols',
-      label: 'Protocols',
-      title: 'Protocols',
-      icon: ShieldCheck,
     },
     {
       id: 'api',
