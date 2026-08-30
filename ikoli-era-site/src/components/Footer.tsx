@@ -1,13 +1,12 @@
 import React, { useState, useEffect } from 'react';
 import { ArrowUpRight, ShieldCheck, SunMedium } from 'lucide-react';
-import { StickyRevealFooter } from './StickyRevealFooter';
 
 interface FooterProps {
   onNavigate?: (page: any) => void;
   isStatic?: boolean;
 }
 
-export const Footer: React.FC<FooterProps> = ({ onNavigate, isStatic = false }) => {
+export const Footer: React.FC<FooterProps> = ({ onNavigate }) => {
   const [watTime, setWatTime] = useState<string>('');
 
   useEffect(() => {
@@ -30,17 +29,17 @@ export const Footer: React.FC<FooterProps> = ({ onNavigate, isStatic = false }) 
     return () => clearInterval(interval);
   }, []);
 
-  const footerContent = (
-    <footer className="w-full bg-[#F5F5F7] text-[#1D1D1F] pt-14 sm:pt-20 pb-8 px-5 sm:px-10 md:px-16 border-t border-black/5 rounded-t-[36px] sm:rounded-t-[48px] relative overflow-hidden select-none shadow-[0_-20px_60px_rgba(0,0,0,0.03)]">
+  return (
+    <footer className="w-full bg-[#F5F5F7] text-[#1D1D1F] pt-14 sm:pt-20 pb-10 px-5 sm:px-10 md:px-16 border-t border-black/5 rounded-t-[36px] sm:rounded-t-[48px] relative overflow-hidden select-none shadow-[0_-12px_40px_rgba(0,0,0,0.02)]">
       <div className="max-w-7xl mx-auto space-y-12 sm:space-y-16 relative z-10">
         
         {/* ── Top 4-Column Directory Grid ───────────────────────────── */}
-        <div className="grid grid-cols-1 md:grid-cols-12 gap-8 lg:gap-12">
+        <div className="grid grid-cols-1 md:grid-cols-12 gap-8 lg:gap-12 text-left">
           
           {/* Col 1: Bio & Mission Statement (Span 4) */}
           <div className="md:col-span-4 space-y-3">
             <h3 className="font-display font-bold text-xl sm:text-2xl text-[#1D1D1F] tracking-tight leading-snug">
-              IKOLI AI is Nigeria's sovereign Skin NTD clinical intelligence & autonomous diagnostic system.
+              IKOLI AI is Nigeria's sovereign Skin NTD clinical intelligence &amp; autonomous diagnostic system.
             </h3>
             <p className="text-xs sm:text-sm text-gray-500 leading-relaxed font-sans font-medium">
               Developed by the IKOLI Consortium (DAHW, RedAid Nigeria, Digital Dreams, FMOH/NTBLCP, VRC-UNN, IDEA) to eliminate Leprosy and Buruli Ulcer disability by 2030.
@@ -49,7 +48,7 @@ export const Footer: React.FC<FooterProps> = ({ onNavigate, isStatic = false }) 
 
           {/* Col 2: Explore Navigation Links (Span 2) */}
           <div className="md:col-span-2 space-y-3">
-            <span className="font-sans text-xs text-gray-400 font-semibold block tracking-wide">
+            <span className="font-sans text-xs text-gray-400 font-semibold block tracking-wide uppercase">
               Explore
             </span>
             <ul className="space-y-2 text-xs font-medium text-gray-600">
@@ -79,10 +78,18 @@ export const Footer: React.FC<FooterProps> = ({ onNavigate, isStatic = false }) 
               </li>
               <li>
                 <button
+                  onClick={() => onNavigate?.('protocols')}
+                  className="hover:text-[#0071E3] transition-colors cursor-pointer text-left font-semibold text-[#1D1D1F]"
+                >
+                  Protocols &amp; Safeguards
+                </button>
+              </li>
+              <li>
+                <button
                   onClick={() => onNavigate?.('api')}
                   className="hover:text-[#0071E3] transition-colors cursor-pointer text-left"
                 >
-                  API Platform
+                  API Documentation
                 </button>
               </li>
               <li>
@@ -91,14 +98,6 @@ export const Footer: React.FC<FooterProps> = ({ onNavigate, isStatic = false }) 
                   className="hover:text-[#0071E3] transition-colors cursor-pointer text-left"
                 >
                   Ask Ikoli AI
-                </button>
-              </li>
-              <li>
-                <button
-                  onClick={() => onNavigate?.('protocols')}
-                  className="hover:text-[#0071E3] transition-colors cursor-pointer text-left font-semibold text-[#1D1D1F]"
-                >
-                  Protocols &amp; Safeguards
                 </button>
               </li>
               <li>
@@ -114,8 +113,8 @@ export const Footer: React.FC<FooterProps> = ({ onNavigate, isStatic = false }) 
 
           {/* Col 3: Follow & Governance Partners Pill Badges (Span 3) */}
           <div className="md:col-span-3 space-y-3">
-            <span className="font-sans text-xs text-gray-400 font-semibold block tracking-wide">
-              Governance & Consortium
+            <span className="font-sans text-xs text-gray-400 font-semibold block tracking-wide uppercase">
+              Governance &amp; Consortium
             </span>
             <div className="flex flex-wrap gap-2 pt-0.5">
               <span className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-white border border-black/8 text-[11px] font-semibold text-[#1D1D1F] shadow-[0_2px_8px_rgba(0,0,0,0.02)] hover:bg-[#1D1D1F] hover:text-white hover:border-[#1D1D1F] transition-all duration-200 cursor-default group">
@@ -157,10 +156,10 @@ export const Footer: React.FC<FooterProps> = ({ onNavigate, isStatic = false }) 
 
           {/* Col 4: Action CTAs (Span 3) */}
           <div className="md:col-span-3 space-y-5 flex flex-col justify-start">
-            {/* CTA 1: Ask Ikoli (Red/Orange Accent) */}
+            {/* CTA 1: Ask Ikoli */}
             <div
               onClick={() => onNavigate?.('ask')}
-              className="group cursor-pointer space-y-0.5"
+              className="group cursor-pointer space-y-0.5 text-left"
             >
               <div className="flex items-center gap-2 text-[#DE322D] font-bold text-base sm:text-lg group-hover:text-[#c42823] transition-colors">
                 <span>Ask Ikoli AI</span>
@@ -175,17 +174,17 @@ export const Footer: React.FC<FooterProps> = ({ onNavigate, isStatic = false }) 
 
             {/* CTA 2: Guidelines & Tools */}
             <div
-              onClick={() => onNavigate?.('diseases')}
-              className="group cursor-pointer space-y-0.5"
+              onClick={() => onNavigate?.('protocols')}
+              className="group cursor-pointer space-y-0.5 text-left"
             >
               <div className="flex items-center gap-2 text-[#1D1D1F] font-bold text-base sm:text-lg group-hover:text-[#0071E3] transition-colors">
-                <span>Guidelines & Protocols</span>
+                <span>Guidelines &amp; Protocols</span>
                 <div className="w-5 h-5 rounded-full bg-[#1D1D1F] text-white flex items-center justify-center shadow-xs group-hover:translate-x-0.5 group-hover:-translate-y-0.5 transition-transform">
                   <ArrowUpRight className="w-3 h-3 stroke-[2.5]" />
                 </div>
               </div>
               <span className="text-xs text-gray-500 block font-normal">
-                WHO MDT & clinical staging tools
+                FMOH &amp; NTBLCP clinical staging tools
               </span>
             </div>
           </div>
@@ -193,25 +192,25 @@ export const Footer: React.FC<FooterProps> = ({ onNavigate, isStatic = false }) 
         </div>
 
         {/* ── Giant Typographic Wordmark: IKOLI AI ── */}
-        <div className="w-full flex justify-center items-end pointer-events-none pt-4 sm:pt-8 overflow-hidden select-none -mb-6 sm:-mb-10">
-          <span className="font-display font-black text-[90px] sm:text-[150px] md:text-[200px] lg:text-[260px] leading-[0.76] tracking-tight text-[#1D1D1F] text-center w-full block uppercase">
+        <div className="w-full flex justify-center items-center pointer-events-none pt-6 sm:pt-10 overflow-hidden select-none">
+          <span className="font-display font-black text-6xl sm:text-8xl md:text-9xl lg:text-[140px] leading-none tracking-tighter text-[#1D1D1F] text-center w-full block uppercase opacity-95">
             IKOLI <span className="text-[#0071E3]">AI</span>
           </span>
         </div>
 
         {/* ── Sub-Footer Bottom Bar ───────────────────────────────── */}
-        <div className="flex flex-col sm:flex-row items-center justify-between gap-3 pt-6 border-t border-black/5 text-[11px] sm:text-xs text-gray-500 font-medium">
+        <div className="flex flex-col sm:flex-row items-center justify-between gap-4 pt-6 border-t border-black/5 text-[11px] sm:text-xs text-gray-500 font-medium">
           {/* Left Copyright & Privacy */}
-          <div className="flex items-center gap-3">
-            <span>Ikoli AI © 2026</span>
-            <span>•</span>
+          <div className="flex flex-wrap items-center gap-3">
+            <span>Ikoli AI &copy; 2026</span>
+            <span>&bull;</span>
             <button
               onClick={() => onNavigate?.('protocols')}
               className="hover:text-[#1D1D1F] transition-colors cursor-pointer"
             >
               Privacy Policy &amp; NDPA 2023
             </button>
-            <span>•</span>
+            <span>&bull;</span>
             <button
               onClick={() => onNavigate?.('protocols')}
               className="text-emerald-600 font-semibold flex items-center gap-1 hover:text-emerald-700 transition-colors cursor-pointer"
@@ -225,7 +224,7 @@ export const Footer: React.FC<FooterProps> = ({ onNavigate, isStatic = false }) 
           <div className="flex items-center gap-2 text-gray-600 font-mono text-[11px]">
             <span>Nigeria (WAT)</span>
             <span className="font-bold text-[#1D1D1F]">{watTime || '4:40 PM'}</span>
-            <span>31°C</span>
+            <span>31&deg;C</span>
             <SunMedium className="w-3.5 h-3.5 text-amber-500" />
           </div>
         </div>
@@ -233,12 +232,4 @@ export const Footer: React.FC<FooterProps> = ({ onNavigate, isStatic = false }) 
       </div>
     </footer>
   );
-
-  // If on Ask Ikoli page or static mode is requested, render without parallax reveal container
-  if (isStatic) {
-    return footerContent;
-  }
-
-  // Flagship layout: Smooth Sticky Reveal Curtain Footer
-  return <StickyRevealFooter>{footerContent}</StickyRevealFooter>;
 };
