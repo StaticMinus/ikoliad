@@ -16,11 +16,9 @@ export const DashboardPage: React.FC<DashboardPageProps> = ({ onNavigate }) => {
       <Navbar currentPage="dashboard" onNavigate={onNavigate} />
 
       {/* ── Layer 1: Pinned Scroll Cinematic Sequence ──────────────────── */}
-      <div className="pt-2 sm:pt-4">
-        <CinematicHeroFrame
-          onExplore={() => onNavigate('diseases')}
-        />
-      </div>
+      <CinematicHeroFrame
+        onExplore={() => onNavigate('diseases')}
+      />
 
       {/* ── Layer 2: Main Surveillance Console ─────────────────────────── */}
       <div className="max-w-7xl mx-auto px-4 sm:px-8 py-12 sm:py-16">

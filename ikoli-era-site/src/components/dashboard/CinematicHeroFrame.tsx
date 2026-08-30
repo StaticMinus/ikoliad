@@ -21,6 +21,7 @@ export const CinematicHeroFrame: React.FC<CinematicHeroFrameProps> = ({
   onExplore,
 }) => {
   const outerTrackRef = useRef<HTMLDivElement>(null);
+  const pinnedContainerRef = useRef<HTMLDivElement>(null);
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const containerRef = useRef<HTMLDivElement>(null);
   const imagesRef = useRef<HTMLImageElement[]>([]);
@@ -180,14 +181,22 @@ export const CinematicHeroFrame: React.FC<CinematicHeroFrameProps> = ({
   // ── 5. GSAP ScrollTrigger Pinned Engine ───────────────────────────
   useEffect(() => {
     const outer = outerTrackRef.current;
-    if (!outer) return;
+    const pinBox = pinnedContainerRef.current;
+    if (!outer || !pinBox) return;
+
+    const timer = setTimeout(() => {
+      ScrollTrigger.refresh();
+    }, 120);
 
     const ctx = gsap.context(() => {
       ScrollTrigger.create({
         trigger: outer,
         start: 'top top',
         end: 'bottom bottom',
-        scrub: 0.8,
+        pin: pinBox,
+        pinSpacing: false,
+        scrub: 0.5,
+        anticipatePin: 1,
         onUpdate: (self) => {
           const progress = self.progress;
           setScrollProgress(progress);
@@ -196,8 +205,11 @@ export const CinematicHeroFrame: React.FC<CinematicHeroFrameProps> = ({
       });
     }, outerTrackRef);
 
-    return () => ctx.revert();
-  }, []);
+    return () => {
+      clearTimeout(timer);
+      ctx.revert();
+    };
+  }, [isReady]);
 
   // Synchronized stage brackets with sleek lerp transitions
   const isStage1 = scrollProgress < 0.25;
@@ -210,8 +222,11 @@ export const CinematicHeroFrame: React.FC<CinematicHeroFrameProps> = ({
       ref={outerTrackRef}
       className="relative w-full h-[420vh] bg-transparent"
     >
-      {/* Pinned Viewport Container (Sticky 100vh) */}
-      <div className="sticky top-0 w-full h-screen flex flex-col justify-between px-3 sm:px-6 md:px-8 pb-4 sm:pb-6 select-none overflow-hidden bg-[#FBFBFD] max-w-[1600px] mx-auto">
+      {/* Pinned Viewport Container (GSAP Pin 100vh) */}
+      <div
+        ref={pinnedContainerRef}
+        className="w-full h-screen flex flex-col justify-between px-3 sm:px-6 md:px-8 pb-4 sm:pb-6 select-none overflow-hidden bg-[#FBFBFD] max-w-[1600px] mx-auto"
+      >
         
         {/* Top Header Text Section with Clean Dark Typography and Generous Spacing */}
         <div className="text-center pt-28 sm:pt-32 md:pt-36 lg:pt-40 pb-3 sm:pb-5 space-y-1.5 shrink-0">

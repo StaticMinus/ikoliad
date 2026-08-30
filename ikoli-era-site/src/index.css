@@ -49,10 +49,11 @@
   animation: fadeInDown 0.2s ease-out forwards;
 }
 
+html,
 body {
   margin: 0;
   padding: 0;
-  overflow-x: hidden;
+  overflow-x: clip;
   font-family: var(--font-sans);
   color: #1D1D1F;
   background-color: #FBFBFD;
