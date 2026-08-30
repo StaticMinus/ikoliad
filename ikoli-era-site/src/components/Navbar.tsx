@@ -188,23 +188,31 @@ export const Navbar: React.FC<NavbarProps> = ({
         </div>
       </header>
 
-      {/* ── IMMERSIVE FULL-SCREEN MEGA SUB-MENU OVERLAY (BLACK BACKDROP & IKOLI CLINICAL CONTENTS) ─── */}
+      {/* ── IMMERSIVE FULL-SCREEN MEGA SUB-MENU OVERLAY (LUXURIOUS DARK GLASS & SMOOTH TRANSITION) ─── */}
       <AnimatePresence>
         {apiSubmenuOpen && (
           <motion.div
-            initial={{ opacity: 0, y: -16 }}
-            animate={{ opacity: 1, y: 0 }}
-            exit={{ opacity: 0, y: -16 }}
-            transition={{ duration: 0.26, ease: [0.16, 1, 0.3, 1] }}
+            initial={{ opacity: 0, scale: 0.985, y: -12 }}
+            animate={{ opacity: 1, scale: 1, y: 0 }}
+            exit={{ opacity: 0, scale: 0.985, y: -12 }}
+            transition={{ duration: 0.35, ease: [0.16, 1, 0.3, 1] }}
             onMouseEnter={handleMouseEnterApi}
             onMouseLeave={handleMouseLeaveApi}
-            className="fixed inset-0 top-0 left-0 w-screen h-screen z-40 bg-black/95 backdrop-blur-3xl overflow-y-auto pointer-events-auto flex flex-col justify-start pt-24 sm:pt-28 pb-14 px-4 sm:px-8 md:px-12 lg:px-16 select-none text-white"
+            className="fixed inset-0 top-0 left-0 w-screen h-screen z-40 bg-[#0A0B0E]/86 backdrop-blur-3xl overflow-y-auto pointer-events-auto flex flex-col justify-start pt-24 sm:pt-28 pb-14 px-4 sm:px-8 md:px-12 lg:px-16 select-none text-white transition-colors duration-300"
           >
-            <div className="max-w-6xl w-full mx-auto space-y-4 sm:space-y-6">
+            {/* Ambient Radial Top Glow for Luxurious Depth */}
+            <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[1000px] h-[450px] bg-gradient-to-b from-[#0071E3]/15 via-[#0071E3]/5 to-transparent blur-[140px] pointer-events-none" />
+
+            <div className="relative z-10 max-w-6xl w-full mx-auto space-y-4 sm:space-y-6">
               
-              {/* ── Top Header Bar (IKOLI AI removed from top left as requested) ── */}
-              <div className="flex items-center justify-end gap-3 pb-2">
-                <div className="hidden sm:flex items-center gap-2 bg-white/10 px-4 py-2 rounded-full border border-white/15 shadow-2xs text-xs text-gray-300 w-64 backdrop-blur-md">
+              {/* ── Top Header Bar (Search & Close Pill) ── */}
+              <motion.div
+                initial={{ opacity: 0, y: -6 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.28, delay: 0.05 }}
+                className="flex items-center justify-end gap-3 pb-2"
+              >
+                <div className="hidden sm:flex items-center gap-2 bg-white/10 hover:bg-white/[0.14] px-4 py-2 rounded-full border border-white/15 shadow-2xs text-xs text-gray-300 w-64 backdrop-blur-md transition-all">
                   <span>🔍</span>
                   <input
                     type="text"
@@ -215,16 +223,21 @@ export const Navbar: React.FC<NavbarProps> = ({
 
                 <button
                   onClick={() => setApiSubmenuOpen(false)}
-                  className="px-3.5 py-1.5 rounded-full bg-white/15 hover:bg-white/25 border border-white/20 text-xs font-semibold text-white flex items-center gap-1.5 shadow-xs transition-all cursor-pointer backdrop-blur-md"
+                  className="px-3.5 py-1.5 rounded-full bg-white/12 hover:bg-white/22 border border-white/20 text-xs font-semibold text-white flex items-center gap-1.5 shadow-xs transition-all cursor-pointer backdrop-blur-md"
                 >
                   <span>Close</span>
                   <span className="text-[10px] font-mono bg-white/20 px-1.5 py-0.5 rounded text-gray-200">ESC</span>
                   <X className="w-3.5 h-3.5 ml-0.5" />
                 </button>
-              </div>
+              </motion.div>
 
               {/* ── 1. Top Card: Spatial Dark Container with IKOLI Clinical Models & APIs ─── */}
-              <div className="bg-[#16181D] rounded-[32px] sm:rounded-[36px] p-6 sm:p-8 md:p-10 border border-white/10 shadow-2xl space-y-6">
+              <motion.div
+                initial={{ opacity: 0, y: 10 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.34, delay: 0.08 }}
+                className="bg-[#13151B]/90 backdrop-blur-2xl rounded-[32px] sm:rounded-[36px] p-6 sm:p-8 md:p-10 border border-white/12 shadow-[0_25px_65px_rgba(0,0,0,0.45)] space-y-6"
+              >
                 <div className="grid grid-cols-12 gap-8 lg:gap-12 items-start text-left">
                   
                   {/* Left Column: Clinical Diagnostic Models (Span 4) */}
@@ -246,7 +259,7 @@ export const Navbar: React.FC<NavbarProps> = ({
                         <button
                           key={item}
                           onClick={() => handleNavClick('api')}
-                          className="w-fit text-left px-5 py-2.5 rounded-full bg-white/10 border border-white/15 hover:bg-white/20 hover:border-white/30 text-xs sm:text-sm font-medium text-white shadow-2xs transition-all cursor-pointer"
+                          className="w-fit text-left px-5 py-2.5 rounded-full bg-white/[0.08] border border-white/12 hover:bg-white/[0.16] hover:border-white/30 text-xs sm:text-sm font-medium text-white shadow-2xs backdrop-blur-sm transition-all cursor-pointer"
                         >
                           {item}
                         </button>
@@ -275,7 +288,7 @@ export const Navbar: React.FC<NavbarProps> = ({
                           <button
                             key={pill}
                             onClick={() => handleNavClick('api')}
-                            className="w-fit text-left px-5 py-2.5 rounded-full bg-white/10 border border-white/15 hover:bg-white/20 hover:border-white/30 text-xs sm:text-sm font-medium text-white shadow-2xs transition-all cursor-pointer"
+                            className="w-fit text-left px-5 py-2.5 rounded-full bg-white/[0.08] border border-white/12 hover:bg-white/[0.16] hover:border-white/30 text-xs sm:text-sm font-medium text-white shadow-2xs backdrop-blur-sm transition-all cursor-pointer"
                           >
                             {pill}
                           </button>
@@ -293,7 +306,7 @@ export const Navbar: React.FC<NavbarProps> = ({
                           <button
                             key={pill}
                             onClick={() => handleNavClick('api')}
-                            className="w-fit text-left px-5 py-2.5 rounded-full bg-white/10 border border-white/15 hover:bg-white/20 hover:border-white/30 text-xs sm:text-sm font-medium text-white shadow-2xs transition-all cursor-pointer"
+                            className="w-fit text-left px-5 py-2.5 rounded-full bg-white/[0.08] border border-white/12 hover:bg-white/[0.16] hover:border-white/30 text-xs sm:text-sm font-medium text-white shadow-2xs backdrop-blur-sm transition-all cursor-pointer"
                           >
                             {pill}
                           </button>
@@ -324,15 +337,20 @@ export const Navbar: React.FC<NavbarProps> = ({
                   </div>
 
                 </div>
-              </div>
+              </motion.div>
 
               {/* ── 2. Bottom Row: 3 Grand Photographic Cards (Authentic IKOLI Imagery & Content) ── */}
-              <div className="grid grid-cols-1 md:grid-cols-3 gap-4 sm:gap-6">
+              <motion.div
+                initial={{ opacity: 0, y: 14 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.38, delay: 0.12 }}
+                className="grid grid-cols-1 md:grid-cols-3 gap-4 sm:gap-6"
+              >
                 
                 {/* Card 1: Eliminate skin NTDs (CHEW Field Screening Photo) */}
                 <div
                   onClick={() => handleNavClick('diseases')}
-                  className="relative aspect-[4/3] rounded-[28px] sm:rounded-[32px] overflow-hidden bg-gray-900 shadow-lg group cursor-pointer border border-white/10"
+                  className="relative aspect-[4/3] rounded-[28px] sm:rounded-[32px] overflow-hidden bg-gray-900 shadow-xl group cursor-pointer border border-white/12 backdrop-blur-md"
                 >
                   <img
                     src="/media/submenu_chew_screening.jpg"
@@ -356,7 +374,7 @@ export const Navbar: React.FC<NavbarProps> = ({
                 {/* Card 2: National sentinel network (Laboratory Surveillance Photo) */}
                 <div
                   onClick={() => handleNavClick('dashboard')}
-                  className="relative aspect-[4/3] rounded-[28px] sm:rounded-[32px] overflow-hidden bg-gray-900 shadow-lg group cursor-pointer border border-white/10"
+                  className="relative aspect-[4/3] rounded-[28px] sm:rounded-[32px] overflow-hidden bg-gray-900 shadow-xl group cursor-pointer border border-white/12 backdrop-blur-md"
                 >
                   <img
                     src="/media/submenu_sentinel_lab.jpg"
@@ -380,7 +398,7 @@ export const Navbar: React.FC<NavbarProps> = ({
                 {/* Card 3: Restore human dignity (Patient Dignity Photo) */}
                 <div
                   onClick={() => handleNavClick('about')}
-                  className="relative aspect-[4/3] rounded-[28px] sm:rounded-[32px] overflow-hidden bg-gray-900 shadow-lg group cursor-pointer border border-white/10"
+                  className="relative aspect-[4/3] rounded-[28px] sm:rounded-[32px] overflow-hidden bg-gray-900 shadow-xl group cursor-pointer border border-white/12 backdrop-blur-md"
                 >
                   <img
                     src="/media/submenu_patient_dignity.jpg"
@@ -401,7 +419,7 @@ export const Navbar: React.FC<NavbarProps> = ({
                   </div>
                 </div>
 
-              </div>
+              </motion.div>
 
             </div>
           </motion.div>
