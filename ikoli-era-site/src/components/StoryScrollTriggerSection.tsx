@@ -12,14 +12,13 @@ import {
   Lock,
   Boxes,
 } from 'lucide-react';
-import { BacteriaMovementSimulation } from './BacteriaMovementSimulation';
 import { gsap } from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
 
 gsap.registerPlugin(ScrollTrigger);
 
 interface StoryChapter {
-  id: 'telemetry' | 'vision' | 'who' | 'privacy' | 'supply';
+  id: 'telemetry' | 'vision' | 'guidelines' | 'privacy' | 'supply';
   label: string;
   badge: string;
   icon: React.ElementType;
@@ -32,7 +31,7 @@ interface StoryChapter {
   imageAlt: string;
   imageBadge: string;
   ctaText: string;
-  targetPage?: 'home' | 'dashboard' | 'diseases' | 'ask' | 'about' | 'api';
+  targetPage?: 'home' | 'dashboard' | 'diseases' | 'ask' | 'about' | 'api' | 'protocols';
 }
 
 const STORY_CHAPTERS: StoryChapter[] = [
@@ -69,20 +68,20 @@ const STORY_CHAPTERS: StoryChapter[] = [
     targetPage: 'ask',
   },
   {
-    id: 'who',
-    label: 'WHO 2030 Guidelines',
-    badge: 'Global Strategy',
+    id: 'guidelines',
+    label: 'National Clinical Protocols',
+    badge: 'FMOH & NTBLCP Guidelines',
     icon: Globe2,
-    title: 'Transforming frontline epidemiology for zero physical disability.',
-    subtitle: 'Universal multidrug therapy access and proactive disability prevention.',
-    detail: 'Aligning national clinical protocols with the WHO Neglected Tropical Diseases 2030 Roadmap: interrupting leprosy transmission, reducing Grade-2 disability below 4.8%, and achieving universal PCR confirmation for Buruli ulcer.',
+    title: 'Standardized clinical protocols for zero physical disability across Nigeria.',
+    subtitle: 'Universal curative therapy access and proactive nerve deformity prevention.',
+    detail: 'Aligning Nigerian frontline screening workflows with National Tuberculosis, Buruli Ulcer and Leprosy Control Programme (NTBLCP) protocols: interrupting leprosy transmission, reducing Grade-2 disability below 4.8%, and expanding PCR confirmation for Buruli ulcer.',
     stat1: { value: '< 4.8%', label: 'G2D Target Benchmark' },
     stat2: { value: '89.2%', label: 'MDT Completion Rate' },
     image: '/media/who_clinical_guide_cover.jpg',
-    imageAlt: 'WHO NTD 2030 Clinical Guidelines',
-    imageBadge: 'WHO 2030 PROTOCOLS',
-    ctaText: 'Explore WHO Protocols',
-    targetPage: 'diseases',
+    imageAlt: 'National Clinical NTD Guidelines',
+    imageBadge: 'NATIONAL NTBLCP PROTOCOLS',
+    ctaText: 'Explore National Protocols',
+    targetPage: 'protocols',
   },
   {
     id: 'privacy',
@@ -119,7 +118,7 @@ const STORY_CHAPTERS: StoryChapter[] = [
 ];
 
 interface StoryScrollTriggerSectionProps {
-  onNavigate?: (page: 'home' | 'dashboard' | 'diseases' | 'ask' | 'about' | 'styles' | 'api') => void;
+  onNavigate?: (page: 'home' | 'dashboard' | 'diseases' | 'ask' | 'about' | 'styles' | 'api' | 'protocols') => void;
   onOpenModal?: (diseaseId: string) => void;
 }
 
@@ -442,15 +441,6 @@ export const StoryScrollTriggerSection: React.FC<StoryScrollTriggerSectionProps>
               </motion.div>
             </AnimatePresence>
 
-            {/* Live Bacteria & Micro-Cellular Particle Movement Layer */}
-            <div className="absolute inset-0 z-10 pointer-events-none">
-              <BacteriaMovementSimulation
-                className="w-full h-full"
-                particleCount={18}
-                showReticle={true}
-              />
-            </div>
-
             {/* Top Right Live Telemetry Badge */}
             <div className="absolute top-4 right-4 z-20 bg-white/90 backdrop-blur-md px-4 py-1.5 rounded-full text-xs font-mono font-bold text-[#1D1D1F] border border-black/5 shadow-xs flex items-center gap-2">
               <span className="w-2 h-2 rounded-full bg-[#0071E3] animate-pulse" />
@@ -467,7 +457,7 @@ export const StoryScrollTriggerSection: React.FC<StoryScrollTriggerSectionProps>
               </h4>
               <div className="flex items-center gap-4 pt-1 text-[11px] font-mono text-white/80">
                 <span>● IKOLI AI Core</span>
-                <span>● WHO 2030 Aligned</span>
+                <span>● FMOH / NTBLCP Protocol</span>
                 <span>● NDPA 2023 Statutory</span>
               </div>
             </div>

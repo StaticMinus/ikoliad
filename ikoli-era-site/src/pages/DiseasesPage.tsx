@@ -15,7 +15,7 @@ import { SpatialDiseaseCard } from '../components/ui/SpatialDiseaseCard';
 import { CoverflowDiseaseReel } from '../components/CoverflowDiseaseReel';
 
 interface DiseasesPageProps {
-  onNavigate: (page: 'home' | 'dashboard' | 'diseases' | 'ask' | 'about' | 'styles' | 'api') => void;
+  onNavigate: (page: 'home' | 'dashboard' | 'diseases' | 'ask' | 'about' | 'styles' | 'api' | 'protocols') => void;
 }
 
 export interface DiseaseDetail {
