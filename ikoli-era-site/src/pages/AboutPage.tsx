@@ -492,91 +492,95 @@ export const AboutPage: React.FC<AboutPageProps> = ({ onNavigate }) => {
             ))}
           </div>
 
-        </section>
-
-        {/* ══════════════════════════════════════════════════════════════════════
-            5. SECTION: "4-CARD EDITORIAL REEL & @IKOLICONSORTIUM BANNER" (100% REPLICATION)
-        ══════════════════════════════════════════════════════════════════════ */}
-        <section className="space-y-6 pt-4">
-          
-          {/* 4 Cards in a Row with Captions Directly Underneath (Strictly Square rounded-none) */}
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-3 sm:gap-4">
+          {/* ══════════════════════════════════════════════════════════════════════
+              5. 4-CARD EDITORIAL REEL (100% FLUSH ZERO GAP, SHIFTED UP CLOSE TO PIPELINE)
+          ══════════════════════════════════════════════════════════════════════ */}
+          <div className="pt-4 sm:pt-6 space-y-6">
             
-            {/* Card 1: Clinical Research (Vibrant Creative Color) */}
-            <div className="space-y-2.5 text-center group cursor-pointer">
-              <div className="relative aspect-[3/4] rounded-none overflow-hidden bg-gray-900 border border-black/5 shadow-xs">
-                <img
-                  src="/media/submenu_chew_screening.jpg"
-                  alt="Clinical Research"
-                  className="w-full h-full object-cover group-hover:scale-106 transition-transform duration-700 ease-out"
-                />
-                <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent pointer-events-none" />
+            {/* 4 Cards in a Row - 100% Flush Zero Gap, Captions Directly Underneath */}
+            <div className="grid grid-cols-2 md:grid-cols-4 gap-0 border border-black/10 shadow-sm">
+              
+              {/* Card 1: Clinical Research */}
+              <div className="border-r border-b md:border-b-0 border-black/10 group cursor-pointer flex flex-col">
+                <div className="relative aspect-[3/4] overflow-hidden bg-gray-900">
+                  <img
+                    src="/media/submenu_chew_screening.jpg"
+                    alt="Clinical Research"
+                    className="w-full h-full object-cover group-hover:scale-104 transition-transform duration-700 ease-out"
+                  />
+                </div>
+                <div className="py-3 px-2 bg-white text-center border-t border-black/10">
+                  <span className="text-[10px] sm:text-[11px] font-mono font-bold tracking-widest text-gray-600 uppercase block group-hover:text-[#0071E3] transition-colors">
+                    PORTRAIT / RESEARCH
+                  </span>
+                </div>
               </div>
-              <span className="text-[10px] sm:text-[11px] font-mono font-bold tracking-widest text-gray-500 uppercase block group-hover:text-[#0071E3] transition-colors">
-                PORTRAIT / RESEARCH
-              </span>
-            </div>
 
-            {/* Card 2: Neural Inference (IKOLI AI Man Editorial) */}
-            <div className="space-y-2.5 text-center group cursor-pointer">
-              <div className="relative aspect-[3/4] rounded-none overflow-hidden bg-gray-900 border border-black/5 shadow-xs">
-                <img
-                  src="/media/ikoli_ai_man_editorial.jpg"
-                  alt="Neural Inference"
-                  className="w-full h-full object-cover filter grayscale contrast-110 group-hover:scale-106 transition-transform duration-700 ease-out"
-                />
-                <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent pointer-events-none" />
+              {/* Card 2: Neural Inference */}
+              <div className="border-r border-b md:border-b-0 border-black/10 group cursor-pointer flex flex-col">
+                <div className="relative aspect-[3/4] overflow-hidden bg-gray-900">
+                  <img
+                    src="/media/ikoli_ai_man_editorial.jpg"
+                    alt="Neural Inference"
+                    className="w-full h-full object-cover filter grayscale contrast-110 group-hover:scale-104 transition-transform duration-700 ease-out"
+                  />
+                </div>
+                <div className="py-3 px-2 bg-white text-center border-t border-black/10">
+                  <span className="text-[10px] sm:text-[11px] font-mono font-bold tracking-widest text-gray-600 uppercase block group-hover:text-[#0071E3] transition-colors">
+                    NEURAL INFERENCE
+                  </span>
+                </div>
               </div>
-              <span className="text-[10px] sm:text-[11px] font-mono font-bold tracking-widest text-gray-500 uppercase block group-hover:text-[#0071E3] transition-colors">
-                NEURAL INFERENCE
-              </span>
-            </div>
 
-            {/* Card 3: Consortium Leadership (Vibrant Creative Color in Sunlit Gallery) */}
-            <div className="space-y-2.5 text-center group cursor-pointer">
-              <div className="relative aspect-[3/4] rounded-none overflow-hidden bg-gray-900 border border-black/5 shadow-xs">
-                <img
-                  src="/media/about_contact_creative_color.jpg"
-                  alt="Consortium Leadership"
-                  className="w-full h-full object-cover group-hover:scale-106 transition-transform duration-700 ease-out"
-                />
-                <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent pointer-events-none" />
+              {/* Card 3: Consortium Leadership */}
+              <div className="border-r border-black/10 group cursor-pointer flex flex-col">
+                <div className="relative aspect-[3/4] overflow-hidden bg-gray-900">
+                  <img
+                    src="/media/about_contact_creative_color.jpg"
+                    alt="Consortium Leadership"
+                    className="w-full h-full object-cover group-hover:scale-104 transition-transform duration-700 ease-out"
+                  />
+                </div>
+                <div className="py-3 px-2 bg-white text-center border-t border-black/10">
+                  <span className="text-[10px] sm:text-[11px] font-mono font-bold tracking-widest text-gray-600 uppercase block group-hover:text-[#0071E3] transition-colors">
+                    UZUAKOLI SANCTUARY
+                  </span>
+                </div>
               </div>
-              <span className="text-[10px] sm:text-[11px] font-mono font-bold tracking-widest text-gray-500 uppercase block group-hover:text-[#0071E3] transition-colors">
-                UZUAKOLI SANCTUARY
-              </span>
-            </div>
 
-            {/* Card 4: Sacred Hymnody Manuscript */}
-            <div className="space-y-2.5 text-center group cursor-pointer">
-              <div className="relative aspect-[3/4] rounded-none overflow-hidden bg-gray-900 border border-black/5 shadow-xs">
-                <img
-                  src="/media/about_manuscript_wide.jpg"
-                  alt="Sacred Hymnody"
-                  className="w-full h-full object-cover filter grayscale contrast-115 group-hover:scale-106 transition-transform duration-700 ease-out"
-                />
-                <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent pointer-events-none" />
+              {/* Card 4: Sacred Hymnody */}
+              <div className="group cursor-pointer flex flex-col">
+                <div className="relative aspect-[3/4] overflow-hidden bg-gray-900">
+                  <img
+                    src="/media/about_manuscript_wide.jpg"
+                    alt="Sacred Hymnody"
+                    className="w-full h-full object-cover filter grayscale contrast-115 group-hover:scale-104 transition-transform duration-700 ease-out"
+                  />
+                </div>
+                <div className="py-3 px-2 bg-white text-center border-t border-black/10">
+                  <span className="text-[10px] sm:text-[11px] font-mono font-bold tracking-widest text-gray-600 uppercase block group-hover:text-[#0071E3] transition-colors">
+                    SACRED HYMNODY
+                  </span>
+                </div>
               </div>
-              <span className="text-[10px] sm:text-[11px] font-mono font-bold tracking-widest text-gray-500 uppercase block group-hover:text-[#0071E3] transition-colors">
-                SACRED HYMNODY
-              </span>
+
             </div>
 
-          </div>
+            {/* Sub-Header Banner underneath the 4 cards (@IKOLICONSORTIUM & Manifesto) */}
+            <div className="pt-6 sm:pt-8 flex flex-col md:flex-row md:items-center justify-between gap-4 border-t border-black/8">
+              <div className="space-y-0.5">
+                <h2 className="font-display font-black text-2xl sm:text-3xl md:text-4xl text-[#1D1D1F] tracking-tight uppercase">
+                  @IKOLICONSORTIUM
+                </h2>
+              </div>
 
-          {/* Sub-Header Banner underneath the 4 cards (@IKOLICONSORTIUM & Manifesto) */}
-          <div className="pt-6 sm:pt-8 flex flex-col md:flex-row md:items-center justify-between gap-4 border-t border-black/8">
-            <div className="space-y-0.5">
-              <h2 className="font-display font-black text-2xl sm:text-3xl md:text-4xl text-[#1D1D1F] tracking-tight uppercase">
-                @IKOLICONSORTIUM
-              </h2>
+              <div className="max-w-xl text-left md:text-right">
+                <p className="text-xs sm:text-[13px] text-gray-500 font-medium uppercase tracking-wider leading-relaxed">
+                  CONNECTING HISTORICAL HUMANITARIAN DIGNITY WITH SOVEREIGN NEURAL DIAGNOSTICS FOR OVER 200 MILLION NIGERIANS.
+                </p>
+              </div>
             </div>
 
-            <div className="max-w-xl text-left md:text-right">
-              <p className="text-xs sm:text-[13px] text-gray-500 font-medium uppercase tracking-wider leading-relaxed">
-                CONNECTING HISTORICAL HUMANITARIAN DIGNITY WITH SOVEREIGN NEURAL DIAGNOSTICS FOR OVER 200 MILLION NIGERIANS.
-              </p>
-            </div>
           </div>
 
         </section>
