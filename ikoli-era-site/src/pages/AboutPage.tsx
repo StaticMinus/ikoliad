@@ -586,19 +586,17 @@ export const AboutPage: React.FC<AboutPageProps> = ({ onNavigate }) => {
         </section>
 
         {/* ══════════════════════════════════════════════════════════════════════
-            5. SECTION: "MASSIVE ULTRA-WIDE PANORAMIC CINEMATIC COLOR BANNER" (100% REPLICATION)
+            5. SECTION: "MASSIVE ULTRA-WIDE PANORAMIC CINEMATIC B&W BANNER" (100% FULL-BLEED EDGE-TO-EDGE)
         ══════════════════════════════════════════════════════════════════════ */}
-        <section className="pt-4">
-          
-          <div className="relative rounded-none overflow-hidden bg-[#18191C] border border-black/10 shadow-2xl aspect-[16/8] sm:aspect-[21/9] lg:aspect-[24/9] flex items-end p-6 sm:p-10 md:p-14 text-white group cursor-pointer">
-            {/* Rich Creative Color Panoramic Photograph */}
+        <section className="w-screen relative left-1/2 right-1/2 -ml-[50vw] -mr-[50vw] overflow-hidden">
+          <div className="w-full relative rounded-none overflow-hidden bg-[#18191C] border-y border-black/10 shadow-2xl aspect-[16/7] sm:aspect-[21/8] lg:aspect-[24/8] group cursor-pointer">
+            {/* Cinematic High-Contrast B&W Panoramic Photograph */}
             <img
-              src="/media/about_panoramic_creative_color.jpg"
-              alt="IKOLI Clinical AI Innovation Lab Panorama"
-              className="absolute inset-0 w-full h-full object-cover group-hover:scale-104 transition-transform duration-1000 ease-out"
+              src="/media/about_panoramic_banner.jpg"
+              alt="IKOLI Sovereign Clinical AI Consortium"
+              className="absolute inset-0 w-full h-full object-cover filter grayscale contrast-125 brightness-95 group-hover:scale-103 transition-transform duration-1000 ease-out"
             />
           </div>
-
         </section>
 
         {/* ══════════════════════════════════════════════════════════════════════
