@@ -15,7 +15,6 @@ import { DesignShowcasePage } from './pages/DesignShowcasePage';
 import { ProtocolsPage } from './pages/ProtocolsPage';
 import { SmoothScroll } from './components/SmoothScroll';
 import { PageTransition } from './components/PageTransition';
-import { SovereignVaultIntermission } from './components/SovereignVaultIntermission';
 
 export type NavPage = 'home' | 'dashboard' | 'diseases' | 'ask' | 'about' | 'styles' | 'api' | 'protocols';
 
@@ -155,9 +154,6 @@ export function App() {
 
                 {/* 4. Intelligent Capabilities / Features Showcase */}
                 <FeaturesShowcase />
-
-                {/* 4b. Dark Visual Intermission Section: Sovereign Vault & Neural Core */}
-                <SovereignVaultIntermission onExploreApi={() => handleNavigate('api')} />
 
                 {/* 5. Target Diseases & Clinical Staging Section */}
                 <DiseasesSection onOpenDiseases={() => handleNavigate('diseases')} />
