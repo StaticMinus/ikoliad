@@ -435,39 +435,42 @@ export const AboutPage: React.FC<AboutPageProps> = ({ onNavigate }) => {
         {/* ══════════════════════════════════════════════════════════════════════
             4. SECTION: "ЭТАПЫ РАБОТЫ" / "WORK PROCESS & CLINICAL PIPELINE" (100% REPLICATION)
         ══════════════════════════════════════════════════════════════════════ */}
+        {/* ══════════════════════════════════════════════════════════════════════
+            4. SECTION: "LIFE & LEGACY • IKOLI HARCOURT WHYTE" (4-STAGE BIOGRAPHICAL ODYSSEY)
+        ══════════════════════════════════════════════════════════════════════ */}
         <section id="process" className="space-y-6 sm:space-y-8 pt-4">
           
           <div className="flex flex-col sm:flex-row sm:items-baseline justify-between gap-2 border-b border-black/8 pb-4">
             <h2 className="font-display font-black text-3xl sm:text-4xl md:text-5xl tracking-tight text-[#1D1D1F] uppercase">
-              WORK PROCESS &bull; CLINICAL PIPELINE
+              LIFE &amp; LEGACY &bull; IKOLI HARCOURT WHYTE
             </h2>
             <span className="text-xs font-mono text-gray-400 font-semibold tracking-wider uppercase">
-              4-STAGE AUTONOMOUS SURVEILLANCE &amp; CARE ARCHITECTURE
+              4-STAGE ODYSSEY OF RESILIENCE, SACRED HYMNODY &amp; HUMAN DIGNITY
             </span>
           </div>
 
-          {/* 4 Clean Numbered Horizontal Rows matching reference table */}
+          {/* 4 Clean Numbered Horizontal Rows detailing Ikoli Harcourt Whyte's Life & Mission */}
           <div className="divide-y divide-black/10 border-y border-black/10">
             {[
               {
                 step: '01',
-                title: 'FRONTLINE FIELD SCREENING',
-                desc: 'CHEW community health workers capture dermatological lesion macro-imagery in offline rural clinics across all 774 Local Government Areas.',
+                title: '1919: DIAGNOSIS, EXILE & AWAKENING',
+                desc: 'Born in Abonnema, Rivers State, young Ikoli was diagnosed with leprosy at age 14 in 1919. Ostracized by society and forced out of school, he refused despair, holding onto brass band melodies and unyielding faith in human dignity.',
               },
               {
                 step: '02',
-                title: 'EDGE NEURAL INFERENCE & STAGING',
-                desc: 'On-device ONNX WebGPU neural models perform real-time WHO 3-stage Buruli classification, Ridley-Jopling leprosy spectrum staging, and sub-millimeter necrosis demarcation.',
+                title: '1932: UZUAKOLI SETTLEMENT & DR. DAVEY',
+                desc: 'Transferred to Uzuakoli Leprosy Hospital in Abia State in 1932, he met medical superintendent Dr. Thomas Frank Davey. Dr. Davey recognized his musical genius, mentoring him in Western harmony while recording traditional Igbo music together on field journeys.',
               },
               {
                 step: '03',
-                title: 'EXPERT CLINICIAN TELE-VERIFICATION',
-                desc: 'Consortium dermatologists and zonal reference centers tele-verify high-confidence alerts through Zero-PII cryptographic vaults with zero patient data exposure.',
+                title: '1932–1949: 600+ SACRED HYMNS & PATIENT CHOIR',
+                desc: 'Painstakingly writing tonic sol-fa notations using the stubs of his bandaged fingers, Whyte composed over 600 sacred Igbo hymns. He founded the world-renowned Uzuakoli Patient Choir, touring nationally and transforming social stigma into profound reverence.',
               },
               {
                 step: '04',
-                title: 'MDT THERAPY & RECOVERY DISPATCH',
-                desc: 'Automated dispatch of WHO Multi-Drug Therapy (MDT) pharmaceutical regimens, digital physio tracking for nerve function, and lifelong human dignity restoration.',
+                title: '1949–1977: CURED YET CHOOSING TO STAY',
+                desc: 'Clinically cured in 1949 through early dapsone trials, Harcourt Whyte made the sacred choice to remain at Uzuakoli for life. His anthem "Atula Egwu" (Never Fear) comforted a nation during civil war, inspiring Ola Rotimi\'s Hopes of the Living Dead and world music heritage.',
               },
             ].map((stage) => (
               <div
@@ -493,73 +496,73 @@ export const AboutPage: React.FC<AboutPageProps> = ({ onNavigate }) => {
           </div>
 
           {/* ══════════════════════════════════════════════════════════════════════
-              5. 4-CARD EDITORIAL REEL (100% FLUSH ZERO GAP, SHIFTED UP CLOSE TO PIPELINE)
+              5. 4-CARD EDITORIAL REEL (HARCOURT WHYTE HISTORICAL PILLARS)
           ══════════════════════════════════════════════════════════════════════ */}
           <div className="pt-4 sm:pt-6 space-y-6">
             
             {/* 4 Cards in a Row - 100% Flush Zero Gap, Captions Directly Underneath */}
             <div className="grid grid-cols-2 md:grid-cols-4 gap-0 border border-black/10 shadow-sm">
               
-              {/* Card 1: Clinical Research */}
+              {/* Card 1: Abonnema Roots (1905) */}
               <div className="border-r border-b md:border-b-0 border-black/10 group cursor-pointer flex flex-col">
                 <div className="relative aspect-[3/4] overflow-hidden bg-gray-900">
                   <img
-                    src="/media/submenu_chew_screening.jpg"
-                    alt="Clinical Research"
+                    src="/media/submenu_patient_dignity.jpg"
+                    alt="Abonnema Roots & Early Life"
                     className="w-full h-full object-cover group-hover:scale-104 transition-transform duration-700 ease-out"
                   />
                 </div>
                 <div className="py-3 px-2 bg-white text-center border-t border-black/10">
                   <span className="text-[10px] sm:text-[11px] font-mono font-bold tracking-widest text-gray-600 uppercase block group-hover:text-[#0071E3] transition-colors">
-                    PORTRAIT / RESEARCH
+                    ABONNEMA &bull; 1905
                   </span>
                 </div>
               </div>
 
-              {/* Card 2: Neural Inference */}
+              {/* Card 2: Uzuakoli Sanctuary (1932) */}
               <div className="border-r border-b md:border-b-0 border-black/10 group cursor-pointer flex flex-col">
                 <div className="relative aspect-[3/4] overflow-hidden bg-gray-900">
                   <img
-                    src="/media/ikoli_ai_man_editorial.jpg"
-                    alt="Neural Inference"
+                    src="/media/about_hero_editorial.jpg"
+                    alt="Uzuakoli Sanctuary & Dr. Davey Mentorship"
                     className="w-full h-full object-cover filter grayscale contrast-110 group-hover:scale-104 transition-transform duration-700 ease-out"
                   />
                 </div>
                 <div className="py-3 px-2 bg-white text-center border-t border-black/10">
                   <span className="text-[10px] sm:text-[11px] font-mono font-bold tracking-widest text-gray-600 uppercase block group-hover:text-[#0071E3] transition-colors">
-                    NEURAL INFERENCE
+                    UZUAKOLI &bull; 1932
                   </span>
                 </div>
               </div>
 
-              {/* Card 3: Consortium Leadership */}
+              {/* Card 3: Sacred Tonic Sol-Fa */}
               <div className="border-r border-black/10 group cursor-pointer flex flex-col">
                 <div className="relative aspect-[3/4] overflow-hidden bg-gray-900">
                   <img
-                    src="/media/about_contact_creative_color.jpg"
-                    alt="Consortium Leadership"
+                    src="/media/about_manuscript_wide.jpg"
+                    alt="600+ Sacred Hymns Tonic Sol-Fa"
                     className="w-full h-full object-cover group-hover:scale-104 transition-transform duration-700 ease-out"
                   />
                 </div>
                 <div className="py-3 px-2 bg-white text-center border-t border-black/10">
                   <span className="text-[10px] sm:text-[11px] font-mono font-bold tracking-widest text-gray-600 uppercase block group-hover:text-[#0071E3] transition-colors">
-                    UZUAKOLI SANCTUARY
+                    600+ SACRED HYMNS
                   </span>
                 </div>
               </div>
 
-              {/* Card 4: Sacred Hymnody */}
+              {/* Card 4: Immortal Legacy */}
               <div className="group cursor-pointer flex flex-col">
                 <div className="relative aspect-[3/4] overflow-hidden bg-gray-900">
                   <img
-                    src="/media/about_manuscript_wide.jpg"
-                    alt="Sacred Hymnody"
-                    className="w-full h-full object-cover filter grayscale contrast-115 group-hover:scale-104 transition-transform duration-700 ease-out"
+                    src="/media/about_tall_portrait.jpg"
+                    alt="Immortal Legacy & Atula Egwu"
+                    className="w-full h-full object-cover group-hover:scale-104 transition-transform duration-700 ease-out"
                   />
                 </div>
                 <div className="py-3 px-2 bg-white text-center border-t border-black/10">
                   <span className="text-[10px] sm:text-[11px] font-mono font-bold tracking-widest text-gray-600 uppercase block group-hover:text-[#0071E3] transition-colors">
-                    SACRED HYMNODY
+                    ATULA EGWU &bull; LEGACY
                   </span>
                 </div>
               </div>
