@@ -10,6 +10,7 @@ import {
   Trash2,
   ChevronLeft,
   ChevronRight,
+  X,
 } from 'lucide-react';
 import { GlowingOrb } from './GlowingOrb';
 
@@ -31,6 +32,8 @@ interface CortexSidebarProps {
   onNavigate: (page: 'home' | 'dashboard' | 'diseases' | 'ask' | 'about' | 'styles' | 'api' | 'protocols') => void;
   isCollapsed: boolean;
   onToggleCollapse: () => void;
+  isOpenMobile?: boolean;
+  onCloseMobile?: () => void;
   isDark?: boolean;
 }
 
@@ -43,6 +46,8 @@ export const CortexSidebar: React.FC<CortexSidebarProps> = ({
   onNavigate,
   isCollapsed,
   onToggleCollapse,
+  isOpenMobile = false,
+  onCloseMobile,
   isDark = true,
 }) => {
   const [searchQuery, setSearchQuery] = useState('');
@@ -65,24 +70,19 @@ export const CortexSidebar: React.FC<CortexSidebarProps> = ({
   );
   const olderSessions = filteredSessions.filter((s) => now - s.updatedAt >= 7 * ONE_DAY_MS);
 
-  return (
-    <aside
-      className={`h-full flex flex-col justify-between transition-all duration-300 select-none border-r relative z-30 ${
-        isCollapsed ? 'w-16' : 'w-64 sm:w-72'
-      } ${
-        isDark
-          ? 'bg-[#111114] border-white/10 text-gray-200'
-          : 'bg-[#F9F9FB] border-black/8 text-[#1D1D1F]'
-      }`}
-    >
+  const sidebarContent = (
+    <div className="h-full flex flex-col justify-between select-none">
       {/* ── TOP SECTION: BRAND & NEW CHAT ─────────────────────────── */}
       <div className="p-3.5 space-y-3 shrink-0">
         
-        {/* Brand Header with Logo and Collapse Toggle */}
+        {/* Brand Header with Logo and Collapse/Close Toggle */}
         <div className="flex items-center justify-between gap-2">
-          {!isCollapsed && (
+          {(!isCollapsed || isOpenMobile) && (
             <div
-              onClick={() => onNavigate('home')}
+              onClick={() => {
+                onNavigate('home');
+                if (isOpenMobile && onCloseMobile) onCloseMobile();
+              }}
               className="flex items-center gap-2.5 cursor-pointer group"
             >
               <div className="w-7 h-7 flex items-center justify-center shrink-0 group-hover:scale-110 transition-transform">
@@ -99,7 +99,7 @@ export const CortexSidebar: React.FC<CortexSidebarProps> = ({
             </div>
           )}
 
-          {isCollapsed && (
+          {isCollapsed && !isOpenMobile && (
             <div
               onClick={() => onNavigate('home')}
               className="w-7 h-7 mx-auto flex items-center justify-center cursor-pointer hover:scale-110 transition-transform"
@@ -109,124 +109,149 @@ export const CortexSidebar: React.FC<CortexSidebarProps> = ({
             </div>
           )}
 
-          <button
-            onClick={onToggleCollapse}
-            className={`p-1.5 rounded-lg border transition-colors cursor-pointer ${
-              isDark
-                ? 'bg-white/5 border-white/10 text-gray-400 hover:text-white hover:bg-white/10'
-                : 'bg-white border-black/10 text-gray-600 hover:text-black hover:bg-gray-100 shadow-2xs'
-            }`}
-            title={isCollapsed ? 'Expand sidebar' : 'Collapse sidebar'}
-            aria-label="Toggle sidebar"
-          >
-            {isCollapsed ? <ChevronRight className="w-3.5 h-3.5" /> : <ChevronLeft className="w-3.5 h-3.5" />}
-          </button>
+          {/* Desktop Collapse / Mobile Close */}
+          {isOpenMobile ? (
+            <button
+              onClick={onCloseMobile}
+              className={`p-1.5 rounded-lg border transition-colors cursor-pointer md:hidden ${
+                isDark
+                  ? 'bg-white/5 border-white/10 text-gray-400 hover:text-white'
+                  : 'bg-white border-black/10 text-gray-600 hover:text-black'
+              }`}
+            >
+              <X className="w-4 h-4" />
+            </button>
+          ) : (
+            <button
+              onClick={onToggleCollapse}
+              className={`hidden md:flex p-1.5 rounded-lg border transition-colors cursor-pointer ${
+                isDark
+                  ? 'bg-white/5 border-white/10 text-gray-400 hover:text-white hover:bg-white/10'
+                  : 'bg-white border-black/10 text-gray-600 hover:text-black hover:bg-gray-100 shadow-2xs'
+              }`}
+              title={isCollapsed ? 'Expand sidebar' : 'Collapse sidebar'}
+              aria-label="Toggle sidebar"
+            >
+              {isCollapsed ? <ChevronRight className="w-3.5 h-3.5" /> : <ChevronLeft className="w-3.5 h-3.5" />}
+            </button>
+          )}
         </div>
 
         {/* Primary "+ New Chat" Button */}
-        {!isCollapsed ? (
+        {(!isCollapsed || isOpenMobile) ? (
           <button
-            onClick={onNewSession}
+            onClick={() => {
+              onNewSession();
+              if (isOpenMobile && onCloseMobile) onCloseMobile();
+            }}
             className={`w-full py-2.5 px-3.5 rounded-xl font-semibold text-xs flex items-center justify-center gap-2 shadow-xs transition-all cursor-pointer active:scale-98 ${
               isDark
-                ? 'bg-white/10 hover:bg-white/20 text-white border border-white/10'
-                : 'bg-[#1D1D1F] hover:bg-[#2D2D30] text-white shadow-xs'
+                ? 'bg-white text-black hover:bg-gray-200'
+                : 'bg-[#1D1D1F] text-white hover:bg-black'
             }`}
           >
             <Plus className="w-4 h-4" />
-            <span>New chat</span>
+            <span>New Chat</span>
           </button>
         ) : (
           <button
             onClick={onNewSession}
-            className={`w-10 h-10 mx-auto rounded-xl flex items-center justify-center shadow-xs hover:scale-105 active:scale-95 transition-transform cursor-pointer ${
-              isDark ? 'bg-white/10 text-white border border-white/10' : 'bg-[#1D1D1F] text-white'
+            className={`w-9 h-9 mx-auto rounded-xl flex items-center justify-center transition-all cursor-pointer shadow-xs ${
+              isDark
+                ? 'bg-white text-black hover:bg-gray-200'
+                : 'bg-[#1D1D1F] text-white hover:bg-black'
             }`}
-            title="New chat"
+            title="New Chat"
           >
             <Plus className="w-4 h-4" />
           </button>
         )}
 
-        {/* Search Input Filter */}
-        {!isCollapsed && (
+        {/* Search Consultation Input */}
+        {(!isCollapsed || isOpenMobile) && (
           <div className="relative">
-            <Search className="w-3.5 h-3.5 absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" />
+            <Search className="w-3.5 h-3.5 absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 pointer-events-none" />
             <input
               type="text"
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
-              placeholder="Search chats"
-              className={`w-full pl-8 pr-7 py-1.5 rounded-xl text-xs outline-none border transition-all ${
+              placeholder="Search chats..."
+              className={`w-full text-xs pl-8 pr-3 py-1.5 rounded-lg border outline-none transition-colors ${
                 isDark
-                  ? 'bg-white/5 border-white/10 text-white placeholder-gray-500 focus:border-blue-400/50'
-                  : 'bg-white border-black/10 text-gray-800 placeholder-gray-400 focus:border-blue-500/50 shadow-2xs'
+                  ? 'bg-white/5 border-white/10 text-white placeholder-gray-500 focus:border-[#0071E3]'
+                  : 'bg-white border-black/10 text-black placeholder-gray-400 focus:border-[#0071E3]'
               }`}
             />
-            <span className="absolute right-2.5 top-1/2 -translate-y-1/2 text-[9px] font-mono text-gray-400">
-              ⌘K
-            </span>
           </div>
         )}
 
-        {/* Quick Nav Links */}
-        {!isCollapsed && (
-          <div className="space-y-0.5 pt-1 text-xs font-medium">
+        {/* Quick Navigation Links */}
+        {(!isCollapsed || isOpenMobile) && (
+          <div className="space-y-1 pt-1 border-t border-white/5 dark:border-white/5">
             <button
-              onClick={() => onNavigate('dashboard')}
-              className={`w-full flex items-center gap-2.5 px-3 py-1.5 rounded-lg transition-colors cursor-pointer ${
-                isDark
-                  ? 'hover:bg-white/5 text-gray-300'
-                  : 'hover:bg-black/5 text-gray-700'
+              onClick={() => {
+                onNavigate('dashboard');
+                if (isOpenMobile && onCloseMobile) onCloseMobile();
+              }}
+              className={`w-full flex items-center gap-2.5 px-3 py-1.5 rounded-lg text-xs font-medium transition-colors cursor-pointer ${
+                isDark ? 'text-gray-400 hover:text-white hover:bg-white/5' : 'text-gray-600 hover:text-black hover:bg-black/5'
               }`}
             >
-              <Compass className="w-3.5 h-3.5 text-blue-500" />
-              <span>Explore Surveillance</span>
+              <Compass className="w-3.5 h-3.5 text-[#0071E3]" />
+              <span>Surveillance Dashboard</span>
             </button>
+
             <button
-              onClick={() => onNavigate('diseases')}
-              className={`w-full flex items-center gap-2.5 px-3 py-1.5 rounded-lg transition-colors cursor-pointer ${
-                isDark
-                  ? 'hover:bg-white/5 text-gray-300'
-                  : 'hover:bg-black/5 text-gray-700'
+              onClick={() => {
+                onNavigate('protocols');
+                if (isOpenMobile && onCloseMobile) onCloseMobile();
+              }}
+              className={`w-full flex items-center gap-2.5 px-3 py-1.5 rounded-lg text-xs font-medium transition-colors cursor-pointer ${
+                isDark ? 'text-gray-400 hover:text-white hover:bg-white/5' : 'text-gray-600 hover:text-black hover:bg-black/5'
               }`}
             >
-              <BookOpen className="w-3.5 h-3.5 text-purple-500" />
-              <span>Disease Library</span>
+              <BookOpen className="w-3.5 h-3.5 text-emerald-400" />
+              <span>WHO & NTBLCP Guidelines</span>
             </button>
+
             <button
-              onClick={() => onNavigate('api')}
-              className={`w-full flex items-center gap-2.5 px-3 py-1.5 rounded-lg transition-colors cursor-pointer ${
-                isDark
-                  ? 'hover:bg-white/5 text-gray-300'
-                  : 'hover:bg-black/5 text-gray-700'
+              onClick={() => {
+                onNavigate('diseases');
+                if (isOpenMobile && onCloseMobile) onCloseMobile();
+              }}
+              className={`w-full flex items-center gap-2.5 px-3 py-1.5 rounded-lg text-xs font-medium transition-colors cursor-pointer ${
+                isDark ? 'text-gray-400 hover:text-white hover:bg-white/5' : 'text-gray-600 hover:text-black hover:bg-black/5'
               }`}
             >
-              <FolderArchive className="w-3.5 h-3.5 text-emerald-500" />
-              <span>MEAL Datasets &amp; API</span>
+              <FolderArchive className="w-3.5 h-3.5 text-blue-400" />
+              <span>Skin-NTD Disease Index</span>
             </button>
           </div>
         )}
 
       </div>
 
-      {/* ── MIDDLE SECTION: CHAT HISTORY STREAM ───────────────────── */}
-      <div className="flex-1 overflow-y-auto px-2 space-y-4 text-left scrollbar-thin">
+      {/* ── MIDDLE SECTION: CONVERSATION HISTORY CHRONOLOGY ───────── */}
+      <div className="flex-1 overflow-y-auto px-3 py-2 space-y-4">
         
-        {!isCollapsed && (
+        {(!isCollapsed || isOpenMobile) ? (
           <>
-            {/* Today Group */}
+            {/* Today */}
             {todaySessions.length > 0 && (
               <div className="space-y-1">
-                <span className="text-[10px] font-semibold text-gray-400 px-3 uppercase tracking-wider block">
-                  Today
-                </span>
+                <div className="flex items-center gap-1 px-3 text-[10px] font-bold uppercase tracking-wider text-gray-500">
+                  <History className="w-3 h-3" />
+                  <span>Today</span>
+                </div>
                 {todaySessions.map((session) => (
                   <SessionItem
                     key={session.id}
                     session={session}
                     isActive={session.id === activeSessionId}
-                    onSelect={() => onSelectSession(session.id)}
+                    onSelect={() => {
+                      onSelectSession(session.id);
+                      if (isOpenMobile && onCloseMobile) onCloseMobile();
+                    }}
                     onDelete={(e) => onDeleteSession(session.id, e)}
                     isDark={isDark}
                   />
@@ -234,18 +259,21 @@ export const CortexSidebar: React.FC<CortexSidebarProps> = ({
               </div>
             )}
 
-            {/* Yesterday Group */}
+            {/* Yesterday */}
             {yesterdaySessions.length > 0 && (
               <div className="space-y-1">
-                <span className="text-[10px] font-semibold text-gray-400 px-3 uppercase tracking-wider block">
-                  Yesterday
-                </span>
+                <div className="px-3 text-[10px] font-bold uppercase tracking-wider text-gray-500">
+                  <span>Yesterday</span>
+                </div>
                 {yesterdaySessions.map((session) => (
                   <SessionItem
                     key={session.id}
                     session={session}
                     isActive={session.id === activeSessionId}
-                    onSelect={() => onSelectSession(session.id)}
+                    onSelect={() => {
+                      onSelectSession(session.id);
+                      if (isOpenMobile && onCloseMobile) onCloseMobile();
+                    }}
                     onDelete={(e) => onDeleteSession(session.id, e)}
                     isDark={isDark}
                   />
@@ -253,18 +281,21 @@ export const CortexSidebar: React.FC<CortexSidebarProps> = ({
               </div>
             )}
 
-            {/* Previous 7 Days Group */}
+            {/* Previous 7 Days */}
             {previous7DaysSessions.length > 0 && (
               <div className="space-y-1">
-                <span className="text-[10px] font-semibold text-gray-400 px-3 uppercase tracking-wider block">
-                  7 Days
-                </span>
+                <div className="px-3 text-[10px] font-bold uppercase tracking-wider text-gray-500">
+                  <span>Previous 7 Days</span>
+                </div>
                 {previous7DaysSessions.map((session) => (
                   <SessionItem
                     key={session.id}
                     session={session}
                     isActive={session.id === activeSessionId}
-                    onSelect={() => onSelectSession(session.id)}
+                    onSelect={() => {
+                      onSelectSession(session.id);
+                      if (isOpenMobile && onCloseMobile) onCloseMobile();
+                    }}
                     onDelete={(e) => onDeleteSession(session.id, e)}
                     isDark={isDark}
                   />
@@ -272,18 +303,21 @@ export const CortexSidebar: React.FC<CortexSidebarProps> = ({
               </div>
             )}
 
-            {/* Older Sessions Group */}
+            {/* Older */}
             {olderSessions.length > 0 && (
               <div className="space-y-1">
-                <span className="text-[10px] font-semibold text-gray-400 px-3 uppercase tracking-wider block">
-                  Older
-                </span>
+                <div className="px-3 text-[10px] font-bold uppercase tracking-wider text-gray-500">
+                  <span>Older Consultations</span>
+                </div>
                 {olderSessions.map((session) => (
                   <SessionItem
                     key={session.id}
                     session={session}
                     isActive={session.id === activeSessionId}
-                    onSelect={() => onSelectSession(session.id)}
+                    onSelect={() => {
+                      onSelectSession(session.id);
+                      if (isOpenMobile && onCloseMobile) onCloseMobile();
+                    }}
                     onDelete={(e) => onDeleteSession(session.id, e)}
                     isDark={isDark}
                   />
@@ -291,18 +325,14 @@ export const CortexSidebar: React.FC<CortexSidebarProps> = ({
               </div>
             )}
 
-            {/* Empty history indicator */}
-            {sessions.length === 0 && (
-              <div className="p-4 text-center text-gray-400 text-xs space-y-1">
-                <History className="w-5 h-5 mx-auto opacity-40 mb-1" />
-                <p>No chat history yet.</p>
-                <p className="text-[10px] opacity-70">Ask a question to start a session.</p>
+            {/* Empty Search Fallback */}
+            {filteredSessions.length === 0 && (
+              <div className="text-center py-8 text-xs text-gray-500">
+                No matching consultations.
               </div>
             )}
           </>
-        )}
-
-        {isCollapsed && (
+        ) : (
           <div className="space-y-2 pt-2">
             {sessions.slice(0, 8).map((session) => (
               <button
@@ -324,8 +354,46 @@ export const CortexSidebar: React.FC<CortexSidebarProps> = ({
         )}
 
       </div>
+    </div>
+  );
 
-    </aside>
+  return (
+    <>
+      {/* Desktop Sidebar (hidden on mobile) */}
+      <aside
+        className={`hidden md:flex flex-col justify-between transition-all duration-300 select-none border-r relative z-30 ${
+          isCollapsed ? 'w-16' : 'w-64 sm:w-72'
+        } ${
+          isDark
+            ? 'bg-[#111114] border-white/10 text-gray-200'
+            : 'bg-[#F9F9FB] border-black/8 text-[#1D1D1F]'
+        }`}
+      >
+        {sidebarContent}
+      </aside>
+
+      {/* Mobile Drawer (Visible when isOpenMobile === true) */}
+      {isOpenMobile && (
+        <div className="fixed inset-0 z-50 md:hidden flex animate-fadeIn">
+          {/* Backdrop Overlay */}
+          <div
+            onClick={onCloseMobile}
+            className="fixed inset-0 bg-black/70 backdrop-blur-xs transition-opacity"
+          />
+
+          {/* Drawer Panel */}
+          <div
+            className={`relative z-10 w-72 max-w-[85vw] h-full shadow-2xl transition-transform duration-300 ${
+              isDark
+                ? 'bg-[#111114] border-r border-white/10 text-gray-200'
+                : 'bg-[#F9F9FB] border-r border-black/10 text-[#1D1D1F]'
+            }`}
+          >
+            {sidebarContent}
+          </div>
+        </div>
+      )}
+    </>
   );
 };
 
