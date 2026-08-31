@@ -52,10 +52,19 @@ TONE & AUDIENCE: Data Analyst & Surveillance Mode.
 - Provide clean markdown tables, state-by-state statistical breakdowns (Enugu, Ebonyi, Abia, Anambra, Imo), 2024 vs 2025 deltas, and laboratory diagnostic splits.`,
     };
 
-    // Strict simplified prompt system instruction
-    const systemPrompt = `You are IKOLI AI, the national skin NTD clinical decision support and epidemiological intelligence assistant developed by RedAid Nigeria (RAN), DAHW Germany, Digital Dreams, NTBLCP / Federal Ministry of Health, VRC-UNN, and IDEA Nigeria.
+    // Strict simplified prompt system instruction with safety guardrails
+    const systemPrompt = `You are "Ask Ikoli – Conversational Health & Programme Information Assistant", developed under the IKOLI-AI Demonstrator (v0.1) by RedAid Nigeria (RAN), DAHW Germany, Digital Dreams, NTBLCP / Federal Ministry of Health, VRC-UNN, and IDEA Nigeria.
 
 ${personaTones[persona] || personaTones.visitor}
+
+CRITICAL SAFETY & RESPONSIBLE AI GUARDRAILS (EDCTP3 DEMONSTRATOR):
+1. You are an educational, health information, and programme surveillance assistant. You are NOT an autonomous clinical diagnostic tool or prescribing engine.
+2. NEVER diagnose individual patient lesions, NEVER prescribe individual medications, and NEVER decide individual SDR-PEP eligibility.
+3. If a user asks "Do I have leprosy?", "What drug should I take?", "Diagnose this skin lesion", "Am I eligible for SDR-PEP?", "Prescribe medicine", or asks for a diagnostic verdict:
+   - Provide a clear medical safety advisory stating you cannot diagnose or prescribe.
+   - Explain approved general health information and symptoms.
+   - Direct the user to their nearest designated Primary Health Centre or specialist referral hospital (Oji River Specialist Hospital in Enugu, Mile 4 Hospital in Abakaliki, Uzuakoli Leprosy Hospital in Abia, Awka South PHC in Anambra, Oguta General Hospital in Imo) for in-person evaluation by a qualified health officer.
+   - Note that all consultation, diagnostics, and WHO Multi-Drug Therapy (MDT) in Nigeria are 100% FREE under NTBLCP protocols.
 
 STRICT ANSWERING RULES:
 1. ALWAYS answer the specific question directly in the very FIRST sentence.
@@ -105,7 +114,7 @@ OFFICIAL DATASET:
             'Content-Type': 'application/json',
             'Authorization': `Bearer ${openRouterApiKey}`,
             'HTTP-Referer': 'https://ikoli-ai.vercel.app',
-            'X-Title': 'IKOLI AI Intelligence Gateway',
+            'X-Title': 'IKOLI-AI Demonstrator v0.1 Gateway',
           },
           body: JSON.stringify({
             model: selectedModel,
@@ -138,6 +147,44 @@ OFFICIAL DATASET:
     // 2. Exact Grounded Fallback Synthesizer with Persona Awareness
     const lower = prompt.toLowerCase();
     let directAnswer = '';
+
+    // Safety Interceptor
+    const isUnsafeDiagnosticQuery =
+      lower.includes('do i have leprosy') ||
+      lower.includes('do i have buruli') ||
+      lower.includes('do i have yaws') ||
+      lower.includes('diagnose this') ||
+      lower.includes('diagnose me') ||
+      lower.includes('diagnose my') ||
+      lower.includes('diagnose lesion') ||
+      lower.includes('can you diagnose') ||
+      lower.includes('tell me if i have') ||
+      lower.includes('am i sick with');
+
+    const isUnsafePrescriptionQuery =
+      lower.includes('what drug should i take') ||
+      lower.includes('what medicine should i take') ||
+      lower.includes('what drug should i buy') ||
+      lower.includes('prescribe') ||
+      lower.includes('prescribe medicine') ||
+      lower.includes('prescribe for me') ||
+      lower.includes('what medication should i swallow') ||
+      lower.includes('which tablet should i use');
+
+    const isUnsafeEligibilityQuery =
+      lower.includes('am i eligible for sdr') ||
+      lower.includes('am i eligible for pep') ||
+      lower.includes('can i take sdr-pep') ||
+      lower.includes('should i take sdr-pep');
+
+    if (isUnsafeDiagnosticQuery || isUnsafePrescriptionQuery || isUnsafeEligibilityQuery) {
+      directAnswer = `⚠️ **Medical Safety & Triage Notice**\n\n**Ask Ikoli is a conversational health and programme information assistant, not a clinical diagnostic or prescribing tool.** I cannot provide an individual medical diagnosis, prescribe drugs, or determine individual patient eligibility for SDR-PEP.\n\n### 📍 Recommended Next Step:\nPlease visit your nearest designated **Primary Health Centre** or specialist referral hospital for an in-person examination by a qualified health officer:\n- **Oji River Specialist Leprosy Hospital** (Enugu)\n- **Mile 4 Hospital Reference Center** (Abakaliki, Ebonyi)\n- **Uzuakoli Leprosy Hospital** (Abia)\n- **Awka South Model Comprehensive PHC** (Anambra)\n- **Oguta General Hospital NTD Wing** (Imo)\n\n*All consultations, laboratory tests, and WHO Multi-Drug Therapy (MDT) blister packs across Nigeria are 100% free of charge under NTBLCP national protocols.*`;
+      return res.status(200).json({
+        content: directAnswer,
+        model: 'ikoli-safety-guardrail',
+        provider: 'local-evidence-engine',
+      });
+    }
 
     if (lower.includes('disability') || lower.includes('grade 2') || lower.includes('grade-2') || lower.includes('g2d') || lower.includes('deformity') || lower.includes('grade1') || lower.includes('grade 1') || lower.includes('grade 0')) {
       if (persona === 'visitor') {

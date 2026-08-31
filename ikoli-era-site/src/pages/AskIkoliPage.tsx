@@ -57,7 +57,7 @@ export const AskIkoliPage: React.FC<AskIkoliPageProps> = ({ onNavigate }) => {
       case 'executive':
         return "Ask about national elimination targets, funding impact, WHO 2030 roadmap, or LGA disease hot-spots...";
       case 'clinical':
-        return "Describe patient symptoms, lesion count, sensory loss, or ask about WHO MDT blister pack dosages...";
+        return "Ask about NTBLCP clinical guidelines, sensory testing procedures, or WHO MDT blister pack protocols...";
       case 'analyst':
         return "Query statistical indicators, state-by-state 2024 vs 2025 deltas, or PCR confirmation splits...";
     }
@@ -315,13 +315,13 @@ export const AskIkoliPage: React.FC<AskIkoliPageProps> = ({ onNavigate }) => {
           {/* Top Status Header Bar (Clean, Minimal, No Developer/Model Pills) */}
           <div className="w-full flex items-center justify-between gap-3 border-b pb-4 pt-1 transition-colors duration-300 border-black/5 dark:border-white/10">
             
-            {/* Left: Clean Brand Status Badge */}
+            {/* Left: Top Badge Tag */}
             <div className="flex items-center gap-2">
               <div className={`px-3.5 py-1.5 rounded-full flex items-center gap-2 border text-xs font-mono font-medium backdrop-blur-xl ${
                 isDark ? 'bg-white/5 border-white/10 text-gray-200' : 'bg-white border-black/10 text-gray-800 shadow-xs'
               }`}>
                 <span className="w-2 h-2 rounded-full bg-[#10B981] shadow-[0_0_8px_#10B981]" />
-                <span className="font-bold tracking-tight">IKOLI • Clinical Diagnostic Workspace</span>
+                <span className="font-bold tracking-tight">IKOLI-AI Demonstrator v0.1 • Conversational Assistant</span>
               </div>
             </div>
 
@@ -333,10 +333,10 @@ export const AskIkoliPage: React.FC<AskIkoliPageProps> = ({ onNavigate }) => {
                   className={`px-3.5 py-1.5 rounded-full border text-xs font-medium transition-all cursor-pointer flex items-center gap-1.5 ${
                     isDark ? 'bg-white/5 border-white/10 text-gray-300 hover:bg-white/10 hover:text-white' : 'bg-white border-black/10 text-gray-700 hover:bg-gray-100 shadow-xs'
                   }`}
-                  title="Start fresh screening"
+                  title="Start fresh conversation"
                 >
                   <RotateCcw className="w-3 h-3" />
-                  <span className="hidden sm:inline">New Screening</span>
+                  <span className="hidden sm:inline">New Session</span>
                 </button>
               )}
 
@@ -360,59 +360,72 @@ export const AskIkoliPage: React.FC<AskIkoliPageProps> = ({ onNavigate }) => {
           </div>
 
           {/* Masked Hero Headline */}
-          <div className="space-y-2 text-center">
+          <div className="space-y-2.5 text-center">
             <h1 className={`font-display font-black text-3xl sm:text-5xl md:text-6xl tracking-tight leading-[1.06] ${
               isDark ? 'text-white' : 'text-[#1D1D1F]'
             }`}>
-              Think clearly. Diagnose confidently.
+              Ask Ikoli
             </h1>
-            <p className={`text-xs sm:text-sm md:text-base max-w-xl mx-auto leading-relaxed font-medium ${
+            <p className="text-sm sm:text-lg font-semibold text-[#0071E3] tracking-tight">
+              Conversational Health &amp; Programme Information Assistant
+            </p>
+            <p className={`text-xs sm:text-sm max-w-xl mx-auto leading-relaxed font-medium ${
               isDark ? 'text-gray-400' : 'text-gray-500'
             }`}>
-              Nigeria's frontline clinical intelligence engine for Leprosy, Buruli Ulcer & Yaws differential staging.
+              Explains approved leprosy &amp; Buruli ulcer information, national programme indicators, and service navigation. Does not provide clinical diagnoses, prescriptions, or SDR-PEP eligibility determinations.
             </p>
           </div>
 
-          {/* Apple-style Audience Persona Segmented Capsule Switcher */}
+          {/* Persistent Demonstration Environment Notice */}
+          <div className={`p-3 rounded-2xl border text-xs text-left max-w-2xl mx-auto flex items-start sm:items-center gap-2.5 ${
+            isDark ? 'bg-amber-500/10 border-amber-500/25 text-amber-300' : 'bg-amber-500/10 border-amber-500/30 text-amber-900'
+          }`}>
+            <span className="w-2 h-2 rounded-full bg-amber-500 shrink-0 mt-1 sm:mt-0 shadow-[0_0_8px_rgba(245,158,11,0.6)]" />
+            <span className="font-medium leading-relaxed">
+              <strong>Demonstration environment.</strong> Data displayed are synthetic/illustrative and do not represent live patient or official national programme data.
+            </span>
+          </div>
+
+          {/* Two Primary Operating Modes + Audience Sub-Persona Segmented Switcher */}
           <div className="pt-1 flex flex-wrap items-center justify-center p-1 rounded-full border backdrop-blur-xl bg-black/5 dark:bg-white/5 border-black/10 dark:border-white/10 gap-1 text-xs">
             <button
               onClick={() => setPersona('visitor')}
-              className={`px-3.5 py-1.5 rounded-full transition-all flex items-center gap-1.5 font-medium cursor-pointer ${
+              className={`px-4 py-2 rounded-full transition-all flex items-center gap-1.5 font-medium cursor-pointer ${
                 persona === 'visitor'
-                  ? 'bg-white dark:bg-white/20 text-[#1D1D1F] dark:text-white shadow-xs font-semibold'
+                  ? 'bg-white dark:bg-white/20 text-[#1D1D1F] dark:text-white shadow-xs font-bold'
                   : 'text-gray-500 hover:text-gray-900 dark:hover:text-white'
               }`}
             >
-              <span>💬</span>
-              <span>Plain English / Visitor</span>
+              <span>🌐</span>
+              <span>Public Mode (Approved Health Info)</span>
             </button>
             <button
               onClick={() => setPersona('executive')}
-              className={`px-3.5 py-1.5 rounded-full transition-all flex items-center gap-1.5 font-medium cursor-pointer ${
+              className={`px-4 py-2 rounded-full transition-all flex items-center gap-1.5 font-medium cursor-pointer ${
                 persona === 'executive'
-                  ? 'bg-white dark:bg-white/20 text-[#1D1D1F] dark:text-white shadow-xs font-semibold'
+                  ? 'bg-white dark:bg-white/20 text-[#1D1D1F] dark:text-white shadow-xs font-bold'
                   : 'text-gray-500 hover:text-gray-900 dark:hover:text-white'
               }`}
             >
-              <span>📊</span>
-              <span>Executive & Donor</span>
+              <span>🔐</span>
+              <span>Programme Mode (Authorised Data)</span>
             </button>
             <button
               onClick={() => setPersona('clinical')}
-              className={`px-3.5 py-1.5 rounded-full transition-all flex items-center gap-1.5 font-medium cursor-pointer ${
+              className={`px-3 py-2 rounded-full transition-all flex items-center gap-1.5 font-medium cursor-pointer ${
                 persona === 'clinical'
-                  ? 'bg-white dark:bg-white/20 text-[#1D1D1F] dark:text-white shadow-xs font-semibold'
+                  ? 'bg-white dark:bg-white/20 text-[#1D1D1F] dark:text-white shadow-xs font-bold'
                   : 'text-gray-500 hover:text-gray-900 dark:hover:text-white'
               }`}
             >
               <span>🩺</span>
-              <span>Clinical Specialist</span>
+              <span>Guidelines &amp; Protocols</span>
             </button>
             <button
               onClick={() => setPersona('analyst')}
-              className={`px-3.5 py-1.5 rounded-full transition-all flex items-center gap-1.5 font-medium cursor-pointer ${
+              className={`px-3 py-2 rounded-full transition-all flex items-center gap-1.5 font-medium cursor-pointer ${
                 persona === 'analyst'
-                  ? 'bg-white dark:bg-white/20 text-[#1D1D1F] dark:text-white shadow-xs font-semibold'
+                  ? 'bg-white dark:bg-white/20 text-[#1D1D1F] dark:text-white shadow-xs font-bold'
                   : 'text-gray-500 hover:text-gray-900 dark:hover:text-white'
               }`}
             >

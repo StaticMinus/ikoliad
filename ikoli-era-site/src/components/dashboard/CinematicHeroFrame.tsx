@@ -230,12 +230,26 @@ export const CinematicHeroFrame: React.FC<CinematicHeroFrameProps> = ({
         
         {/* Top Header Text Section with Clean Dark Typography */}
         <div className="text-center pt-20 sm:pt-32 md:pt-36 lg:pt-40 pb-2 sm:pb-5 space-y-1 sm:space-y-1.5 shrink-0">
+          <div className="inline-flex items-center gap-2 bg-black/[0.04] border border-black/5 px-3 py-0.5 rounded-full mb-1">
+            <span className="w-1.5 h-1.5 rounded-full bg-[#0071E3] animate-pulse" />
+            <span className="text-[10px] font-mono font-bold uppercase tracking-wider text-[#1D1D1F]">
+              IKOLI-AI Demonstrator v0.1
+            </span>
+          </div>
           <h2 className="font-display font-black text-xl sm:text-4xl md:text-5xl lg:text-6xl tracking-tight uppercase text-[#1D1D1F] px-2">
             YOUR HEALTH, OUR MISSION
           </h2>
           <p className="text-[11px] sm:text-sm text-gray-500 font-medium px-4">
-            Eliminating neglected tropical skin diseases across Nigeria with frontline clinical AI
+            Neglected tropical skin diseases governance and surveillance platform for Nigeria
           </p>
+          
+          {/* Persistent Demonstration Environment Notice */}
+          <div className="max-w-2xl mx-auto mt-2 bg-amber-500/10 border border-amber-500/25 rounded-full px-4 py-1 text-[11px] text-amber-900 font-medium flex items-center justify-center gap-2 shadow-2xs">
+            <span className="w-1.5 h-1.5 rounded-full bg-amber-500 shrink-0" />
+            <span>
+              <strong>Demonstration environment.</strong> Data displayed are synthetic/illustrative and do not represent live patient data.
+            </span>
+          </div>
         </div>
 
         {/* Middle Canvas Card Container (Expanded Full-Width Immersion Hero) */}

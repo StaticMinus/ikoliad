@@ -2,7 +2,6 @@ import React, { useState, useEffect } from 'react';
 import {
   Maximize2,
   Calendar,
-  Info,
   TrendingDown,
   MapPin,
   CheckCircle2,
@@ -515,7 +514,7 @@ export const SurveillanceHubConsole: React.FC<SurveillanceHubConsoleProps> = ({
           <div>
             <div className="flex items-center gap-2">
               <h2 className="font-extrabold text-base tracking-tight text-[#1D1D1F]">
-                IKOLI AI
+                IKOLI-AI Demonstrator v0.1
               </h2>
               <span className="text-gray-300">/</span>
               <span className="text-xs font-semibold text-gray-600">
@@ -603,6 +602,19 @@ export const SurveillanceHubConsole: React.FC<SurveillanceHubConsoleProps> = ({
           </button>
         </div>
 
+      </div>
+
+      {/* ── Persistent Demonstration Notice Banner ──────────────────── */}
+      <div className="bg-amber-500/10 border border-amber-500/25 rounded-2xl p-3 sm:p-3.5 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-2.5 text-xs text-amber-900 font-medium">
+        <div className="flex items-center gap-2.5">
+          <span className="w-2 h-2 rounded-full bg-amber-500 shrink-0 shadow-[0_0_8px_rgba(245,158,11,0.6)]" />
+          <span>
+            <strong>Demonstration environment.</strong> Data displayed are synthetic/illustrative and do not represent live patient or official national programme data.
+          </span>
+        </div>
+        <span className="font-mono text-[10px] uppercase font-bold text-amber-800 bg-amber-100/80 px-2.5 py-0.5 rounded-full border border-amber-200 shrink-0">
+          EDCTP3 Demonstrator
+        </span>
       </div>
 
       {/* ── 5 Pilot States Minimalist Capsule Filter ──────────────────── */}
@@ -715,9 +727,10 @@ export const SurveillanceHubConsole: React.FC<SurveillanceHubConsoleProps> = ({
 
               </div>
 
-              <div className="flex items-center gap-1.5 text-[11px] text-gray-400 font-medium">
-                <Info className="w-3.5 h-3.5 shrink-0 text-gray-400" />
-                <span>Zero-PII anonymized registry from 312 sentinel health facilities.</span>
+              <div className="pt-2.5 border-t border-black/5 flex flex-wrap items-center justify-between gap-1.5 text-[10px] font-mono text-gray-500">
+                <span><strong>Source:</strong> NTBLCP / RedAid Sentinel Registry</span>
+                <span><strong>Period:</strong> 2024–2025 Baseline</span>
+                <span className="text-emerald-700 bg-emerald-50 px-2 py-0.5 rounded-full border border-emerald-200 font-bold">MEAL Validated</span>
               </div>
             </div>
 
@@ -768,6 +781,12 @@ export const SurveillanceHubConsole: React.FC<SurveillanceHubConsoleProps> = ({
                     <span className="font-mono text-gray-700">Turnaround: 4.8d</span>
                   </div>
                 </div>
+              </div>
+
+              <div className="pt-2 border-t border-black/5 flex flex-wrap items-center justify-between gap-1.5 text-[10px] font-mono text-gray-500">
+                <span><strong>Source:</strong> UNTH &amp; Mile 4 LIMS</span>
+                <span><strong>Period:</strong> Q1 2025</span>
+                <span className="text-purple-700 bg-purple-50 px-2 py-0.5 rounded-full border border-purple-200 font-bold">IS2404 qPCR Log</span>
               </div>
             </div>
 

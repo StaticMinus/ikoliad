@@ -39,7 +39,7 @@ export const Footer: React.FC<FooterProps> = ({ onNavigate }) => {
           {/* Col 1: Bio & Mission Statement (Span 4) */}
           <div className="md:col-span-4 space-y-3">
             <h3 className="font-display font-bold text-xl sm:text-2xl text-[#1D1D1F] tracking-tight leading-snug">
-              IKOLI AI is Nigeria's sovereign Skin NTD clinical intelligence &amp; autonomous diagnostic system.
+              IKOLI-AI is Nigeria's sovereign Skin NTD governance, surveillance &amp; health information demonstrator (v0.1).
             </h3>
             <p className="text-xs sm:text-sm text-gray-500 leading-relaxed font-sans font-medium">
               Developed by the IKOLI Consortium (DAHW, RedAid Nigeria, Digital Dreams, FMOH/NTBLCP, VRC-UNN, IDEA) to eliminate Leprosy and Buruli Ulcer disability by 2030.
@@ -202,7 +202,7 @@ export const Footer: React.FC<FooterProps> = ({ onNavigate }) => {
         <div className="flex flex-col sm:flex-row items-center justify-between gap-4 pt-6 border-t border-black/5 text-[11px] sm:text-xs text-gray-500 font-medium">
           {/* Left Copyright & Privacy */}
           <div className="flex flex-wrap items-center gap-3">
-            <span>Ikoli AI &copy; 2026</span>
+            <span>IKOLI-AI Demonstrator v0.1 &copy; 2026</span>
             <span>&bull;</span>
             <button
               onClick={() => onNavigate?.('protocols')}

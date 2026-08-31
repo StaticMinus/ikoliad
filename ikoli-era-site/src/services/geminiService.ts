@@ -79,7 +79,7 @@ export interface GeminiResponse {
 export function getSystemInstruction(persona: ResponsePersona = 'visitor'): string {
   const personaInstructions: Record<ResponsePersona, string> = {
     visitor: `
-TONE & AUDIENCE: Plain English / Public & Visitor Mode (DEFAULT).
+TONE & AUDIENCE: Plain English / Public Mode (DEFAULT).
 - Speak in warm, empathetic, simple everyday English that anyone (patients, families, students, community members) can easily understand.
 - AVOID heavy medical jargon, complicated drug tables, or clinical abbreviations.
 - Focus on destigmatization, reassuring facts, how easy it is to cure, and that all medicines are 100% FREE from the government and RedAid Nigeria.
@@ -104,13 +104,22 @@ TONE & AUDIENCE: Data Analyst & Surveillance Mode.
   };
 
   return `
-You are IKOLI AI, the national skin NTD intelligence assistant developed by RedAid Nigeria (RAN), DAHW Germany, Digital Dreams, NTBLCP / Federal Ministry of Health, VRC-UNN, and IDEA Nigeria.
+You are "Ask Ikoli – Conversational Health & Programme Information Assistant", developed under the IKOLI-AI Demonstrator (v0.1) by RedAid Nigeria (RAN), DAHW Germany, Digital Dreams, NTBLCP / Federal Ministry of Health, VRC-UNN, and IDEA Nigeria.
 
 ${personaInstructions[persona]}
 
+CRITICAL SAFETY & RESPONSIBLE AI GUARDRAILS (EDCTP3 COMPLIANT):
+1. You are an educational, health information, and programme surveillance assistant. You are NOT an autonomous clinical diagnostic tool or prescribing engine.
+2. NEVER diagnose individual patient lesions, NEVER prescribe individual medications, and NEVER decide individual SDR-PEP eligibility.
+3. If a user asks "Do I have leprosy?", "What drug should I take?", "Diagnose this skin lesion", "Am I eligible for SDR-PEP?", "Prescribe medicine", or asks for a diagnostic verdict:
+   - Provide a clear medical safety advisory stating you cannot diagnose or prescribe.
+   - Explain approved general health information and symptoms.
+   - Direct the user to their nearest designated Primary Health Centre or specialist referral hospital (Oji River Specialist Hospital in Enugu, Mile 4 Hospital in Abakaliki, Uzuakoli Leprosy Hospital in Abia, Awka South PHC in Anambra, Oguta General Hospital in Imo) for in-person evaluation by a qualified health officer.
+   - Note that all consultation, diagnostics, and WHO Multi-Drug Therapy (MDT) in Nigeria are 100% FREE under NTBLCP protocols.
+
 STRICT ANSWERING RULES:
 1. ALWAYS answer the specific question immediately in the FIRST sentence.
-2. NEVER output generic headings like "Differential Clinical Synthesis", "Clinical Reasoning Synthesis for...", or long disclaimers.
+2. NEVER output generic headings like "Differential Clinical Synthesis", "Clinical Reasoning Synthesis for...", or long automated disclaimers.
 3. Keep all responses clear, helpful, and directly tailored to the selected mode.
 
 OFFICIAL DATASET (SOUTH-EAST 5 STATES • 312 FACILITIES):
@@ -449,7 +458,7 @@ function simulateSmartClinicalResponse(
   if (['hi', 'hello', 'hey', 'good morning', 'good afternoon', 'good evening', 'start'].includes(lower)) {
     if (persona === 'visitor') {
       return {
-        text: 'Hello! I am **IKOLI AI**. I am here to help you understand skin health, leprosy, and Buruli ulcer in simple, everyday language. What would you like to know?',
+        text: 'Hello! I am **Ask Ikoli – Conversational Health & Programme Information Assistant**. I am here to help you understand skin health, leprosy, Buruli ulcer, and healthcare service information in simple, everyday language. What would you like to know?',
         category: 'IKOLI AI',
         source: 'clinical-knowledge-base',
         modelUsed: 'Plain English Synthesizer',
@@ -457,7 +466,7 @@ function simulateSmartClinicalResponse(
       };
     } else if (persona === 'executive') {
       return {
-        text: 'Welcome. I am **IKOLI AI Executive Intelligence**. I provide strategic policy synthesis, donor briefing metrics, and 2026 elimination trajectory analysis across Nigeria.',
+        text: 'Welcome. I am **Ask Ikoli – Conversational Health & Programme Information Assistant**. I provide strategic policy synthesis, donor briefing metrics, and 2026 elimination trajectory analysis across Nigeria.',
         category: 'IKOLI AI',
         source: 'clinical-knowledge-base',
         modelUsed: 'Executive Synthesizer',
@@ -465,25 +474,77 @@ function simulateSmartClinicalResponse(
       };
     } else {
       return {
-        text: 'Hello! I am **IKOLI AI**, your clinical intelligence assistant developed by RedAid Nigeria. Ask me anything about skin lesion diagnosis, Grade-2 disability, MDT treatment, PCR lab testing, or state surveillance figures.',
+        text: 'Hello! I am **Ask Ikoli – Conversational Health & Programme Information Assistant**, developed by RedAid Nigeria. Ask me anything about approved health education, Grade-2 disability indicators, WHO guidelines, or sentinel surveillance figures.',
         category: 'IKOLI AI',
         source: 'clinical-knowledge-base',
-        modelUsed: 'Clinical Grounding Synthesizer',
+        modelUsed: 'Programme Synthesizer',
         followUpPrompt: 'What is Grade-2 Disability (G2D)?',
       };
     }
   }
 
-  // 2. Multimodal attachment analysis
+  // 1b. RESPONSIBLE AI SAFETY GUARDRAILS (REFUSAL OF DIAGNOSTIC / PRESCRIBING / PERSONAL ELIGIBILITY QUERIES)
+  const isUnsafeDiagnosticQuery =
+    lower.includes('do i have leprosy') ||
+    lower.includes('do i have buruli') ||
+    lower.includes('do i have yaws') ||
+    lower.includes('diagnose this') ||
+    lower.includes('diagnose me') ||
+    lower.includes('diagnose my') ||
+    lower.includes('diagnose lesion') ||
+    lower.includes('can you diagnose') ||
+    lower.includes('tell me if i have') ||
+    lower.includes('am i sick with');
+
+  const isUnsafePrescriptionQuery =
+    lower.includes('what drug should i take') ||
+    lower.includes('what medicine should i take') ||
+    lower.includes('what drug should i buy') ||
+    lower.includes('prescribe') ||
+    lower.includes('prescribe medicine') ||
+    lower.includes('prescribe for me') ||
+    lower.includes('what medication should i swallow') ||
+    lower.includes('which tablet should i use');
+
+  const isUnsafeEligibilityQuery =
+    lower.includes('am i eligible for sdr') ||
+    lower.includes('am i eligible for pep') ||
+    lower.includes('can i take sdr-pep') ||
+    lower.includes('should i take sdr-pep');
+
+  if (isUnsafeDiagnosticQuery || isUnsafePrescriptionQuery || isUnsafeEligibilityQuery) {
+    const refusalHeader = `⚠️ **Medical Safety & Triage Notice**\n\n**Ask Ikoli is a conversational health and programme information assistant, not a clinical diagnostic or prescribing tool.** I cannot provide an individual medical diagnosis, prescribe drugs, or determine individual patient eligibility for SDR-PEP.`;
+    
+    let specificInfo = '';
+    if (isUnsafeDiagnosticQuery) {
+      specificInfo = `\n\n### 🩺 Approved Health Information on Early Signs:\n- **Leprosy:** A pale or reddish skin patch with **loss of feeling/sensation** (unable to feel a light touch or heat).\n- **Buruli Ulcer:** A firm, painless swelling or nodule beneath the skin, which may ulcerate if untreated.\n- **Yaws:** Raised raspberry-like papules or crusting sores, most common in children.`;
+    } else if (isUnsafePrescriptionQuery) {
+      specificInfo = `\n\n### 💊 Approved Programme Information on Medication:\n- **Never self-medicate or purchase unverified drugs.** Skin NTDs require specific WHO-standard Multi-Drug Therapy (MDT) blister packs or prescribed antibiotic combinations.\n- Under the National Tuberculosis, Leprosy and Buruli Ulcer Control Programme (NTBLCP), **all diagnostic tests and standard treatment packs are provided 100% free of charge.**`;
+    } else if (isUnsafeEligibilityQuery) {
+      specificInfo = `\n\n### 🛡️ Approved Information on SDR-PEP:\n- **Single-Dose Rifampicin Post-Exposure Prophylaxis (SDR-PEP)** is administered exclusively by trained health officers after in-person contact screening of registered leprosy cases.\n- Eligibility must be verified by a clinician to exclude active leprosy, pregnancy, liver disease, or recent rifampicin use.`;
+    }
+
+    const facilityAction = `\n\n### 📍 Recommended Next Step:\nPlease visit your nearest designated **Primary Health Centre** or specialist referral hospital for an in-person examination by a qualified health officer:\n- **Oji River Specialist Leprosy Hospital** (Enugu)\n- **Mile 4 Hospital Reference Center** (Abakaliki, Ebonyi)\n- **Uzuakoli Leprosy Hospital** (Abia)\n- **Awka South Model Comprehensive PHC** (Anambra)\n- **Oguta General Hospital NTD Wing** (Imo)\n\n*All consultations and NTBLCP treatments across Nigeria are 100% free of charge.*`;
+
+    return {
+      text: `${refusalHeader}${specificInfo}${facilityAction}`,
+      category: 'IKOLI AI Safety Guardrail',
+      followUpPrompt: 'What is leprosy?',
+      source: 'clinical-knowledge-base',
+      modelUsed: 'Responsible AI Safety Guardrail',
+    };
+  }
+
+  // 2. Multimodal attachment analysis (Educational reference only, non-diagnostic)
   if (attachment) {
     if (persona === 'visitor') {
-      text = `**Photo Check for: ${attachment.name}**\n\n- **What we see:** A discolored skin patch with possible loss of feeling.\n- **What you should do:**\n  1. Gently touch the center of the patch with a piece of cotton wool to see if you feel it.\n  2. If the patch feels numb or doesn't feel touch, visit the nearest health center.\n  3. **Treatment is 100% free:** All medications are provided without cost by the government and RedAid Nigeria.`;
-      followUp = 'Where can I get free treatment?';
+      text = `**Educational Reference Guide for: ${attachment.name}**\n\n*(Notice: Ask Ikoli does not perform clinical diagnosis from photographs.)*\n\n- **Educational Observation:** Skin discolourations or hypopigmented patches are common general presentations of various dermatological conditions.\n- **Recommended In-Person Check:**\n  1. A certified health worker must perform a sensory touch test using a light cotton wisp on the patch.\n  2. If there is loss of feeling or numbness, the person will be evaluated for free NTBLCP treatment.\n- **All Care is 100% Free:** Free consultations and WHO medicines are provided by the government and RedAid Nigeria at local health centres.`;
+      followUp = 'Where is the nearest referral hospital?';
     } else {
-      text = `**Lesion Assessment for: ${attachment.name}**\n\n- **Clinical Presentation:** Well-demarcated skin patch with suspected loss of sensation.\n- **Primary Diagnosis:** Paucibacillary (PB) Leprosy vs Early Buruli Ulcer (Category I nodule).\n- **Immediate Steps:**\n  1. Perform a touch sensitivity test with a cotton wisp on the center of the patch.\n  2. Palpate the ulnar and peroneal nerves for tenderness.\n  3. If sensory loss is present, start the **WHO 6-month PB blister pack** (Dapsone + Rifampicin).\n  4. For open ulcers, send a swab for IS2404 qPCR testing at UNTH or Mile 4 Hospital.`;
-      followUp = 'What is the dosage for the 6-month PB blister pack?';
+      text = `**Demonstration Reference Review for: ${attachment.name}**\n\n*(Notice: Demonstrator environment. Clinical decision support requires in-person practitioner evaluation.)*\n\n- **Protocol Checklist for Frontline Health Officers:**\n  1. **Sensory Assessment:** Test tactile sensation (cotton wisp) and thermal sensitivity across lesion boundaries.\n  2. **Nerve Palpation:** Palpate bilateral ulnar, greater auricular, and common peroneal nerves for enlargement or tenderness.\n  3. **Referral Pathway:** Refer suspected Buruli ulcers to UNTH or Mile 4 Hospital for IS2404 qPCR molecular confirmation.\n  4. **Reporting:** Log anonymized records in sentinel registry under NTBLCP zero-PII protocols.`;
+      followUp = 'What is the standard WHO MDT regimen?';
     }
-    return { text, category: 'IKOLI AI', followUpPrompt: followUp, source: 'clinical-knowledge-base', modelUsed: 'Clinical Grounding Synthesizer' };
+    return { text, category: 'IKOLI AI', followUpPrompt: followUp, source: 'clinical-knowledge-base', modelUsed: 'Educational Reference Guide' };
   }
 
   // 3. GRADE 2 DISABILITY (G2D) & DISABILITY GRADING

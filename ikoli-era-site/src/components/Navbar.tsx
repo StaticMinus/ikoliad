@@ -103,7 +103,7 @@ export const Navbar: React.FC<NavbarProps> = ({
     { title: 'Yaws Treponematosis', category: 'Disease', page: 'diseases', desc: 'Primary papilloma & osteoperiostitis rapid serological triage', icon: Shield },
     { title: 'Trachoma (C. trachomatis)', category: 'Disease', page: 'diseases', desc: 'Autonomous upper eyelid eversion follicle identification', icon: Shield },
     { title: 'Cutaneous Leishmaniasis', category: 'Disease', page: 'diseases', desc: 'Volcano ulcer margin morphology & amastigote detection', icon: Shield },
-    { title: 'Ask Ikoli AI (Neural Diagnostics)', category: 'Tool', page: 'ask', desc: 'Multimodal clinical computer vision & WHO staging inference engine', icon: Sparkles },
+    { title: 'Ask Ikoli – Health & Programme Assistant', category: 'Assistant', page: 'ask', desc: 'Conversational approved health information, programme indicators & service navigation', icon: Sparkles },
     { title: 'Sentinel Surveillance Console', category: 'Console', page: 'dashboard', desc: 'State-by-state disease registry across 36 Nigerian states & FCT', icon: LayoutDashboard },
     { title: 'WHO Protocols & Governance', category: 'Governance', page: 'protocols', desc: 'WHO NTD 2030 Roadmap metrics, clinical safety charter', icon: FileText },
     { title: 'REST API & TypeScript/Python SDKs', category: 'Developers', page: 'api', desc: 'Autonomous inference endpoints, batch surveillance ingestion', icon: Code2 },

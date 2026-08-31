@@ -65,9 +65,9 @@ export const WHODashboardHeader: React.FC<WHODashboardHeaderProps> = ({
       {/* ── Headline, Description & Primary CTA Row ─────────── */}
       <div className="flex flex-col lg:flex-row lg:items-end justify-between gap-6">
         <div className="space-y-2.5 max-w-3xl">
-          <div className="flex items-center gap-2">
-            <span className="text-[10px] font-mono font-bold text-[#0082FF] uppercase tracking-widest bg-blue-50 px-2.5 py-0.5 rounded-full border border-blue-100">
-              NATIONAL HEALTH SURVEILLANCE MATRIX
+          <div className="flex flex-wrap items-center gap-2">
+            <span className="text-[10px] font-mono font-bold text-[#0071E3] uppercase tracking-widest bg-blue-50 px-2.5 py-0.5 rounded-full border border-blue-100">
+              IKOLI-AI Demonstrator v0.1
             </span>
             <span className="text-[10px] font-mono font-bold text-gray-500 bg-slate-100 px-2.5 py-0.5 rounded-full">
               WHO 2030 ROADMAP COMPLIANT
@@ -77,6 +77,12 @@ export const WHODashboardHeader: React.FC<WHODashboardHeaderProps> = ({
           <h1 className="font-display font-black text-3xl sm:text-4xl lg:text-5xl text-[#0A0C10] tracking-tight leading-tight">
             Skin NTDs Epidemiological Surveillance Dashboard
           </h1>
+
+          {/* Demonstration Notice */}
+          <div className="bg-amber-500/10 border border-amber-500/25 rounded-xl p-2.5 text-xs text-amber-900 font-medium flex items-center gap-2">
+            <span className="w-2 h-2 rounded-full bg-amber-500 shrink-0" />
+            <span><strong>Demonstration environment.</strong> Data displayed are synthetic/illustrative and do not represent live patient or official national programme data.</span>
+          </div>
 
           <p className="text-sm sm:text-base text-gray-600 font-sans leading-relaxed pt-1">
             Authoritative public health intelligence, active case detection metrics, molecular PCR verification, and Grade-2 disability reduction trajectories across Nigeria's sentinel healthcare facilities.
