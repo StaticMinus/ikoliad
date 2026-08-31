@@ -4,6 +4,7 @@ import { Footer } from '../components/Footer';
 import {
   queryGeminiClinicalAI,
   type GeminiAttachment,
+  type ResponsePersona,
 } from '../services/geminiService';
 import { ClinicalMarkdown } from '../components/ui/ClinicalMarkdown';
 import { MagneticButton } from '../components/ui/MagneticButton';
@@ -42,11 +43,59 @@ interface ChatMessage {
 
 export const AskIkoliPage: React.FC<AskIkoliPageProps> = ({ onNavigate }) => {
   const [theme, setTheme] = useState<'dark' | 'light'>('light');
-  // Clean fresh start on every entry
+  // Audience Response Persona (Default: Visitor / Plain English)
+  const [persona, setPersona] = useState<ResponsePersona>('visitor');
   const [messages, setMessages] = useState<ChatMessage[]>([]);
   const [inputQuery, setInputQuery] = useState('');
   const [isTyping, setIsTyping] = useState(false);
   const [copiedId, setCopiedId] = useState<string | null>(null);
+
+  const getPlaceholderText = () => {
+    switch (persona) {
+      case 'visitor':
+        return "Ask any question in plain English (e.g. 'What is leprosy?', 'Is it curable and free?', 'What is Grade-2 disability?')...";
+      case 'executive':
+        return "Ask about national elimination targets, funding impact, WHO 2030 roadmap, or LGA disease hot-spots...";
+      case 'clinical':
+        return "Describe patient symptoms, lesion count, sensory loss, or ask about WHO MDT blister pack dosages...";
+      case 'analyst':
+        return "Query statistical indicators, state-by-state 2024 vs 2025 deltas, or PCR confirmation splits...";
+    }
+  };
+
+  const getSuggestedQueries = () => {
+    switch (persona) {
+      case 'visitor':
+        return [
+          { label: 'What is leprosy?', query: 'What is leprosy?' },
+          { label: 'What is Grade-2 disability?', query: 'What is Grade-2 disability?' },
+          { label: 'Is treatment completely free?', query: 'Is leprosy treatment completely free in Nigeria?' },
+          { label: 'How many cases in Enugu?', query: 'How many cases do we have in Enugu?' },
+          { label: 'What is Buruli ulcer?', query: 'What is Buruli ulcer?' },
+        ];
+      case 'executive':
+        return [
+          { label: '2026 National Targets', query: 'What are the 2026 national elimination targets?' },
+          { label: 'G2D Disability Reduction', query: 'How much did Grade-2 disability decrease in 2025?' },
+          { label: 'RedAid Strategic Roadmap', query: 'What is RedAid Nigeria strategic roadmap?' },
+          { label: 'State-by-State Overview', query: 'Give an executive summary of all 5 South-East states' },
+        ];
+      case 'clinical':
+        return [
+          { label: 'PB vs MB Blister Packs', query: 'What is the difference between PB and MB leprosy treatment?' },
+          { label: 'Sensory Testing Protocol', query: 'How do you perform sensory and motor nerve testing?' },
+          { label: 'IS2404 qPCR Buruli Protocol', query: 'What is the IS2404 qPCR procedure for Buruli ulcer?' },
+          { label: 'Single-Dose Rifampicin (SDR-PEP)', query: 'What is the dosage for SDR-PEP preventive treatment?' },
+        ];
+      case 'analyst':
+        return [
+          { label: '5-State 2024 vs 2025 Comparison', query: 'Compare 2024 vs 2025 cases across all 5 states' },
+          { label: 'Child Leprosy Rate in Ebonyi', query: 'What is the child leprosy rate in Ebonyi?' },
+          { label: 'PCR Laboratory Confirmation Splits', query: 'Show laboratory PCR confirmation breakdown' },
+          { label: 'Grade-2 Disability Percentages', query: 'What are the Grade-2 disability percentages by state?' },
+        ];
+    }
+  };
 
   // Attachments state
   const [attachedFile, setAttachedFile] = useState<GeminiAttachment | null>(null);
@@ -177,11 +226,12 @@ export const AskIkoliPage: React.FC<AskIkoliPageProps> = ({ onNavigate }) => {
 
     try {
       const result = await queryGeminiClinicalAI(
-        query || 'Analyze this attached clinical skin NTD file/image according to NTBLCP guidelines.',
+        query || 'Analyze this attached skin NTD file/image according to national guidelines.',
         currentAttachment,
         undefined,
         undefined,
-        historyPayload
+        historyPayload,
+        persona
       );
 
       setIsTyping(false);
@@ -321,6 +371,54 @@ export const AskIkoliPage: React.FC<AskIkoliPageProps> = ({ onNavigate }) => {
             }`}>
               Nigeria's frontline clinical intelligence engine for Leprosy, Buruli Ulcer & Yaws differential staging.
             </p>
+          </div>
+
+          {/* Apple-style Audience Persona Segmented Capsule Switcher */}
+          <div className="pt-1 flex flex-wrap items-center justify-center p-1 rounded-full border backdrop-blur-xl bg-black/5 dark:bg-white/5 border-black/10 dark:border-white/10 gap-1 text-xs">
+            <button
+              onClick={() => setPersona('visitor')}
+              className={`px-3.5 py-1.5 rounded-full transition-all flex items-center gap-1.5 font-medium cursor-pointer ${
+                persona === 'visitor'
+                  ? 'bg-white dark:bg-white/20 text-[#1D1D1F] dark:text-white shadow-xs font-semibold'
+                  : 'text-gray-500 hover:text-gray-900 dark:hover:text-white'
+              }`}
+            >
+              <span>💬</span>
+              <span>Plain English / Visitor</span>
+            </button>
+            <button
+              onClick={() => setPersona('executive')}
+              className={`px-3.5 py-1.5 rounded-full transition-all flex items-center gap-1.5 font-medium cursor-pointer ${
+                persona === 'executive'
+                  ? 'bg-white dark:bg-white/20 text-[#1D1D1F] dark:text-white shadow-xs font-semibold'
+                  : 'text-gray-500 hover:text-gray-900 dark:hover:text-white'
+              }`}
+            >
+              <span>📊</span>
+              <span>Executive & Donor</span>
+            </button>
+            <button
+              onClick={() => setPersona('clinical')}
+              className={`px-3.5 py-1.5 rounded-full transition-all flex items-center gap-1.5 font-medium cursor-pointer ${
+                persona === 'clinical'
+                  ? 'bg-white dark:bg-white/20 text-[#1D1D1F] dark:text-white shadow-xs font-semibold'
+                  : 'text-gray-500 hover:text-gray-900 dark:hover:text-white'
+              }`}
+            >
+              <span>🩺</span>
+              <span>Clinical Specialist</span>
+            </button>
+            <button
+              onClick={() => setPersona('analyst')}
+              className={`px-3.5 py-1.5 rounded-full transition-all flex items-center gap-1.5 font-medium cursor-pointer ${
+                persona === 'analyst'
+                  ? 'bg-white dark:bg-white/20 text-[#1D1D1F] dark:text-white shadow-xs font-semibold'
+                  : 'text-gray-500 hover:text-gray-900 dark:hover:text-white'
+              }`}
+            >
+              <span>📈</span>
+              <span>Data Analyst</span>
+            </button>
           </div>
 
           {/* ══════════════════════════════════════════════════════════════════
@@ -536,7 +634,7 @@ export const AskIkoliPage: React.FC<AskIkoliPageProps> = ({ onNavigate }) => {
                       handleSend(inputQuery);
                     }
                   }}
-                  placeholder="Describe patient symptoms, lesion count, sensory loss, or ask an epidemiological question…"
+                  placeholder={getPlaceholderText()}
                   className={`w-full bg-transparent text-sm sm:text-base outline-none resize-none min-h-[75px] font-sans leading-relaxed ${
                     isDark ? 'text-white placeholder-gray-500' : 'text-[#1D1D1F] placeholder-gray-400'
                   }`}
@@ -598,14 +696,8 @@ export const AskIkoliPage: React.FC<AskIkoliPageProps> = ({ onNavigate }) => {
           {/* Quick Preset Diagnostic Suggestions with Magnetic Buttons */}
           <div className="flex flex-wrap items-center justify-center gap-2 pt-1 text-xs">
             <span className={isDark ? 'text-gray-500' : 'text-gray-400'}>Suggested queries:</span>
-            {[
-              'How many cases were recorded in Enugu last year?',
-              'What is the PCR confirmation rate for Buruli ulcer?',
-              'How many child cases were found in Ebonyi?',
-              'Leprosy PB vs MB MDT pack',
-              'Which state had the highest Buruli burden?',
-            ].map((p, idx) => (
-              <MagneticButton key={idx} onClick={() => handleSend(p)}>
+            {getSuggestedQueries().map((item, idx) => (
+              <MagneticButton key={idx} onClick={() => handleSend(item.query)}>
                 <button
                   className={`px-3 py-1 rounded-full border transition-all cursor-pointer ${
                     isDark
@@ -613,7 +705,7 @@ export const AskIkoliPage: React.FC<AskIkoliPageProps> = ({ onNavigate }) => {
                       : 'bg-white border-black/10 text-gray-700 hover:bg-gray-100 hover:text-black shadow-xs'
                   }`}
                 >
-                  {p}
+                  {item.label}
                 </button>
               </MagneticButton>
             ))}
