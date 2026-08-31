@@ -109,8 +109,6 @@ RESPONSE STYLE:
 - Keep tone respectful, clinically grounded, and empowering.
 `;
 
-const DEFAULT_OPENROUTER_KEY = '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';
-
 // Helper: Retrieve Stored API Keys
 export function getStoredGeminiKey(): string {
   const envKey = (import.meta as unknown as { env: Record<string, string> })?.env?.VITE_GEMINI_API_KEY || '';
@@ -129,8 +127,7 @@ export function getStoredOpenRouterKey(): string {
   if (envKey && envKey.trim() !== '') {
     return envKey.trim();
   }
-  const localKey = (localStorage.getItem('ikoli_openrouter_api_key') || '').trim();
-  return localKey || DEFAULT_OPENROUTER_KEY;
+  return (localStorage.getItem('ikoli_openrouter_api_key') || '').trim();
 }
 
 export function setStoredOpenRouterKey(key: string): void {
@@ -154,6 +151,40 @@ export function setStoredWebSearchEnabled(enabled: boolean): void {
   localStorage.setItem('ikoli_web_search_enabled', String(enabled));
 }
 
+// Secure Serverless Proxy Provider (Protects API Keys from Browser Exposure)
+async function callServerProxy(
+  modelName: string,
+  prompt: string,
+  attachment?: GeminiAttachment | null,
+  enableWebSearch: boolean = true
+): Promise<GeminiResponse | null> {
+  try {
+    const res = await fetch('/api/chat', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        prompt,
+        model: modelName,
+        attachment,
+        webSearch: enableWebSearch
+      })
+    });
+    if (!res.ok) return null;
+    const data = await res.json();
+    if (data && data.content) {
+      return {
+        text: data.content,
+        modelUsed: data.model || modelName,
+        source: 'openrouter-live',
+        latencyMs: 0,
+      };
+    }
+  } catch {
+    return null;
+  }
+  return null;
+}
+
 // Main Query Dispatcher
 export async function queryGeminiClinicalAI(
   prompt: string,
@@ -166,7 +197,18 @@ export async function queryGeminiClinicalAI(
   const openRouterKey = getStoredOpenRouterKey();
   const useWebSearch = enableWebSearch !== undefined ? enableWebSearch : getStoredWebSearchEnabled();
 
-  // 1. If user selected OmniRoute / 9Router Local Gateway
+  // 1. First, attempt secure Serverless backend proxy (Zero client-side secret exposure)
+  try {
+    const serverProxyRes = await callServerProxy(modelToUse, prompt, attachment, useWebSearch);
+    if (serverProxyRes) {
+      serverProxyRes.latencyMs = Date.now() - startTime;
+      return serverProxyRes;
+    }
+  } catch {
+    // Continue to direct / local fallback
+  }
+
+  // 2. If user selected OmniRoute / 9Router Local Gateway
   if (modelToUse.includes('omniroute')) {
     try {
       const omniRes = await callOmniRoute(prompt, attachment);
@@ -179,28 +221,30 @@ export async function queryGeminiClinicalAI(
     }
   }
 
-  // 2. Query OpenRouter with the validated active model
-  const modelsToTry = [
-    modelToUse,
-    'openai/gpt-4o-mini',
-    'deepseek/deepseek-chat',
-    'meta-llama/llama-3.3-70b-instruct',
-    'deepseek/deepseek-r1',
-  ];
+  // 3. Query OpenRouter directly IF user provided a custom local key in settings
+  if (openRouterKey && openRouterKey.trim() !== '') {
+    const modelsToTry = [
+      modelToUse,
+      'openai/gpt-4o-mini',
+      'deepseek/deepseek-chat',
+      'meta-llama/llama-3.3-70b-instruct',
+      'deepseek/deepseek-r1',
+    ];
 
-  for (const model of modelsToTry) {
-    try {
-      const openRouterRes = await callOpenRouter(openRouterKey, model, prompt, attachment, useWebSearch);
-      if (openRouterRes) {
-        openRouterRes.latencyMs = Date.now() - startTime;
-        return openRouterRes;
+    for (const model of modelsToTry) {
+      try {
+        const openRouterRes = await callOpenRouter(openRouterKey, model, prompt, attachment, useWebSearch);
+        if (openRouterRes) {
+          openRouterRes.latencyMs = Date.now() - startTime;
+          return openRouterRes;
+        }
+      } catch (err) {
+        console.warn(`OpenRouter model ${model} failed, trying next:`, err);
       }
-    } catch (err) {
-      console.warn(`OpenRouter model ${model} failed, trying next:`, err);
     }
   }
 
-  // 3. Fallback to Local OmniRoute gateway on port 20128
+  // 4. Fallback to Local OmniRoute gateway on port 20128
   try {
     const omniRes = await callOmniRoute(prompt, attachment);
     if (omniRes) {
@@ -211,7 +255,7 @@ export async function queryGeminiClinicalAI(
     // continue
   }
 
-  // 4. Intelligent Local Grounded Clinical Engine (Zero Hallucination offline synthesizer)
+  // 5. Intelligent Local Grounded Clinical Engine (Zero Hallucination offline synthesizer)
   const fallback = simulateSmartClinicalResponse(prompt, attachment);
   fallback.latencyMs = Date.now() - startTime;
   return fallback;

@@ -9,4 +9,8 @@ export default defineConfig({
     strictPort: true,
     host: true,
   },
+  build: {
+    // Anti-Cloning & Security Hardening: Disable all production source maps
+    sourcemap: false,
+  },
 })

@@ -397,7 +397,7 @@ export const Navbar: React.FC<NavbarProps> = ({
               animate={{ opacity: 1 }}
               exit={{ opacity: 0 }}
               onClick={() => setMobileMenuOpen(false)}
-              className="md:hidden fixed inset-0 bg-black/40 backdrop-blur-sm z-40 pointer-events-auto"
+              className="md:hidden fixed inset-0 bg-black/60 backdrop-blur-md z-[99990] pointer-events-auto"
             />
 
             {/* Bottom Sheet Modal */}
@@ -406,7 +406,7 @@ export const Navbar: React.FC<NavbarProps> = ({
               animate={{ y: 0 }}
               exit={{ y: '100%' }}
               transition={{ duration: 0.32, ease: [0.16, 1, 0.3, 1] }}
-              className="md:hidden fixed bottom-0 left-0 right-0 bg-[#F5F5F7] text-[#1D1D1F] rounded-t-[32px] p-5 pt-3 border-t border-black/8 shadow-[0_-20px_60px_rgba(0,0,0,0.15)] z-50 pointer-events-auto pb-9 space-y-3.5 max-h-[85vh] overflow-y-auto"
+              className="md:hidden fixed bottom-0 left-0 right-0 bg-[#F5F5F7] text-[#1D1D1F] rounded-t-[32px] p-5 pt-3 border-t border-black/10 shadow-[0_-24px_80px_rgba(0,0,0,0.4)] z-[99999] pointer-events-auto pb-9 space-y-3.5 max-h-[85vh] overflow-y-auto isolate"
             >
               {/* Drag Pill Handle */}
               <div className="w-10 h-1 bg-black/20 rounded-full mx-auto mb-2" />
@@ -437,7 +437,7 @@ export const Navbar: React.FC<NavbarProps> = ({
                   setMobileMenuOpen(false);
                   setSearchModalOpen(true);
                 }}
-                className="w-full bg-[#F5F5F7] hover:bg-[#EBEBEF] text-gray-600 px-3.5 py-2.5 rounded-2xl text-xs font-semibold flex items-center gap-2.5 border border-black/5 transition-all cursor-pointer shadow-2xs"
+                className="w-full bg-white hover:bg-[#EBEBEF] text-gray-600 px-3.5 py-2.5 rounded-2xl text-xs font-semibold flex items-center gap-2.5 border border-black/5 transition-all cursor-pointer shadow-2xs"
               >
                 <Search className="w-3.5 h-3.5 text-gray-500" />
                 <span>Search platform &amp; diseases...</span>

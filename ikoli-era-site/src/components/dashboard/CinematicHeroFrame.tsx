@@ -220,20 +220,20 @@ export const CinematicHeroFrame: React.FC<CinematicHeroFrameProps> = ({
   return (
     <div
       ref={outerTrackRef}
-      className="relative w-full h-[420vh] bg-transparent"
+      className="relative w-full h-[220vh] sm:h-[320vh] md:h-[420vh] bg-transparent"
     >
       {/* Pinned Viewport Container (GSAP Pin 100vh) */}
       <div
         ref={pinnedContainerRef}
-        className="w-full h-screen flex flex-col justify-between px-3 sm:px-6 md:px-8 pb-4 sm:pb-6 select-none overflow-hidden bg-[#FBFBFD] max-w-[1600px] mx-auto"
+        className="w-full h-screen flex flex-col justify-between px-2.5 sm:px-6 md:px-8 pb-3 sm:pb-6 select-none overflow-hidden bg-[#FBFBFD] max-w-[1600px] mx-auto"
       >
         
-        {/* Top Header Text Section with Clean Dark Typography and Generous Spacing */}
-        <div className="text-center pt-28 sm:pt-32 md:pt-36 lg:pt-40 pb-3 sm:pb-5 space-y-1.5 shrink-0">
-          <h2 className="font-display font-black text-2xl sm:text-4xl md:text-5xl lg:text-6xl tracking-tight uppercase text-[#1D1D1F]">
+        {/* Top Header Text Section with Clean Dark Typography */}
+        <div className="text-center pt-20 sm:pt-32 md:pt-36 lg:pt-40 pb-2 sm:pb-5 space-y-1 sm:space-y-1.5 shrink-0">
+          <h2 className="font-display font-black text-xl sm:text-4xl md:text-5xl lg:text-6xl tracking-tight uppercase text-[#1D1D1F] px-2">
             YOUR HEALTH, OUR MISSION
           </h2>
-          <p className="text-xs sm:text-sm text-gray-500 font-medium">
+          <p className="text-[11px] sm:text-sm text-gray-500 font-medium px-4">
             Eliminating neglected tropical skin diseases across Nigeria with frontline clinical AI
           </p>
         </div>
@@ -241,7 +241,7 @@ export const CinematicHeroFrame: React.FC<CinematicHeroFrameProps> = ({
         {/* Middle Canvas Card Container (Expanded Full-Width Immersion Hero) */}
         <div
           ref={containerRef}
-          className="relative w-full flex-1 my-1 sm:my-2 rounded-2xl sm:rounded-[32px] overflow-hidden shadow-2xl border border-black/10 bg-[#0B0D13] flex items-center justify-center min-h-[360px] sm:min-h-[480px] md:min-h-[560px] max-h-[84vh]"
+          className="relative w-full flex-1 my-1 sm:my-2 rounded-xl sm:rounded-[32px] overflow-hidden shadow-2xl border border-black/10 bg-[#0B0D13] flex items-center justify-center min-h-[300px] sm:min-h-[480px] md:min-h-[560px] max-h-[84vh]"
         >
           {/* HTML5 High-Performance 2D Canvas */}
           <canvas
@@ -261,64 +261,64 @@ export const CinematicHeroFrame: React.FC<CinematicHeroFrameProps> = ({
             </div>
           )}
 
-          {/* ── Dynamic Narrative Overlay 1 (Stage 1: Positioned at Bottom-Left) ── */}
+          {/* ── Dynamic Narrative Overlay 1 (Stage 1: Mobile-anchored at Bottom) ── */}
           <div
-            className={`absolute bottom-6 sm:bottom-8 left-4 sm:left-10 z-20 transition-all duration-500 transform ${
+            className={`absolute bottom-3 sm:bottom-8 left-3 sm:left-10 right-3 sm:right-auto z-20 transition-all duration-500 transform ${
               isStage1
                 ? 'opacity-100 translate-y-0 scale-100'
                 : 'opacity-0 translate-y-3 scale-95 pointer-events-none'
             }`}
           >
-            <div className="max-w-md sm:max-w-lg bg-black/65 backdrop-blur-2xl p-4 sm:p-5 rounded-2xl border border-white/15 space-y-1.5 text-left shadow-2xl">
-              <span className="bg-white/20 text-white text-[10px] font-mono font-bold px-2.5 py-0.5 rounded-full uppercase tracking-wider">
+            <div className="max-w-none sm:max-w-md md:max-w-lg bg-black/80 sm:bg-black/65 backdrop-blur-2xl p-3.5 sm:p-5 rounded-xl sm:rounded-2xl border border-white/15 space-y-1 sm:space-y-1.5 text-left shadow-2xl">
+              <span className="bg-white/20 text-white text-[9px] sm:text-[10px] font-mono font-bold px-2 sm:px-2.5 py-0.5 rounded-full uppercase tracking-wider">
                 Precision Health Surveillance
               </span>
-              <h3 className="font-bold text-base sm:text-xl md:text-2xl text-white tracking-tight leading-snug">
+              <h3 className="font-bold text-sm sm:text-xl md:text-2xl text-white tracking-tight leading-snug">
                 Empowering Nigeria’s frontline health workers with computer vision.
               </h3>
-              <p className="text-xs sm:text-sm text-gray-300 font-normal leading-relaxed">
+              <p className="text-[11px] sm:text-sm text-gray-300 font-normal leading-relaxed">
                 Scroll to explore real-time AI lesion screening and sentinel clinical telemetry.
               </p>
             </div>
           </div>
 
-          {/* ── Dynamic Narrative Overlay 2 (Stage 2: Positioned at Top-Right) ─── */}
+          {/* ── Dynamic Narrative Overlay 2 (Stage 2: Mobile-anchored at Bottom) ─── */}
           <div
-            className={`absolute top-6 sm:top-8 right-4 sm:right-10 z-20 transition-all duration-500 transform ${
+            className={`absolute bottom-3 sm:top-8 left-3 sm:left-auto right-3 sm:right-10 z-20 transition-all duration-500 transform ${
               isStage2
                 ? 'opacity-100 translate-y-0 scale-100'
                 : 'opacity-0 -translate-y-3 scale-95 pointer-events-none'
             }`}
           >
-            <div className="max-w-md bg-black/65 backdrop-blur-2xl p-4 sm:p-5 rounded-2xl border border-white/15 space-y-1.5 text-left shadow-2xl">
-              <span className="bg-[#0071E3] text-white text-[10px] font-mono font-bold px-2.5 py-0.5 rounded-full uppercase tracking-wider">
+            <div className="max-w-none sm:max-w-md bg-black/80 sm:bg-black/65 backdrop-blur-2xl p-3.5 sm:p-5 rounded-xl sm:rounded-2xl border border-white/15 space-y-1 sm:space-y-1.5 text-left shadow-2xl">
+              <span className="bg-[#0071E3] text-white text-[9px] sm:text-[10px] font-mono font-bold px-2 sm:px-2.5 py-0.5 rounded-full uppercase tracking-wider">
                 Zero-PII Volumetric Processing
               </span>
-              <h3 className="font-bold text-base sm:text-xl md:text-2xl text-white tracking-tight leading-snug">
+              <h3 className="font-bold text-sm sm:text-xl md:text-2xl text-white tracking-tight leading-snug">
                 Sub-millimeter margin analysis for Hansen’s & Buruli Ulcers.
               </h3>
-              <p className="text-xs sm:text-sm text-gray-300 font-normal leading-relaxed">
+              <p className="text-[11px] sm:text-sm text-gray-300 font-normal leading-relaxed">
                 Continuous optical validation preserves peripheral nerve integrity before permanent disability occurs.
               </p>
             </div>
           </div>
 
-          {/* ── Dynamic Narrative Overlay 3 (Stage 3: Positioned at Top-Left) ──── */}
+          {/* ── Dynamic Narrative Overlay 3 (Stage 3: Mobile-anchored at Bottom) ──── */}
           <div
-            className={`absolute top-6 sm:top-8 left-4 sm:left-10 z-20 transition-all duration-500 transform ${
+            className={`absolute bottom-3 sm:top-8 left-3 sm:left-10 right-3 sm:right-auto z-20 transition-all duration-500 transform ${
               isStage3
                 ? 'opacity-100 translate-y-0 scale-100'
                 : 'opacity-0 -translate-y-3 scale-95 pointer-events-none'
             }`}
           >
-            <div className="max-w-md sm:max-w-lg bg-black/65 backdrop-blur-2xl p-4 sm:p-5 rounded-2xl border border-white/15 space-y-1.5 text-left shadow-2xl">
-              <span className="bg-emerald-500 text-white text-[10px] font-mono font-bold px-2.5 py-0.5 rounded-full uppercase tracking-wider">
+            <div className="max-w-none sm:max-w-md md:max-w-lg bg-black/80 sm:bg-black/65 backdrop-blur-2xl p-3.5 sm:p-5 rounded-xl sm:rounded-2xl border border-white/15 space-y-1 sm:space-y-1.5 text-left shadow-2xl">
+              <span className="bg-emerald-500 text-white text-[9px] sm:text-[10px] font-mono font-bold px-2 sm:px-2.5 py-0.5 rounded-full uppercase tracking-wider">
                 National Logistics Integration
               </span>
-              <h3 className="font-bold text-base sm:text-xl md:text-2xl text-white tracking-tight leading-snug">
+              <h3 className="font-bold text-sm sm:text-xl md:text-2xl text-white tracking-tight leading-snug">
                 Instant treatment dispatch & WHO MDT blister packs.
               </h3>
-              <p className="text-xs sm:text-sm text-gray-300 font-normal leading-relaxed">
+              <p className="text-[11px] sm:text-sm text-gray-300 font-normal leading-relaxed">
                 Direct automated supply chain alerts to 312+ sentinel facilities across the federation.
               </p>
             </div>
@@ -326,22 +326,22 @@ export const CinematicHeroFrame: React.FC<CinematicHeroFrameProps> = ({
 
           {/* ── Dynamic Narrative Overlay 4 (Stage 4: Positioned at Bottom Action Card) ── */}
           <div
-            className={`absolute inset-x-3 sm:inset-x-8 bottom-5 sm:bottom-6 z-20 bg-black/80 backdrop-blur-3xl p-4 sm:p-5 rounded-2xl border border-white/20 flex items-center justify-between gap-4 transition-all duration-500 transform ${
+            className={`absolute inset-x-2.5 sm:inset-x-8 bottom-3 sm:bottom-6 z-20 bg-black/85 sm:bg-black/80 backdrop-blur-3xl p-3.5 sm:p-5 rounded-xl sm:rounded-2xl border border-white/20 flex items-center justify-between gap-3 sm:gap-4 transition-all duration-500 transform ${
               isStage4
                 ? 'opacity-100 translate-y-0 scale-100'
                 : 'opacity-0 translate-y-3 scale-95 pointer-events-none'
             }`}
           >
-            <div className="space-y-1 max-w-2xl text-left">
+            <div className="space-y-0.5 sm:space-y-1 max-w-2xl text-left">
               <div className="flex items-center gap-2">
-                <span className="bg-white/20 text-white text-[10px] font-mono font-bold px-2.5 py-0.5 rounded-full uppercase tracking-wider">
+                <span className="bg-white/20 text-white text-[9px] sm:text-[10px] font-mono font-bold px-2 sm:px-2.5 py-0.5 rounded-full uppercase tracking-wider">
                   National Health Mission
                 </span>
                 <span className="text-[10px] font-mono text-gray-300 hidden sm:inline">
                   36 States Telemetry
                 </span>
               </div>
-              <h3 className="font-bold text-sm sm:text-base md:text-lg text-white leading-tight">
+              <h3 className="font-bold text-xs sm:text-base md:text-lg text-white leading-tight">
                 Leaders in frontline disease surveillance & AI diagnostics
               </h3>
               <p className="text-xs sm:text-sm text-white/80 leading-relaxed hidden sm:block font-normal">
@@ -351,19 +351,19 @@ export const CinematicHeroFrame: React.FC<CinematicHeroFrameProps> = ({
 
             <MagneticButton onClick={onExplore}>
               <button
-                className="w-10 h-10 sm:w-12 sm:h-12 rounded-full bg-white text-[#1D1D1F] flex items-center justify-center shadow-lg hover:scale-105 active:scale-95 transition-all shrink-0 cursor-pointer group/btn"
+                className="w-9 h-9 sm:w-12 sm:h-12 rounded-full bg-white text-[#1D1D1F] flex items-center justify-center shadow-lg hover:scale-105 active:scale-95 transition-all shrink-0 cursor-pointer group/btn"
                 aria-label="Explore diseases"
               >
-                <ArrowUpRight className="w-5 h-5 stroke-[2.5] group-hover/btn:translate-x-0.5 group-hover/btn:-translate-y-0.5 transition-transform" />
+                <ArrowUpRight className="w-4 h-4 sm:w-5 sm:h-5 stroke-[2.5] group-hover/btn:translate-x-0.5 group-hover/btn:-translate-y-0.5 transition-transform" />
               </button>
             </MagneticButton>
           </div>
 
           {/* Subtle Bottom Scroll Cue Indicator */}
           {isStage1 && (
-            <div className="absolute bottom-2.5 left-1/2 -translate-x-1/2 z-20 flex items-center gap-1.5 text-[10px] font-mono text-white/60 animate-bounce pointer-events-none">
+            <div className="absolute bottom-2 sm:bottom-2.5 left-1/2 -translate-x-1/2 z-20 flex items-center gap-1.5 text-[9px] sm:text-[10px] font-mono text-white/60 animate-bounce pointer-events-none">
               <span>Scroll to navigate</span>
-              <ChevronDown className="w-3.5 h-3.5" />
+              <ChevronDown className="w-3 h-3 sm:w-3.5 sm:h-3.5" />
             </div>
           )}
         </div>

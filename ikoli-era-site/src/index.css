@@ -61,6 +61,21 @@ body {
   -moz-osx-font-smoothing: grayscale;
 }
 
+/* ── Asset & Media Protection Speedbumps ────────────────── */
+img, video, canvas {
+  -webkit-user-drag: none;
+  -khtml-user-drag: none;
+  -moz-user-drag: none;
+  -o-user-drag: none;
+}
+
+.no-select {
+  -webkit-user-select: none;
+  -moz-user-select: none;
+  -ms-user-select: none;
+  user-select: none;
+}
+
 /* ── 3D Perspective & Spatial Containers ────────────────── */
 .perspective-1000 {
   perspective: 1000px;

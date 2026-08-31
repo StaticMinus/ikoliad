@@ -1,0 +1,41 @@
+# Block AI Crawlers and Scraper Bots from scraping or cloning site content
+User-agent: GPTBot
+Disallow: /
+
+User-agent: ChatGPT-User
+Disallow: /
+
+User-agent: CCBot
+Disallow: /
+
+User-agent: anthropic-ai
+Disallow: /
+
+User-agent: Claude-Web
+Disallow: /
+
+User-agent: Bytespider
+Disallow: /
+
+User-agent: Diffbot
+Disallow: /
+
+User-agent: FacebookBot
+Disallow: /
+
+User-agent: Google-Extended
+Disallow: /
+
+User-agent: PerplexityBot
+Disallow: /
+
+User-agent: Scrapy
+Disallow: /
+
+User-agent: Amazonbot
+Disallow: /
+
+# Allow standard search engines (Google, Bing)
+User-agent: *
+Allow: /
+Disallow: /api/
