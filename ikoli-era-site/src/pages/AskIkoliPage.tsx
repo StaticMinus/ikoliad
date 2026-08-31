@@ -10,7 +10,6 @@ import { MagneticButton } from '../components/ui/MagneticButton';
 import { GlowingOrb } from '../components/cortex/GlowingOrb';
 import { FeatureActionCards } from '../components/cortex/FeatureActionCards';
 import { CortexSidebar, type ChatSession } from '../components/cortex/CortexSidebar';
-import { ProvenanceBadge } from '../components/cortex/ProvenanceBadge';
 import { LiveVoiceCallModal } from '../components/cortex/LiveVoiceCallModal';
 import {
   Paperclip,
@@ -616,7 +615,7 @@ export const AskIkoliPage: React.FC<AskIkoliPageProps> = ({ onNavigate }) => {
         )}
 
         {/* ── Main Chat / Empty State Container ─────────────────────────── */}
-        <div className="flex-1 overflow-y-auto px-4 sm:px-8 py-4 sm:py-6 space-y-6 flex flex-col justify-start">
+        <div className="flex-1 overflow-y-auto overflow-x-hidden no-scrollbar px-4 sm:px-8 py-4 sm:py-6 space-y-6 flex flex-col justify-start">
           
           {/* ── A. EMPTY STATE ───────────────────────────────────────────── */}
           {messages.length === 0 && (
@@ -836,7 +835,6 @@ export const AskIkoliPage: React.FC<AskIkoliPageProps> = ({ onNavigate }) => {
             <div className="max-w-3xl w-full mx-auto space-y-6 pb-4">
               {messages.map((msg, idx) => {
                 if (msg.sender === 'ai' && !msg.text) return null;
-                const userQuery = idx > 0 ? messages[idx - 1]?.text : '';
                 return (
                   <div
                     key={msg.id}
@@ -886,17 +884,6 @@ export const AskIkoliPage: React.FC<AskIkoliPageProps> = ({ onNavigate }) => {
                       {/* Typewriter pulse cursor when actively streaming */}
                       {isStreaming && idx === messages.length - 1 && msg.sender === 'ai' && (
                         <span className="inline-block w-2 h-4 bg-[#00D2FF] ml-1 animate-pulse align-middle" />
-                      )}
-
-                      {/* Cryptographic Provenance Badge for AI Responses */}
-                      {msg.sender === 'ai' && msg.text && (
-                        <ProvenanceBadge
-                          query={userQuery}
-                          responseText={msg.text}
-                          timestamp={msg.timestamp}
-                          source={msg.source}
-                          isDark={isDark}
-                        />
                       )}
 
                       {/* AI Response Tools */}

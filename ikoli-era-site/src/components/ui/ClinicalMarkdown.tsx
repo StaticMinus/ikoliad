@@ -296,7 +296,7 @@ export const ClinicalMarkdown: React.FC<ClinicalMarkdownProps> = ({
 
         if (block.type === 'table') {
           return (
-            <div key={idx} className="my-3 overflow-x-auto rounded-2xl border border-white/10 dark:border-white/10 shadow-xs">
+            <div key={idx} className="my-3 overflow-x-auto no-scrollbar rounded-2xl border border-white/10 dark:border-white/10 shadow-xs">
               <table className="w-full text-left text-xs border-collapse">
                 <thead>
                   <tr className={isDark ? 'bg-white/5 text-white' : 'bg-black/5 text-[#1D1D1F]'}>

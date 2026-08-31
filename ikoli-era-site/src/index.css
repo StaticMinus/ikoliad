@@ -154,14 +154,26 @@ img, video, canvas {
   border-bottom-right-radius: 50% 8vh;
 }
 
-/* Custom Scrollbar */
+/* Custom Apple-Style Minimal Overlay Scrollbar */
 ::-webkit-scrollbar {
-  width: 6px;
+  width: 5px;
+  height: 5px;
 }
 ::-webkit-scrollbar-track {
-  background: #F4F8FC;
+  background: transparent;
 }
 ::-webkit-scrollbar-thumb {
-  background: #0071E3;
-  border-radius: 3px;
+  background: rgba(120, 120, 128, 0.2);
+  border-radius: 9999px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: rgba(120, 120, 128, 0.4);
+}
+
+.no-scrollbar::-webkit-scrollbar {
+  display: none;
+}
+.no-scrollbar {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
 }
