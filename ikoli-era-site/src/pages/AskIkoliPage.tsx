@@ -167,13 +167,21 @@ export const AskIkoliPage: React.FC<AskIkoliPageProps> = ({ onNavigate }) => {
     setMessages((prev) => [...prev, userMsg]);
     setInputQuery('');
     setAttachedFile(null);
+    const historyPayload = messages.map((m) => ({
+      role: m.sender === 'user' ? ('user' as const) : ('assistant' as const),
+      content: m.text,
+    }));
+
     if (fileInputRef.current) fileInputRef.current.value = '';
     setIsTyping(true);
 
     try {
       const result = await queryGeminiClinicalAI(
         query || 'Analyze this attached clinical skin NTD file/image according to NTBLCP guidelines.',
-        currentAttachment
+        currentAttachment,
+        undefined,
+        undefined,
+        historyPayload
       );
 
       setIsTyping(false);

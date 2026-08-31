@@ -1,4 +1,4 @@
-import React, { useState, useRef } from 'react';
+import React, { useState, useRef, useEffect } from 'react';
 import { Navbar } from '../components/Navbar';
 import { Footer } from '../components/Footer';
 import {
@@ -21,100 +21,145 @@ export const AboutPage: React.FC<AboutPageProps> = ({ onNavigate }) => {
   const audioCtxRef = useRef<AudioContext | null>(null);
   const gainNodeRef = useRef<GainNode | null>(null);
   const timerRef = useRef<number | null>(null);
+  const activeOscillatorsRef = useRef<OscillatorNode[]>([]);
+
+  // Stop all audio immediately and safely
+  const stopAllAudio = () => {
+    if (timerRef.current) {
+      clearInterval(timerRef.current);
+      timerRef.current = null;
+    }
+
+    // Stop all active oscillators immediately
+    activeOscillatorsRef.current.forEach((osc) => {
+      try {
+        osc.stop();
+        osc.disconnect();
+      } catch {
+        // already stopped
+      }
+    });
+    activeOscillatorsRef.current = [];
+
+    if (gainNodeRef.current && audioCtxRef.current) {
+      try {
+        gainNodeRef.current.gain.cancelScheduledValues(0);
+        gainNodeRef.current.gain.setValueAtTime(0, audioCtxRef.current.currentTime);
+      } catch {
+        // ignore
+      }
+    }
+
+    if (audioCtxRef.current) {
+      try {
+        audioCtxRef.current.close();
+      } catch {
+        // ignore
+      }
+      audioCtxRef.current = null;
+    }
+
+    setIsPlayingHymn(false);
+  };
+
+  // Cleanup on unmount
+  useEffect(() => {
+    return () => {
+      stopAllAudio();
+    };
+  }, []);
 
   // ── Rich 4-Voice Choral Synthesizer (Ikoli Harcourt Whyte's "Atula Egwu") ───
   const toggleHymnAudio = async () => {
     if (isPlayingHymn) {
-      if (timerRef.current) clearInterval(timerRef.current);
-      if (gainNodeRef.current && audioCtxRef.current) {
-        gainNodeRef.current.gain.linearRampToValueAtTime(0.0001, audioCtxRef.current.currentTime + 0.6);
-        setTimeout(() => {
-          audioCtxRef.current?.close();
-          audioCtxRef.current = null;
-        }, 700);
+      stopAllAudio();
+      return;
+    }
+
+    try {
+      stopAllAudio(); // Ensure any previous instance is clean
+
+      const AudioCtx = window.AudioContext || (window as unknown as { webkitAudioContext: typeof AudioContext }).webkitAudioContext;
+      const ctx = new AudioCtx();
+      audioCtxRef.current = ctx;
+
+      if (ctx.state === 'suspended') {
+        await ctx.resume();
       }
+
+      // Master Gain & Warm Vocal Formant EQ Filter
+      const masterGain = ctx.createGain();
+      masterGain.gain.setValueAtTime(0.0001, ctx.currentTime);
+      masterGain.gain.linearRampToValueAtTime(0.32, ctx.currentTime + 1.0);
+
+      // Vocal Formant Resonator (creates a warm human choral acoustic texture)
+      const formantFilter = ctx.createBiquadFilter();
+      formantFilter.type = 'peaking';
+      formantFilter.frequency.value = 850; // Warm chest vowel formant
+      formantFilter.Q.value = 1.8;
+      formantFilter.gain.value = 4.0;
+
+      const airFilter = ctx.createBiquadFilter();
+      airFilter.type = 'lowpass';
+      airFilter.frequency.value = 4200; // Removes harsh digital highs
+
+      masterGain.connect(formantFilter);
+      formantFilter.connect(airFilter);
+      airFilter.connect(ctx.destination);
+      gainNodeRef.current = masterGain;
+
+      // Traditional Uzuakoli 4-Part Choral Stanzas (Bass, Tenor, Alto, Soprano)
+      const choralStanzas = [
+        [130.81, 261.63, 329.63, 523.25], // C Major Sacred ("A-tu-la")
+        [174.61, 220.00, 349.23, 698.46], // F Major Solace ("E-gwu")
+        [146.83, 293.66, 370.00, 587.33], // D Dominant Light
+        [196.00, 246.94, 392.00, 783.99], // G Major Resolution ("Chukwu di nso")
+      ];
+
+      let stanzaIdx = 0;
+      const playChoralChord = () => {
+        if (!ctx || ctx.state === 'closed') return;
+        const chord = choralStanzas[stanzaIdx % choralStanzas.length];
+        stanzaIdx++;
+
+        chord.forEach((freq, i) => {
+          const osc = ctx.createOscillator();
+          const voiceGain = ctx.createGain();
+
+          // Blend sine and warm triangle for rich acoustic timbre
+          osc.type = i === 0 ? 'sine' : 'triangle';
+          osc.frequency.setValueAtTime(freq, ctx.currentTime);
+
+          // Subtle choral vibrato LFO (4.8 Hz)
+          const lfo = ctx.createOscillator();
+          const lfoGain = ctx.createGain();
+          lfo.frequency.value = 4.8 + i * 0.3;
+          lfoGain.gain.value = 1.2;
+          lfo.connect(osc.frequency);
+          lfo.start();
+          lfo.stop(ctx.currentTime + 4.8);
+
+          // Smooth dynamic swelling envelope
+          voiceGain.gain.setValueAtTime(0.0001, ctx.currentTime);
+          voiceGain.gain.linearRampToValueAtTime(0.07, ctx.currentTime + 1.2);
+          voiceGain.gain.exponentialRampToValueAtTime(0.0001, ctx.currentTime + 4.6);
+
+          osc.connect(voiceGain);
+          voiceGain.connect(masterGain);
+
+          activeOscillatorsRef.current.push(osc, lfo);
+
+          osc.start();
+          osc.stop(ctx.currentTime + 4.8);
+        });
+      };
+
+      playChoralChord();
+      timerRef.current = window.setInterval(playChoralChord, 3800);
+      setIsPlayingHymn(true);
+    } catch (err) {
+      console.warn('AudioContext not available', err);
       setIsPlayingHymn(false);
-    } else {
-      try {
-        const AudioCtx = window.AudioContext || (window as unknown as { webkitAudioContext: typeof AudioContext }).webkitAudioContext;
-        const ctx = new AudioCtx();
-        audioCtxRef.current = ctx;
-
-        if (ctx.state === 'suspended') {
-          await ctx.resume();
-        }
-
-        // Master Gain & Warm Vocal Formant EQ Filter
-        const masterGain = ctx.createGain();
-        masterGain.gain.setValueAtTime(0.0001, ctx.currentTime);
-        masterGain.gain.linearRampToValueAtTime(0.32, ctx.currentTime + 1.0);
-
-        // Vocal Formant Resonator (creates a warm human choral acoustic texture)
-        const formantFilter = ctx.createBiquadFilter();
-        formantFilter.type = 'peaking';
-        formantFilter.frequency.value = 850; // Warm chest vowel formant
-        formantFilter.Q.value = 1.8;
-        formantFilter.gain.value = 4.0;
-
-        const airFilter = ctx.createBiquadFilter();
-        airFilter.type = 'lowpass';
-        airFilter.frequency.value = 4200; // Removes harsh digital highs
-
-        masterGain.connect(formantFilter);
-        formantFilter.connect(airFilter);
-        airFilter.connect(ctx.destination);
-        gainNodeRef.current = masterGain;
-
-        // Traditional Uzuakoli 4-Part Choral Stanzas (Bass, Tenor, Alto, Soprano)
-        const choralStanzas = [
-          [130.81, 261.63, 329.63, 523.25], // C Major Sacred ("A-tu-la")
-          [174.61, 220.00, 349.23, 698.46], // F Major Solace ("E-gwu")
-          [146.83, 293.66, 370.00, 587.33], // D Dominant Light
-          [196.00, 246.94, 392.00, 783.99], // G Major Resolution ("Chukwu di nso")
-        ];
-
-        let stanzaIdx = 0;
-        const playChoralChord = () => {
-          if (!ctx || ctx.state === 'closed') return;
-          const chord = choralStanzas[stanzaIdx % choralStanzas.length];
-          stanzaIdx++;
-
-          chord.forEach((freq, i) => {
-            const osc = ctx.createOscillator();
-            const voiceGain = ctx.createGain();
-
-            // Blend sine and warm triangle for rich acoustic timbre
-            osc.type = i === 0 ? 'sine' : 'triangle';
-            osc.frequency.setValueAtTime(freq, ctx.currentTime);
-
-            // Subtle choral vibrato LFO (4.8 Hz)
-            const lfo = ctx.createOscillator();
-            const lfoGain = ctx.createGain();
-            lfo.frequency.value = 4.8 + i * 0.3;
-            lfoGain.gain.value = 1.2;
-            lfo.connect(osc.frequency);
-            lfo.start();
-            lfo.stop(ctx.currentTime + 4.8);
-
-            // Smooth dynamic swelling envelope
-            voiceGain.gain.setValueAtTime(0.0001, ctx.currentTime);
-            voiceGain.gain.linearRampToValueAtTime(0.07, ctx.currentTime + 1.2);
-            voiceGain.gain.exponentialRampToValueAtTime(0.0001, ctx.currentTime + 4.6);
-
-            osc.connect(voiceGain);
-            voiceGain.connect(masterGain);
-
-            osc.start();
-            osc.stop(ctx.currentTime + 4.8);
-          });
-        };
-
-        playChoralChord();
-        timerRef.current = window.setInterval(playChoralChord, 3800);
-        setIsPlayingHymn(true);
-      } catch (err) {
-        console.warn('AudioContext not available', err);
-      }
     }
   };
 
@@ -144,12 +189,12 @@ export const AboutPage: React.FC<AboutPageProps> = ({ onNavigate }) => {
           <img
             src="/media/about_hero_editorial.jpg"
             alt="Ikoli Harcourt Whyte (1905–1977)"
-            className="w-full h-full object-cover object-center filter grayscale contrast-115 brightness-95"
+            className="w-full h-full object-cover object-[center_22%] sm:object-[center_18%] filter grayscale contrast-110 brightness-90"
           />
           {/* Spatial Atmospheric Vignette Overlays for High-Contrast Readability */}
           <div className="absolute inset-0 bg-gradient-to-t from-black via-transparent to-black/60 pointer-events-none" />
           <div className="absolute inset-0 bg-gradient-to-r from-black/85 via-transparent to-black/85 pointer-events-none" />
-          <div className="absolute inset-0 bg-black/25 pointer-events-none" />
+          <div className="absolute inset-0 bg-black/30 pointer-events-none" />
         </div>
 
         {/* 2. Spatial Refractive Seam Lines (Vertical Columns from Blueprint) */}
@@ -553,7 +598,7 @@ export const AboutPage: React.FC<AboutPageProps> = ({ onNavigate }) => {
               <div className="border-r border-b md:border-b-0 border-black/10 group cursor-pointer flex flex-col">
                 <div className="relative aspect-[3/4] overflow-hidden bg-gray-900">
                   <img
-                    src="/media/about_hero_editorial.jpg"
+                    src="/media/about_tall_portrait.jpg"
                     alt="Uzuakoli Sanctuary & Dr. Davey Mentorship"
                     className="w-full h-full object-cover filter grayscale contrast-110 group-hover:scale-104 transition-transform duration-700 ease-out"
                   />

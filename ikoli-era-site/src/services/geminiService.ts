@@ -143,12 +143,13 @@ export function setStoredWebSearchEnabled(enabled: boolean): void {
   localStorage.setItem('ikoli_web_search_enabled', String(enabled));
 }
 
-// Secure Serverless Proxy Provider
+// Secure Serverless Proxy Provider with Multi-Turn Memory
 async function callServerProxy(
   modelName: string,
   prompt: string,
   attachment?: GeminiAttachment | null,
-  enableWebSearch: boolean = true
+  enableWebSearch: boolean = true,
+  conversationHistory?: Array<{ role: 'user' | 'assistant'; content: string }>
 ): Promise<GeminiResponse | null> {
   try {
     const res = await fetch('/api/chat', {
@@ -159,6 +160,7 @@ async function callServerProxy(
         model: modelName,
         attachment,
         webSearch: enableWebSearch,
+        history: conversationHistory || [],
       }),
     });
     if (!res.ok) return null;
@@ -166,7 +168,7 @@ async function callServerProxy(
     if (data && data.content) {
       return {
         text: data.content,
-        category: 'IKOLI Response',
+        category: 'IKOLI AI',
         modelUsed: data.model || modelName,
         source: 'openrouter-live',
         latencyMs: 0,
@@ -178,21 +180,22 @@ async function callServerProxy(
   return null;
 }
 
-// Main Query Dispatcher
+// Main Query Dispatcher with Multi-Turn Memory
 export async function queryGeminiClinicalAI(
   prompt: string,
   attachment?: GeminiAttachment | null,
   preferredModel?: string,
-  enableWebSearch?: boolean
+  enableWebSearch?: boolean,
+  conversationHistory?: Array<{ role: 'user' | 'assistant'; content: string }>
 ): Promise<GeminiResponse> {
   const startTime = Date.now();
   const modelToUse = preferredModel || getSelectedModel();
   const openRouterKey = getStoredOpenRouterKey();
   const useWebSearch = enableWebSearch !== undefined ? enableWebSearch : getStoredWebSearchEnabled();
 
-  // 1. First, attempt secure Serverless backend proxy
+  // 1. First, attempt secure Serverless backend proxy with conversation memory
   try {
-    const serverProxyRes = await callServerProxy(modelToUse, prompt, attachment, useWebSearch);
+    const serverProxyRes = await callServerProxy(modelToUse, prompt, attachment, useWebSearch, conversationHistory);
     if (serverProxyRes) {
       serverProxyRes.latencyMs = Date.now() - startTime;
       return serverProxyRes;
@@ -226,7 +229,7 @@ export async function queryGeminiClinicalAI(
 
     for (const model of modelsToTry) {
       try {
-        const openRouterRes = await callOpenRouter(openRouterKey, model, prompt, attachment, useWebSearch);
+        const openRouterRes = await callOpenRouter(openRouterKey, model, prompt, attachment, useWebSearch, conversationHistory);
         if (openRouterRes) {
           openRouterRes.latencyMs = Date.now() - startTime;
           return openRouterRes;
@@ -248,21 +251,29 @@ export async function queryGeminiClinicalAI(
     // continue
   }
 
-  // 5. Intelligent Grounded Synthesizer with Exact Data Extraction
-  const fallback = simulateSmartClinicalResponse(prompt, attachment);
+  // 5. Intelligent Grounded Synthesizer with Exact Data Extraction & History Context
+  const fallback = simulateSmartClinicalResponse(prompt, attachment, conversationHistory);
   fallback.latencyMs = Date.now() - startTime;
   return fallback;
 }
 
-// Provider: OpenRouter API Call with Live Web Search
+// Provider: OpenRouter API Call with Live Web Search & Multi-Turn History
 async function callOpenRouter(
   apiKey: string,
   modelName: string,
   prompt: string,
   attachment?: GeminiAttachment | null,
-  enableWebSearch: boolean = true
+  enableWebSearch: boolean = true,
+  conversationHistory?: Array<{ role: 'user' | 'assistant'; content: string }>
 ): Promise<GeminiResponse | null> {
   const endpoint = 'https://openrouter.ai/api/v1/chat/completions';
+
+  // Format message history
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const formattedHistory: Array<any> = (conversationHistory || []).map((h) => ({
+    role: h.role === 'user' ? 'user' : 'assistant',
+    content: h.content,
+  }));
 
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const userContent: Array<any> = [];
@@ -288,6 +299,7 @@ async function callOpenRouter(
     model: modelName,
     messages: [
       { role: 'system', content: SYSTEM_INSTRUCTION },
+      ...formattedHistory,
       { role: 'user', content: userContent },
     ],
     temperature: 0.2,
@@ -389,8 +401,14 @@ async function callOmniRoute(
 }
 
 // Intelligent Grounded Clinical & Epidemiological Synthesizer
-function simulateSmartClinicalResponse(prompt: string, attachment?: GeminiAttachment | null): GeminiResponse {
+function simulateSmartClinicalResponse(
+  prompt: string,
+  attachment?: GeminiAttachment | null,
+  conversationHistory?: Array<{ role: 'user' | 'assistant'; content: string }>
+): GeminiResponse {
   const lower = prompt.trim().toLowerCase();
+  const historyText = (conversationHistory || []).map((h) => h.content).join(' ').toLowerCase();
+  const combinedContext = `${historyText} ${lower}`;
   let text = '';
   const category = 'IKOLI AI';
   let followUp: string | undefined = undefined;
@@ -413,14 +431,14 @@ function simulateSmartClinicalResponse(prompt: string, attachment?: GeminiAttach
     return { text, category: 'Lesion Assessment', followUpPrompt: followUp, source: 'clinical-knowledge-base', modelUsed: 'Clinical Grounding Synthesizer' };
   }
 
-  // 3. Specific State & Year Queries
-  if (lower.includes('enugu')) {
+  // 3. Specific State & Year Queries with Contextual Follow-up Memory
+  if (lower.includes('enugu') || (combinedContext.includes('enugu') && !lower.includes('ebonyi') && !lower.includes('abia') && !lower.includes('anambra') && !lower.includes('imo') && (lower.includes('child') || lower.includes('case') || lower.includes('hospital') || lower.includes('treat') || lower.includes('disability')))) {
     text = `In **Enugu State**, there are currently **38 active leprosy cases** and **2 Buruli ulcer cases** recorded in our 2025 working baseline (down from 44 leprosy cases in 2024).\n\n### 📊 Enugu State Case Summary\n\n| Indicator | 2024 (Last Year) | 2025 (Current) | 2026 Target |\n| :--- | :--- | :--- | :--- |\n| **Leprosy Cases** | 44 | **38** (26 MB / 12 PB) | 25 |\n| **Child Cases (<15)** | 5 (11.4%) | **2 (5.3%)** | 0 (0.0%) |\n| **Grade-2 Disability** | 9 (20.5%) | **12 (31.6%)** | <4.8% |\n| **Buruli Ulcer** | 0 | **2** (35% PCR confirmed) | 0 |\n| **MDT Cure Rate** | 88.2% | **91.4%** | 95.0% |\n\n**Key Takeaways:**\n- **Child cases dropped from 5 to 2**, showing that active household transmission is reducing.\n- **Key Centers:** Oji River Specialist Leprosy Hospital and UNTH Molecular Lab Hub (Ituku-Ozalla).`;
     followUp = 'How many child leprosy cases were found in Ebonyi?';
-  } else if (lower.includes('ebonyi') || lower.includes('abakaliki') || lower.includes('mile 4') || lower.includes('mile4')) {
+  } else if (lower.includes('ebonyi') || lower.includes('abakaliki') || lower.includes('mile 4') || lower.includes('mile4') || (combinedContext.includes('ebonyi') && (lower.includes('child') || lower.includes('case') || lower.includes('hospital')))) {
     text = `In **Ebonyi State**, there are currently **59 active leprosy cases** and **11 Buruli ulcer cases** recorded in our 2025 baseline (down from 92 leprosy cases in 2024).\n\n### 📊 Ebonyi State Case Summary\n\n| Indicator | 2024 (Last Year) | 2025 (Current) | 2026 Target |\n| :--- | :--- | :--- | :--- |\n| **Leprosy Cases** | 92 | **59** (44 MB / 15 PB) | 40 |\n| **Child Cases (<15)** | 6 (6.5%) | **3 (5.1%)** | 0 (0.0%) |\n| **Grade-2 Disability** | 36 (39.1%) | **15 (25.4%)** | <4.8% |\n| **Buruli Ulcer** | 11 | **11** (31.5% PCR confirmed) | 5 |\n| **MDT Cure Rate** | 85.0% | **87.5%** | 93.0% |\n\n**Key Takeaways:**\n- **Mile 4 Hospital Reference Center** in Abakaliki is the main referral hub for complex cases, wound surgery, and GeneXpert diagnostics.\n- **High-Risk LGAs:** Izzi, Ikwo, Ezza North, and Ohaukwu.`;
     followUp = 'What is the PCR testing procedure at Mile 4 Hospital?';
-  } else if (lower.includes('abia') || lower.includes('uzuakoli')) {
+  } else if (lower.includes('abia') || lower.includes('uzuakoli') || (combinedContext.includes('abia') && (lower.includes('child') || lower.includes('case')))) {
     text = `In **Abia State**, there are currently **43 active leprosy cases** and **38 Buruli ulcer cases** recorded in our 2025 baseline.\n\n### 📊 Abia State Case Summary\n\n| Indicator | 2024 (Last Year) | 2025 (Current) | 2026 Target |\n| :--- | :--- | :--- | :--- |\n| **Leprosy Cases** | 30 | **43** (35 MB / 8 PB) | 28 |\n| **Child Cases (<15)** | 0 (0.0%) | **0 (0.0%)** | 0 (0.0%) |\n| **Grade-2 Disability** | 15 (50.0%) | **8 (18.6%)** | <4.8% |\n| **Buruli Ulcer** | 38 | **38** (26.5% PCR confirmed) | 15 |\n| **MDT Cure Rate** | 86.0% | **88.4%** | 93.0% |\n\n**Key Takeaways:**\n- **Zero Child Cases (0.0%):** Shows zero active pediatric transmission in household contacts.\n- **Highest Buruli Burden:** Abia has the largest Buruli cluster (38 cases) in Isiala Ngwa North, Bende, and Ohafia.\n- **Sanctuaries:** Uzuakoli Leprosy Hospital and Mbawsi Primary Health Centre.`;
     followUp = 'Which state had the highest Buruli ulcer burden in 2025?';
   } else if (lower.includes('anambra')) {
