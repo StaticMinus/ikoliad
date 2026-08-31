@@ -43,8 +43,8 @@ interface ChatMessage {
 
 export const AskIkoliPage: React.FC<AskIkoliPageProps> = ({ onNavigate }) => {
   const [theme, setTheme] = useState<'dark' | 'light'>('light');
-  // Audience Response Persona (Default: Visitor / Plain English)
-  const [persona, setPersona] = useState<ResponsePersona>('visitor');
+  // Audience Response Persona (Default: Public / Plain English)
+  const persona: ResponsePersona = 'visitor';
   const [messages, setMessages] = useState<ChatMessage[]>([]);
   const [inputQuery, setInputQuery] = useState('');
   const [isTyping, setIsTyping] = useState(false);
@@ -291,19 +291,9 @@ export const AskIkoliPage: React.FC<AskIkoliPageProps> = ({ onNavigate }) => {
 
         <div className="w-full max-w-4xl mx-auto flex flex-col items-center text-center relative z-10 space-y-6">
           
-          {/* Top Status Header Bar (Clean, Minimal, No Developer/Model Pills) */}
-          <div className="w-full flex items-center justify-between gap-3 border-b pb-4 pt-1 transition-colors duration-300 border-black/5 dark:border-white/10">
+          {/* Top Status Header Bar (Right-aligned controls) */}
+          <div className="w-full flex items-center justify-end gap-3 pb-2 pt-1">
             
-            {/* Left: Top Badge Tag */}
-            <div className="flex items-center gap-2">
-              <div className={`px-3.5 py-1.5 rounded-full flex items-center gap-2 border text-xs font-mono font-medium backdrop-blur-xl ${
-                isDark ? 'bg-white/5 border-white/10 text-gray-200' : 'bg-white border-black/10 text-gray-800 shadow-xs'
-              }`}>
-                <span className="w-2 h-2 rounded-full bg-[#10B981] shadow-[0_0_8px_#10B981]" />
-                <span className="font-bold tracking-tight">IKOLI-AI Demonstrator v0.1 • Conversational Assistant</span>
-              </div>
-            </div>
-
             {/* Right: Reset Consultation & Theme Toggle */}
             <div className="flex items-center gap-2">
               {messages.length > 0 && (
@@ -363,32 +353,6 @@ export const AskIkoliPage: React.FC<AskIkoliPageProps> = ({ onNavigate }) => {
             <span className="font-medium leading-relaxed">
               <strong>Demonstration environment.</strong> Data displayed are synthetic/illustrative and do not represent live patient or official national programme data.
             </span>
-          </div>
-
-          {/* Conceptual Operating Mode Switcher (Public Mode vs Programme Mode) */}
-          <div className="pt-1 flex items-center justify-center p-1 rounded-full border backdrop-blur-xl bg-black/5 dark:bg-white/5 border-black/10 dark:border-white/10 gap-1 text-xs max-w-sm mx-auto">
-            <button
-              onClick={() => setPersona('visitor')}
-              className={`flex-1 px-4 py-2 rounded-full transition-all flex items-center justify-center gap-1.5 font-medium cursor-pointer ${
-                persona === 'visitor'
-                  ? 'bg-white dark:bg-white/20 text-[#1D1D1F] dark:text-white shadow-xs font-bold'
-                  : 'text-gray-500 hover:text-gray-900 dark:hover:text-white'
-              }`}
-            >
-              <span>🌐</span>
-              <span>Public Mode</span>
-            </button>
-            <button
-              onClick={() => setPersona('executive')}
-              className={`flex-1 px-4 py-2 rounded-full transition-all flex items-center justify-center gap-1.5 font-medium cursor-pointer ${
-                persona !== 'visitor'
-                  ? 'bg-white dark:bg-white/20 text-[#1D1D1F] dark:text-white shadow-xs font-bold'
-                  : 'text-gray-500 hover:text-gray-900 dark:hover:text-white'
-              }`}
-            >
-              <span>🔐</span>
-              <span>Programme Mode</span>
-            </button>
           </div>
 
           {/* ══════════════════════════════════════════════════════════════════
