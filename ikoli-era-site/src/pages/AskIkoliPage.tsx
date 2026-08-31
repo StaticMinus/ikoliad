@@ -11,11 +11,9 @@ import { GlowingOrb } from '../components/cortex/GlowingOrb';
 import { FeatureActionCards } from '../components/cortex/FeatureActionCards';
 import { CortexSidebar, type ChatSession } from '../components/cortex/CortexSidebar';
 import { ProvenanceBadge } from '../components/cortex/ProvenanceBadge';
-import { ClinicalExportModal } from '../components/cortex/ClinicalExportModal';
+import { LiveVoiceCallModal } from '../components/cortex/LiveVoiceCallModal';
 import {
   Paperclip,
-  Mic,
-  MicOff,
   ArrowUp,
   User,
   Copy,
@@ -27,14 +25,13 @@ import {
   Volume2,
   Square,
   Share2,
-  Download,
   HelpCircle,
   Menu,
   PhoneCall,
   Plus,
   Globe,
   ChevronDown,
-  ImageIcon,
+  BarChart2,
   Edit3,
 } from 'lucide-react';
 
@@ -62,7 +59,7 @@ export const AskIkoliPage: React.FC<AskIkoliPageProps> = ({ onNavigate }) => {
   const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [deeperResearchActive, setDeeperResearchActive] = useState(true);
-  const [showExportModal, setShowExportModal] = useState(false);
+  const [isVoiceCallOpen, setIsVoiceCallOpen] = useState(false);
   const persona: ResponsePersona = 'visitor';
 
   // ── 1. Multi-Session Persistent Storage ───────────────────────────
@@ -151,12 +148,10 @@ export const AskIkoliPage: React.FC<AskIkoliPageProps> = ({ onNavigate }) => {
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   // Voice & Audio State
-  const [isListening, setIsListening] = useState(false);
   const [isSpeaking, setIsSpeaking] = useState(false);
   const [speakingMessageId, setSpeakingMessageId] = useState<string | null>(null);
   const utteranceRef = useRef<SpeechSynthesisUtterance | null>(null);
   const [availableVoices, setAvailableVoices] = useState<SpeechSynthesisVoice[]>([]);
-  const [recognitionError, setRecognitionError] = useState<string | null>(null);
 
   // Preload and keep voices refreshed
   useEffect(() => {
@@ -243,62 +238,8 @@ export const AskIkoliPage: React.FC<AskIkoliPageProps> = ({ onNavigate }) => {
 
   // ── 3. Voice Recognition Handler with WebAudio DSP ───────────────
   const handleToggleVoice = async () => {
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    const windowObj = window as any;
-    const SpeechRecognition = windowObj.SpeechRecognition || windowObj.webkitSpeechRecognition;
-
-    if (!SpeechRecognition) {
-      setRecognitionError('Speech recognition is not supported in this browser.');
-      setTimeout(() => setRecognitionError(null), 4000);
-      return;
-    }
-
-    if (isListening) {
-      setIsListening(false);
-      webAudioService.stopMicrophone();
-      return;
-    }
-
-    try {
-      const recognition = new SpeechRecognition();
-      recognition.continuous = false;
-      recognition.interimResults = false;
-      recognition.lang = 'en-NG'; // Nigerian English standard
-
-      recognition.onstart = async () => {
-        setIsListening(true);
-        setRecognitionError(null);
-        await webAudioService.startMicrophone();
-      };
-
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      recognition.onresult = (event: any) => {
-        const transcript = event.results[0][0].transcript;
-        setInputQuery((prev) => (prev ? `${prev} ${transcript}` : transcript));
-        setIsListening(false);
-        webAudioService.stopMicrophone();
-      };
-
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      recognition.onerror = (event: any) => {
-        setIsListening(false);
-        webAudioService.stopMicrophone();
-        setRecognitionError(`Voice error: ${event.error}`);
-        setTimeout(() => setRecognitionError(null), 4000);
-      };
-
-      recognition.onend = () => {
-        setIsListening(false);
-        webAudioService.stopMicrophone();
-      };
-
-      recognition.start();
-    } catch (err) {
-      console.error('Speech recognition exception:', err);
-      setIsListening(false);
-      webAudioService.stopMicrophone();
-      setRecognitionError('Failed to initialize speech recognition.');
-    }
+    // Open full-screen live voice call interactive mode
+    setIsVoiceCallOpen(true);
   };
 
   // ── 4. File Attachment Handler ────────────────────────────────────
@@ -421,6 +362,36 @@ export const AskIkoliPage: React.FC<AskIkoliPageProps> = ({ onNavigate }) => {
     }
   };
 
+  // Handle voice call log into chat transcript
+  const handleVoiceCallTranscript = (userText: string, aiText: string) => {
+    const userMessage: ChatMessage = {
+      id: 'msg-' + Date.now(),
+      sender: 'user',
+      text: userText,
+      timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
+    };
+
+    const aiMessage: ChatMessage = {
+      id: 'msg-' + (Date.now() + 1),
+      sender: 'ai',
+      text: aiText,
+      timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
+      source: 'clinical-knowledge-base',
+    };
+
+    setSessions((prev) =>
+      prev.map((s) =>
+        s.id === activeSessionId
+          ? {
+              ...s,
+              updatedAt: Date.now(),
+              messages: [...s.messages, userMessage, aiMessage],
+            }
+          : s
+      )
+    );
+  };
+
   const handleCopy = (id: string, text: string) => {
     navigator.clipboard.writeText(text);
     setCopiedId(id);
@@ -532,15 +503,13 @@ export const AskIkoliPage: React.FC<AskIkoliPageProps> = ({ onNavigate }) => {
         className="hidden"
       />
 
-      {/* Clinical Multi-format Export Modal */}
-      {currentSession && (
-        <ClinicalExportModal
-          session={currentSession}
-          isOpen={showExportModal}
-          onClose={() => setShowExportModal(false)}
-          isDark={isDark}
-        />
-      )}
+      {/* Live Interactive Voice Call Modal */}
+      <LiveVoiceCallModal
+        isOpen={isVoiceCallOpen}
+        onClose={() => setIsVoiceCallOpen(false)}
+        onTranscriptMessage={handleVoiceCallTranscript}
+        persona={persona}
+      />
 
       {/* ── Left Sidebar Drawer (Desktop Collapsible & Mobile Slide-Over) ── */}
       <CortexSidebar
@@ -562,7 +531,7 @@ export const AskIkoliPage: React.FC<AskIkoliPageProps> = ({ onNavigate }) => {
         isDark ? 'bg-[#0D0D11]' : 'bg-[#F5F5F7]'
       }`}>
         
-        {/* ── Top Header Toolbar (Minimal Mobile & Rich Desktop) ─────────── */}
+        {/* ── Top Header Toolbar (Clean & Focused) ───────────────────────── */}
         <header className={`h-14 px-3 sm:px-6 border-b flex items-center justify-between shrink-0 select-none backdrop-blur-md z-20 transition-colors duration-300 ${
           isDark
             ? 'border-white/10 bg-[#0D0D11]/90 text-white'
@@ -600,22 +569,21 @@ export const AskIkoliPage: React.FC<AskIkoliPageProps> = ({ onNavigate }) => {
             </button>
           </div>
 
-          {/* Right: Actions (Voice Call, Share, Export, Theme) */}
+          {/* Right: Actions (Interactive Voice Call, Share, Theme) */}
           <div className="flex items-center gap-1.5 sm:gap-2">
             
-            {/* Mobile Voice Mode / Audio Call Action */}
+            {/* Live Interactive Voice Call Action */}
             <button
-              onClick={handleToggleVoice}
-              className={`w-9 h-9 rounded-full flex items-center justify-center transition-all cursor-pointer ${
-                isListening
-                  ? 'bg-red-500 text-white shadow-[0_0_12px_rgba(239,68,68,0.5)] animate-pulse'
-                  : isDark
-                  ? 'bg-white/10 text-white hover:bg-white/15'
-                  : 'bg-black/5 text-[#1D1D1F] hover:bg-black/10'
+              onClick={() => setIsVoiceCallOpen(true)}
+              className={`px-3 py-1.5 rounded-full flex items-center gap-1.5 text-xs font-semibold transition-all cursor-pointer shadow-xs ${
+                isDark
+                  ? 'bg-[#0071E3]/20 hover:bg-[#0071E3]/30 text-[#00D2FF] border border-[#0071E3]/40 shadow-[0_0_12px_rgba(0,113,227,0.3)]'
+                  : 'bg-[#0071E3] hover:bg-[#0077ED] text-white shadow-[0_0_12px_rgba(0,113,227,0.3)]'
               }`}
-              title={isListening ? 'Stop listening' : 'Start voice mode'}
+              title="Start Live Voice Call"
             >
-              <PhoneCall className="w-4 h-4" />
+              <PhoneCall className="w-3.5 h-3.5" />
+              <span className="hidden sm:inline">Voice Call</span>
             </button>
 
             {/* Desktop Share Button */}
@@ -629,21 +597,6 @@ export const AskIkoliPage: React.FC<AskIkoliPageProps> = ({ onNavigate }) => {
               title="Copy conversation link"
             >
               <Share2 className="w-4 h-4" />
-            </button>
-
-            {/* Multi-Format Export Dossier Button */}
-            <button
-              onClick={() => setShowExportModal(true)}
-              disabled={messages.length === 0}
-              className={`hidden sm:flex px-3 py-1.5 rounded-xl border text-xs font-semibold items-center gap-1.5 disabled:opacity-30 disabled:cursor-not-allowed transition-all cursor-pointer shadow-2xs ${
-                isDark
-                  ? 'border-white/10 bg-white/5 text-gray-200 hover:bg-white/10'
-                  : 'border-black/10 bg-white text-gray-800 hover:bg-gray-100'
-              }`}
-              title="Export Consultation Dossier (Markdown, DHIS2 CSV, JSON)"
-            >
-              <Download className="w-3.5 h-3.5 text-[#0071E3]" />
-              <span>Export Dossier</span>
             </button>
 
             {/* Theme Toggle Button */}
@@ -677,12 +630,16 @@ export const AskIkoliPage: React.FC<AskIkoliPageProps> = ({ onNavigate }) => {
               {/* 1. DESKTOP VIEW (Rich Studio with Composer Card & Feature Tiles) */}
               <div className="hidden md:block my-auto max-w-3xl w-full mx-auto space-y-8 text-center select-none py-6">
                 
-                {/* 3D Blue Orb (Kinetic during typing/audio, still when idle) */}
-                <div className="flex items-center justify-center transform hover:scale-105 transition-transform duration-500 cursor-pointer">
+                {/* 3D Blue Orb (Clicking opens voice call!) */}
+                <div
+                  onClick={() => setIsVoiceCallOpen(true)}
+                  className="flex items-center justify-center transform hover:scale-105 transition-transform duration-500 cursor-pointer group"
+                  title="Click to start live interactive voice call"
+                >
                   <GlowingOrb
                     size={140}
                     isTyping={isActivelyTyping}
-                    isAudioActive={isListening || isSpeaking}
+                    isAudioActive={isSpeaking}
                   />
                 </div>
 
@@ -713,14 +670,6 @@ export const AskIkoliPage: React.FC<AskIkoliPageProps> = ({ onNavigate }) => {
                     ? 'bg-[#141418] border-white/10 shadow-[0_16px_50px_rgba(0,0,0,0.3)]'
                     : 'bg-white border-black/8 shadow-[0_16px_50px_rgba(0,0,0,0.06)]'
                 }`}>
-                  
-                  {recognitionError && (
-                    <div className={`p-2 rounded-xl border text-xs ${
-                      isDark ? 'bg-red-950/40 border-red-800 text-red-300' : 'bg-red-50 border-red-200 text-red-700'
-                    }`}>
-                      {recognitionError}
-                    </div>
-                  )}
 
                   {attachedFile && (
                     <div className={`p-2.5 rounded-xl border flex items-center justify-between text-xs ${
@@ -779,7 +728,7 @@ export const AskIkoliPage: React.FC<AskIkoliPageProps> = ({ onNavigate }) => {
                       <span>Deeper research</span>
                     </button>
 
-                    {/* Right: Attach, Mic, Send */}
+                    {/* Right: Attach, Voice Call, Send */}
                     <div className="flex items-center gap-2">
                       <button
                         onClick={() => fileInputRef.current?.click()}
@@ -794,15 +743,13 @@ export const AskIkoliPage: React.FC<AskIkoliPageProps> = ({ onNavigate }) => {
                       <button
                         onClick={handleToggleVoice}
                         className={`p-2 rounded-xl transition-all cursor-pointer ${
-                          isListening
-                            ? 'text-red-400 bg-red-500/10 animate-pulse'
-                            : isDark
+                          isDark
                             ? 'text-gray-400 hover:text-[#00D2FF] hover:bg-white/5'
                             : 'text-gray-500 hover:text-[#0071E3] hover:bg-black/5'
                         }`}
-                        title={isListening ? 'Stop listening' : 'Start voice input'}
+                        title="Start live interactive voice call"
                       >
-                        {isListening ? <MicOff className="w-4 h-4" /> : <Mic className="w-4 h-4" />}
+                        <PhoneCall className="w-4 h-4" />
                       </button>
 
                       <MagneticButton onClick={() => handleSend()}>
@@ -830,11 +777,15 @@ export const AskIkoliPage: React.FC<AskIkoliPageProps> = ({ onNavigate }) => {
               <div className="md:hidden flex-1 flex flex-col justify-between py-6 max-w-sm mx-auto w-full">
                 
                 {/* Centered Minimal 3D Blue Orb */}
-                <div className="my-auto flex flex-col items-center justify-center space-y-4">
+                <div
+                  onClick={() => setIsVoiceCallOpen(true)}
+                  className="my-auto flex flex-col items-center justify-center space-y-4 cursor-pointer"
+                  title="Tap to start live voice call"
+                >
                   <GlowingOrb
                     size={110}
                     isTyping={isActivelyTyping}
-                    isAudioActive={isListening || isSpeaking}
+                    isAudioActive={isSpeaking}
                   />
                   <h2 className={`font-display font-bold text-lg tracking-tight ${
                     isDark ? 'text-white' : 'text-[#1D1D1F]'
@@ -843,7 +794,7 @@ export const AskIkoliPage: React.FC<AskIkoliPageProps> = ({ onNavigate }) => {
                   </h2>
                 </div>
 
-                {/* Clean Vertical Action List */}
+                {/* Clean Vertical Action List (No 'Create Image', Clean Clinical Focus) */}
                 <div className="space-y-2 pt-4">
                   <button
                     onClick={() => handleSend("Generate an epidemiological breakdown and chart of 2025 SDR-PEP coverage vs case reduction.")}
@@ -853,8 +804,8 @@ export const AskIkoliPage: React.FC<AskIkoliPageProps> = ({ onNavigate }) => {
                         : 'bg-white border-black/8 text-[#1D1D1F] hover:bg-gray-50 shadow-xs'
                     }`}
                   >
-                    <ImageIcon className="w-5 h-5 text-purple-400 shrink-0" />
-                    <span>Create an image or clinical chart</span>
+                    <BarChart2 className="w-5 h-5 text-[#00D2FF] shrink-0" />
+                    <span>Synthesize 2025 South-East surveillance data</span>
                   </button>
 
                   <button
@@ -1083,9 +1034,10 @@ export const AskIkoliPage: React.FC<AskIkoliPageProps> = ({ onNavigate }) => {
                   </button>
                   <button
                     onClick={handleToggleVoice}
-                    className={`p-1.5 rounded-lg ${isListening ? 'text-red-400 animate-pulse' : isDark ? 'text-gray-400 hover:text-[#00D2FF]' : 'text-gray-500 hover:text-[#0071E3]'}`}
+                    className={`p-1.5 rounded-lg ${isDark ? 'text-gray-400 hover:text-[#00D2FF] hover:bg-white/5' : 'text-gray-500 hover:text-[#0071E3] hover:bg-black/5'}`}
+                    title="Start Live Voice Call"
                   >
-                    {isListening ? <MicOff className="w-4 h-4" /> : <Mic className="w-4 h-4" />}
+                    <PhoneCall className="w-4 h-4" />
                   </button>
                 </div>
 
@@ -1150,7 +1102,7 @@ export const AskIkoliPage: React.FC<AskIkoliPageProps> = ({ onNavigate }) => {
               className="flex-1 bg-transparent text-sm outline-none placeholder-gray-400 py-1.5 font-sans"
             />
 
-            {/* Voice Mic or Send Arrow Button */}
+            {/* Voice Call or Send Arrow Button */}
             {inputQuery.trim() || attachedFile ? (
               <button
                 onClick={() => handleSend()}
@@ -1161,17 +1113,15 @@ export const AskIkoliPage: React.FC<AskIkoliPageProps> = ({ onNavigate }) => {
               </button>
             ) : (
               <button
-                onClick={handleToggleVoice}
+                onClick={() => setIsVoiceCallOpen(true)}
                 className={`w-8 h-8 rounded-full flex items-center justify-center shrink-0 transition-all cursor-pointer ${
-                  isListening
-                    ? 'bg-red-500 text-white animate-pulse'
-                    : isDark
+                  isDark
                     ? 'bg-white/10 text-gray-200 hover:bg-white/20'
                     : 'bg-black/5 text-gray-700 hover:bg-black/10'
                 }`}
-                title="Dictate with voice"
+                title="Start live voice call"
               >
-                <Mic className="w-4 h-4" />
+                <PhoneCall className="w-4 h-4" />
               </button>
             )}
           </div>
