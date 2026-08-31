@@ -12,9 +12,13 @@ import {
   FlaskConical,
   Zap,
   ArrowUpRight,
+  Baby,
+  ShieldCheck,
+  CheckCheck,
 } from 'lucide-react';
 import {
   STATES_DATA,
+  NATIONAL_SUMMARY,
   type StateData,
 } from '../../data/surveillanceData';
 
@@ -58,6 +62,19 @@ const ALL_FACILITIES: Record<string, FacilityItem[]> = {
       stateId: 'enugu',
       cases: 184,
       clinicians: 12,
+      stock: 'Optimal (>90d)',
+      stockStatus: 'optimal',
+      sync: 'Real-time Live',
+      syncStatus: 'live',
+      connectivity: 'Cellular 4G',
+    },
+    {
+      name: 'UNTH Molecular Reference Laboratory Hub',
+      lga: 'Ituku-Ozalla',
+      stateName: 'Enugu State',
+      stateId: 'enugu',
+      cases: 64,
+      clinicians: 8,
       stock: 'Optimal (>90d)',
       stockStatus: 'optimal',
       sync: 'Real-time Live',
@@ -132,25 +149,25 @@ const ALL_FACILITIES: Record<string, FacilityItem[]> = {
       connectivity: 'Cellular 4G',
     },
     {
-      name: 'Udi Comprehensive Health Centre',
-      lga: 'Udi',
+      name: 'UNTH Molecular Reference Laboratory Hub',
+      lga: 'Ituku-Ozalla',
       stateName: 'Enugu State',
       stateId: 'enugu',
-      cases: 72,
-      clinicians: 6,
-      stock: 'Adequate (60d)',
-      stockStatus: 'adequate',
+      cases: 64,
+      clinicians: 8,
+      stock: 'Optimal (>90d)',
+      stockStatus: 'optimal',
       sync: 'Real-time Live',
       syncStatus: 'live',
       connectivity: 'Cellular 4G',
     },
     {
-      name: 'Nsukka Urban Model PHC',
+      name: 'Nsukka Model Comprehensive Health Centre',
       lga: 'Nsukka',
       stateName: 'Enugu State',
       stateId: 'enugu',
-      cases: 64,
-      clinicians: 5,
+      cases: 110,
+      clinicians: 8,
       stock: 'Optimal (>90d)',
       stockStatus: 'optimal',
       sync: 'Real-time Live',
@@ -186,7 +203,7 @@ const ALL_FACILITIES: Record<string, FacilityItem[]> = {
       connectivity: 'Satellite WAN',
     },
     {
-      name: 'Ikwo Central Model PHC',
+      name: 'Ikwo District Health Centre',
       lga: 'Ikwo',
       stateName: 'Ebonyi State',
       stateId: 'ebonyi',
@@ -327,7 +344,7 @@ const ALL_FACILITIES: Record<string, FacilityItem[]> = {
 export const SurveillanceHubConsole: React.FC<SurveillanceHubConsoleProps> = ({
   onExploreState,
 }) => {
-  const [activeTab, setActiveTab] = useState<'overview' | 'analytics' | 'monitoring'>('overview');
+  const [activeTab, setActiveTab] = useState<'overview' | 'analytics' | 'pcr' | 'meal' | 'monitoring'>('overview');
   const [selectedStateId, setSelectedStateId] = useState<string>('anambra');
   const [powerMode, setPowerMode] = useState<'buruli' | 'leprosy'>('leprosy');
   const [selectedMetricModal, setSelectedMetricModal] = useState<string | null>(null);
@@ -340,7 +357,6 @@ export const SurveillanceHubConsole: React.FC<SurveillanceHubConsoleProps> = ({
     onExploreState?.(id);
   };
 
-  // Dynamic live timeline simulation (oscillating active dots & real-time telemetry feed)
   useEffect(() => {
     const interval = setInterval(() => {
       setLivePulseTick((prev) => (prev + 1) % 60);
@@ -357,25 +373,43 @@ export const SurveillanceHubConsole: React.FC<SurveillanceHubConsoleProps> = ({
     { time: '20:00', activeDots: 4 + ((livePulseTick + 2) % 3), totalDots: 8 },
   ];
 
-  // Export to Excel / CSV Functionality
+  // Export to Excel / CSV Functionality (Table 12 & Table 17 Full Concordance)
   const handleExportExcel = () => {
     const rows = [
-      ['IKOLI AI EPIDEMIOLOGICAL SURVEILLANCE DATASET'],
-      ['Platform', 'IKOLI AI (v1.1) • RedAid Nigeria & FMoHSW'],
+      ['IKOLI AI EPIDEMIOLOGICAL SURVEILLANCE & MEAL DATASET'],
+      ['Platform', 'IKOLI AI (v1.1) • RedAid Nigeria & FMoHSW / NTBLCP'],
       ['Export Date', new Date().toISOString()],
       ['State', currentState.name],
       ['Selected View', activeTab.toUpperCase()],
       [],
-      ['METRIC', 'VALUE', 'UNIT / NOTES'],
+      ['EPIDEMIOLOGICAL INDICATOR (2025 BASELINE)', 'VALUE', 'UNIT / OPERATIONAL DEFINITION'],
       ['Total Screened Patients', currentState.totalScreened, 'Patients'],
-      ['Active Sentinel Facilities', currentState.activeFacilities, 'PHC Centers'],
-      ['Total Leprosy Cases', currentState.leprosyCases, 'Active Cases'],
+      ['Active Sentinel Facilities', currentState.activeFacilities, 'PHC Centers & Hospitals'],
+      ['New Leprosy Cases (2025)', currentState.leprosyCases, 'Annual Notified'],
       ['Paucibacillary (PB)', currentState.leprosyPB, '6-Month MDT Regimen'],
       ['Multibacillary (MB)', currentState.leprosyMB, '12-Month MDT Regimen'],
-      ['Total Buruli Ulcer Cases', currentState.buruliCases, 'Active Cases'],
-      ['WHO MDT Cure Rate', `${currentState.leprosyCureRate}%`, '12-Mo Cohort'],
-      ['Grade-2 Disability (G2D) Rate', `${currentState.leprosyG2D}%`, 'Target <4.8%'],
-      ['IS2404 PCR Turnaround Time', `${currentState.avgLabTurnaroundDays} days`, 'Mile 4 Reference Lab'],
+      ['Child Cases (<15 yrs)', currentState.childCases, 'Active Community Transmission Index'],
+      ['Child Proportion Rate', `${currentState.childRate}%`, 'Target: 0.0% (Zero-Leprosy 2030)'],
+      ['Grade-2 Disability (G2D) Cases', currentState.leprosyG2DCases, 'Permanent Disability Count'],
+      ['Grade-2 Disability (G2D) Rate', `${currentState.leprosyG2D}%`, 'Target: <4.8%'],
+      ['WHO MDT 12-Month Cure Rate', `${currentState.leprosyCureRate}%`, 'Completed MDT Cohort'],
+      ['Buruli Ulcer Notified Cases', currentState.buruliCases, 'Total BU Cases'],
+      ['Category I Lesions (<5cm)', currentState.buruliCat1, 'Single Nodule/Plaque'],
+      ['Category II Lesions (5-15cm)', currentState.buruliCat2, 'Edematous Plaque'],
+      ['Category III Lesions (>15cm/Joint)', currentState.buruliCat3, 'Surgical Debridement Candidate'],
+      ['IS2404 PCR Confirmed Cases', currentState.buruliPcrCases, 'DNA Molecular Confirmed'],
+      ['PCR Confirmation Proportion', `${currentState.buruliPcrRate}%`, 'National Target >70%'],
+      ['Clinical Diagnosis Alone', currentState.buruliClinicalCases, 'Physical Staging Only'],
+      ['Microscopy / ZN Smears', currentState.buruliMicroscopyCases, 'Acid-Fast Bacilli Direct Smear'],
+      ['Specimen-to-Result Linkage (≤7d)', `${currentState.specimenLinkageRate}%`, 'Target ≥90% (Table 12)'],
+      ['Avg Lab PCR Turnaround Time', `${currentState.avgLabTurnaroundDays} days`, 'UNTH & Mile 4 Reference Hubs'],
+      [],
+      ['MEAL & DIGITAL HEALTH QUALITY METRICS (TABLE 12)'],
+      ['Reporting Completeness', `${NATIONAL_SUMMARY.reportingCompleteness}%`, 'Target ≥90%'],
+      ['Reporting Timeliness', `${NATIONAL_SUMMARY.reportingTimeliness}%`, 'Target ≥85%'],
+      ['Technical Ingestion Latency', `${NATIONAL_SUMMARY.ingestionLatencyHours} hours`, 'Target ≤24h'],
+      ['Rule Coverage (Arithmetic/Hierarchy)', `${NATIONAL_SUMMARY.ruleCoveragePercent}%`, 'Target 100%'],
+      ['High-Priority Exception Resolution', `${NATIONAL_SUMMARY.highPriorityResolutionRate}%`, 'Target ≥80% in 10d'],
       [],
       ['SENTINEL HEALTHCARE FACILITIES IN ' + currentState.name.toUpperCase()],
       ['Facility Name', 'LGA', 'Active Cases', 'Clinicians', 'MDT Stock Status', 'Connectivity'],
@@ -390,13 +424,12 @@ export const SurveillanceHubConsole: React.FC<SurveillanceHubConsoleProps> = ({
     const encodedUri = encodeURI(csvContent);
     const link = document.createElement('a');
     link.setAttribute('href', encodedUri);
-    link.setAttribute('download', `IKOLI_Surveillance_${currentState.name.replace(/\s+/g, '_')}_${activeTab}_${new Date().toISOString().slice(0, 10)}.csv`);
+    link.setAttribute('download', `IKOLI_MEAL_Surveillance_${currentState.name.replace(/\s+/g, '_')}_${new Date().toISOString().slice(0, 10)}.csv`);
     document.body.appendChild(link);
     link.click();
     document.body.removeChild(link);
   };
 
-  // 5 Pilot States List
   const pilotStates = [
     STATES_DATA['all'],
     STATES_DATA['enugu'],
@@ -406,58 +439,57 @@ export const SurveillanceHubConsole: React.FC<SurveillanceHubConsoleProps> = ({
     STATES_DATA['imo'],
   ].filter(Boolean);
 
-  // Active facilities for currently selected state
   const currentFacilities = ALL_FACILITIES[selectedStateId] || ALL_FACILITIES['all'];
 
-  // Exact state-level historical trends (2021-2025 actuals + 2026 targets from RAN report)
-  const STATE_HISTORICAL_DATA: Record<string, { year: string; leprosy: number; buruli: number; g2d: number; cure: number }[]> = {
+  // Exact 5-State Historical Data from RedAid Report Table 5 & 17
+  const STATE_HISTORICAL_DATA: Record<string, { year: string; leprosy: number; child: number; buruli: number; g2d: number; pcrRate: number; cure: number }[]> = {
     all: [
-      { year: '2021', leprosy: 158, buruli: 50, g2d: 26.6, cure: 81.2 },
-      { year: '2022', leprosy: 119, buruli: 31, g2d: 25.2, cure: 82.8 },
-      { year: '2023', leprosy: 225, buruli: 46, g2d: 23.1, cure: 84.1 },
-      { year: '2024', leprosy: 175, buruli: 53, g2d: 34.9, cure: 86.3 },
-      { year: '2025', leprosy: 162, buruli: 7, g2d: 21.6, cure: 89.2 },
-      { year: '2026', leprosy: 106, buruli: 2, g2d: 4.8, cure: 94.0 },
-    ],
-    enugu: [
-      { year: '2021', leprosy: 42, buruli: 0, g2d: 26.2, cure: 83.0 },
-      { year: '2022', leprosy: 7, buruli: 2, g2d: 28.6, cure: 84.5 },
-      { year: '2023', leprosy: 43, buruli: 1, g2d: 46.5, cure: 86.0 },
-      { year: '2024', leprosy: 44, buruli: 0, g2d: 20.5, cure: 88.2 },
-      { year: '2025', leprosy: 38, buruli: 0, g2d: 31.6, cure: 91.4 },
-      { year: '2026', leprosy: 24, buruli: 0, g2d: 4.8, cure: 95.0 },
+      { year: '2021', leprosy: 158, child: 9, buruli: 50, g2d: 26.6, pcrRate: 0.4, cure: 81.2 },
+      { year: '2022', leprosy: 119, child: 4, buruli: 31, g2d: 25.2, pcrRate: 1.2, cure: 82.8 },
+      { year: '2023', leprosy: 225, child: 9, buruli: 46, g2d: 23.1, pcrRate: 0.4, cure: 84.1 },
+      { year: '2024', leprosy: 175, child: 11, buruli: 53, g2d: 34.9, pcrRate: 2.7, cure: 86.3 },
+      { year: '2025', leprosy: 162, child: 5, buruli: 55, g2d: 21.6, pcrRate: 27.1, cure: 89.2 },
+      { year: '2026', leprosy: 120, child: 0, buruli: 40, g2d: 4.8, pcrRate: 78.5, cure: 94.0 },
     ],
     ebonyi: [
-      { year: '2021', leprosy: 86, buruli: 19, g2d: 24.4, cure: 80.5 },
-      { year: '2022', leprosy: 73, buruli: 2, g2d: 27.4, cure: 82.0 },
-      { year: '2023', leprosy: 103, buruli: 1, g2d: 23.3, cure: 83.8 },
-      { year: '2024', leprosy: 92, buruli: 11, g2d: 39.1, cure: 85.0 },
-      { year: '2025', leprosy: 59, buruli: 0, g2d: 25.4, cure: 87.5 },
-      { year: '2026', leprosy: 42, buruli: 0, g2d: 4.8, cure: 92.5 },
+      { year: '2021', leprosy: 86, child: 4, buruli: 19, g2d: 24.4, pcrRate: 0.4, cure: 80.5 },
+      { year: '2022', leprosy: 73, child: 2, buruli: 2, g2d: 27.4, pcrRate: 1.0, cure: 82.0 },
+      { year: '2023', leprosy: 103, child: 5, buruli: 1, g2d: 23.3, pcrRate: 0.4, cure: 83.8 },
+      { year: '2024', leprosy: 92, child: 6, buruli: 11, g2d: 39.1, pcrRate: 2.5, cure: 85.0 },
+      { year: '2025', leprosy: 59, child: 3, buruli: 11, g2d: 25.4, pcrRate: 31.5, cure: 87.5 },
+      { year: '2026', leprosy: 40, child: 0, buruli: 5, g2d: 4.8, pcrRate: 80.0, cure: 93.0 },
     ],
-    anambra: [
-      { year: '2021', leprosy: 4, buruli: 1, g2d: 0.0, cure: 85.0 },
-      { year: '2022', leprosy: 6, buruli: 7, g2d: 16.7, cure: 86.2 },
-      { year: '2023', leprosy: 6, buruli: 11, g2d: 16.7, cure: 87.8 },
-      { year: '2024', leprosy: 4, buruli: 2, g2d: 25.0, cure: 88.9 },
-      { year: '2025', leprosy: 13, buruli: 5, g2d: 0.0, cure: 90.1 },
-      { year: '2026', leprosy: 8, buruli: 1, g2d: 0.0, cure: 96.0 },
+    enugu: [
+      { year: '2021', leprosy: 42, child: 5, buruli: 0, g2d: 26.2, pcrRate: 0.0, cure: 83.0 },
+      { year: '2022', leprosy: 7, child: 2, buruli: 2, g2d: 28.6, pcrRate: 0.0, cure: 84.5 },
+      { year: '2023', leprosy: 43, child: 3, buruli: 1, g2d: 46.5, pcrRate: 0.0, cure: 86.0 },
+      { year: '2024', leprosy: 44, child: 5, buruli: 0, g2d: 20.5, pcrRate: 0.0, cure: 88.2 },
+      { year: '2025', leprosy: 38, child: 2, buruli: 2, g2d: 31.6, pcrRate: 35.0, cure: 91.4 },
+      { year: '2026', leprosy: 25, child: 0, buruli: 0, g2d: 4.8, pcrRate: 85.0, cure: 95.0 },
     ],
     abia: [
-      { year: '2021', leprosy: 22, buruli: 16, g2d: 40.9, cure: 80.0 },
-      { year: '2022', leprosy: 26, buruli: 14, g2d: 23.1, cure: 82.1 },
-      { year: '2023', leprosy: 58, buruli: 33, g2d: 12.1, cure: 84.5 },
-      { year: '2024', leprosy: 30, buruli: 38, g2d: 50.0, cure: 86.0 },
-      { year: '2025', leprosy: 43, buruli: 1, g2d: 18.6, cure: 88.4 },
-      { year: '2026', leprosy: 28, buruli: 0, g2d: 4.8, cure: 93.0 },
+      { year: '2021', leprosy: 22, child: 0, buruli: 16, g2d: 40.9, pcrRate: 0.5, cure: 80.0 },
+      { year: '2022', leprosy: 26, child: 0, buruli: 14, g2d: 23.1, pcrRate: 1.5, cure: 82.1 },
+      { year: '2023', leprosy: 58, child: 0, buruli: 33, g2d: 12.1, pcrRate: 0.4, cure: 84.5 },
+      { year: '2024', leprosy: 30, child: 0, buruli: 38, g2d: 50.0, pcrRate: 2.8, cure: 86.0 },
+      { year: '2025', leprosy: 43, child: 0, buruli: 38, g2d: 18.6, pcrRate: 26.5, cure: 88.4 },
+      { year: '2026', leprosy: 28, child: 0, buruli: 15, g2d: 4.8, pcrRate: 75.0, cure: 93.0 },
+    ],
+    anambra: [
+      { year: '2021', leprosy: 4, child: 0, buruli: 1, g2d: 0.0, pcrRate: 0.0, cure: 85.0 },
+      { year: '2022', leprosy: 6, child: 0, buruli: 7, g2d: 16.7, pcrRate: 0.0, cure: 86.2 },
+      { year: '2023', leprosy: 6, child: 1, buruli: 11, g2d: 16.7, pcrRate: 0.0, cure: 87.8 },
+      { year: '2024', leprosy: 4, child: 0, buruli: 2, g2d: 25.0, pcrRate: 0.0, cure: 88.9 },
+      { year: '2025', leprosy: 13, child: 0, buruli: 5, g2d: 0.0, pcrRate: 28.0, cure: 90.1 },
+      { year: '2026', leprosy: 8, child: 0, buruli: 1, g2d: 0.0, pcrRate: 80.0, cure: 96.0 },
     ],
     imo: [
-      { year: '2021', leprosy: 4, buruli: 14, g2d: 25.0, cure: 82.0 },
-      { year: '2022', leprosy: 7, buruli: 6, g2d: 14.3, cure: 84.0 },
-      { year: '2023', leprosy: 15, buruli: 0, g2d: 0.0, cure: 86.5 },
-      { year: '2024', leprosy: 5, buruli: 2, g2d: 0.0, cure: 87.8 },
-      { year: '2025', leprosy: 9, buruli: 1, g2d: 0.0, cure: 89.0 },
-      { year: '2026', leprosy: 4, buruli: 0, g2d: 0.0, cure: 95.0 },
+      { year: '2021', leprosy: 4, child: 0, buruli: 14, g2d: 25.0, pcrRate: 0.0, cure: 82.0 },
+      { year: '2022', leprosy: 7, child: 0, buruli: 6, g2d: 14.3, pcrRate: 0.0, cure: 84.0 },
+      { year: '2023', leprosy: 15, child: 0, buruli: 0, g2d: 0.0, pcrRate: 0.0, cure: 86.5 },
+      { year: '2024', leprosy: 5, child: 0, buruli: 2, g2d: 0.0, pcrRate: 0.0, cure: 87.8 },
+      { year: '2025', leprosy: 9, child: 0, buruli: 2, g2d: 0.0, pcrRate: 25.0, cure: 89.0 },
+      { year: '2026', leprosy: 4, child: 0, buruli: 0, g2d: 0.0, pcrRate: 75.0, cure: 95.0 },
     ],
   };
 
@@ -471,7 +503,7 @@ export const SurveillanceHubConsole: React.FC<SurveillanceHubConsoleProps> = ({
       ══════════════════════════════════════════════════════════════════════ */}
       <div className="flex flex-col md:flex-row items-center justify-between gap-4 border-b border-black/5 pb-5">
         
-        {/* Left: Geometric Three-Petal Logo Badge + Exact Renamed Title */}
+        {/* Left: Geometric Three-Petal Logo Badge + Official Title */}
         <div className="flex items-center gap-3 self-start md:self-auto">
           <div className="w-10 h-10 rounded-2xl bg-[#1D1D1F] flex items-center justify-center text-white shadow-sm">
             <svg className="w-5 h-5" viewBox="0 0 24 24" fill="currentColor">
@@ -481,20 +513,25 @@ export const SurveillanceHubConsole: React.FC<SurveillanceHubConsoleProps> = ({
             </svg>
           </div>
           <div>
-            <h2 className="font-extrabold text-base tracking-tight text-[#1D1D1F]">
-              IKOLI AI • DASHBOARD
-            </h2>
+            <div className="flex items-center gap-2">
+              <h2 className="font-extrabold text-base tracking-tight text-[#1D1D1F]">
+                IKOLI AI • SURVEILLANCE &amp; MEAL HUB
+              </h2>
+              <span className="text-[10px] font-mono font-bold text-emerald-700 bg-emerald-100 px-2 py-0.5 rounded-full border border-emerald-300/40">
+                2025 Reconciled
+              </span>
+            </div>
             <p className="text-[11px] text-gray-500 font-medium">
-              National Skin NTD Surveillance & Clinical AI Intelligence Platform
+              NTBLCP National Roadmap 2023–2030 &bull; RedAid Nigeria Working Baseline
             </p>
           </div>
         </div>
 
-        {/* Center: Segmented Floating Pill Switcher */}
-        <div className="bg-[#DEDEDE] p-1 rounded-full flex items-center gap-1 shadow-inner">
+        {/* Center: 5 Segmented Floating Pill Switchers */}
+        <div className="bg-[#DEDEDE] p-1 rounded-full flex flex-wrap items-center gap-1 shadow-inner">
           <button
             onClick={() => setActiveTab('overview')}
-            className={`px-6 py-2 rounded-full text-xs font-bold transition-all cursor-pointer ${
+            className={`px-4 py-1.5 rounded-full text-xs font-bold transition-all cursor-pointer ${
               activeTab === 'overview'
                 ? 'bg-white text-[#1D1D1F] shadow-sm'
                 : 'text-gray-600 hover:text-[#1D1D1F]'
@@ -504,44 +541,59 @@ export const SurveillanceHubConsole: React.FC<SurveillanceHubConsoleProps> = ({
           </button>
           <button
             onClick={() => setActiveTab('analytics')}
-            className={`px-6 py-2 rounded-full text-xs font-bold transition-all cursor-pointer ${
+            className={`px-4 py-1.5 rounded-full text-xs font-bold transition-all cursor-pointer ${
               activeTab === 'analytics'
                 ? 'bg-white text-[#1D1D1F] shadow-sm'
                 : 'text-gray-600 hover:text-[#1D1D1F]'
             }`}
           >
-            Analytics
+            Longitudinal
+          </button>
+          <button
+            onClick={() => setActiveTab('pcr')}
+            className={`px-4 py-1.5 rounded-full text-xs font-bold transition-all cursor-pointer flex items-center gap-1.5 ${
+              activeTab === 'pcr'
+                ? 'bg-purple-600 text-white shadow-sm'
+                : 'text-gray-600 hover:text-[#1D1D1F]'
+            }`}
+          >
+            <FlaskConical className="w-3.5 h-3.5" />
+            <span>PCR Diagnostics</span>
+          </button>
+          <button
+            onClick={() => setActiveTab('meal')}
+            className={`px-4 py-1.5 rounded-full text-xs font-bold transition-all cursor-pointer flex items-center gap-1.5 ${
+              activeTab === 'meal'
+                ? 'bg-[#0071E3] text-white shadow-sm'
+                : 'text-gray-600 hover:text-[#1D1D1F]'
+            }`}
+          >
+            <ShieldCheck className="w-3.5 h-3.5" />
+            <span>MEAL Quality</span>
           </button>
           <button
             onClick={() => setActiveTab('monitoring')}
-            className={`px-6 py-2 rounded-full text-xs font-bold transition-all cursor-pointer ${
+            className={`px-4 py-1.5 rounded-full text-xs font-bold transition-all cursor-pointer ${
               activeTab === 'monitoring'
                 ? 'bg-white text-[#1D1D1F] shadow-sm'
                 : 'text-gray-600 hover:text-[#1D1D1F]'
             }`}
           >
-            Monitoring
+            Fleet Telemetry
           </button>
         </div>
 
-        {/* Right: Export to Excel / CSV Action Button + Live Status */}
+        {/* Right: Export to Excel / CSV Action Button */}
         <div className="flex items-center gap-2.5 self-start md:self-auto">
-          
           <button
             onClick={handleExportExcel}
             className="bg-white hover:bg-gray-100 text-[#1D1D1F] border border-black/10 px-3.5 py-1.5 rounded-full text-xs font-bold shadow-xs flex items-center gap-2 transition-all hover:scale-105 active:scale-95 cursor-pointer group"
-            title="Download dataset as Microsoft Excel / CSV format"
+            title="Download full dataset in NTBLCP/RedAid MEAL CSV format"
           >
             <FileSpreadsheet className="w-3.5 h-3.5 text-emerald-600 group-hover:scale-110 transition-transform" />
-            <span>Export Report (Excel/CSV)</span>
+            <span>Export MEAL Dataset</span>
             <Download className="w-3 h-3 text-gray-400" />
           </button>
-
-          <div className="hidden sm:flex items-center gap-2 text-xs text-gray-500 font-medium pl-1">
-            <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" />
-            <span className="font-mono text-[11px] text-gray-600">{currentState.lastUpdated}</span>
-          </div>
-
         </div>
 
       </div>
@@ -569,27 +621,27 @@ export const SurveillanceHubConsole: React.FC<SurveillanceHubConsoleProps> = ({
       </div>
 
       {/* ══════════════════════════════════════════════════════════════════════
-          TAB 1: OVERVIEW (Exact Screenshot Bento Grid + Frontline Sentinel Image)
+          TAB 1: OVERVIEW (Bento Grid + Child Transmission + Reference Labs)
       ══════════════════════════════════════════════════════════════════════ */}
       {activeTab === 'overview' && (
-        <div className="grid grid-cols-1 lg:grid-cols-12 gap-5 animate-in fade-in duration-300">
+        <div className="grid grid-cols-1 lg:grid-cols-12 gap-5 animate-in fade-in duration-300 text-left">
           
           {/* ── LEFT COLUMN (4 Cols) ─────────────────────────────────── */}
           <div className="lg:col-span-4 space-y-4 flex flex-col justify-between">
             
-            {/* Card 1: Current Conditions */}
+            {/* Card 1: Current Conditions Grid */}
             <div className="bg-white rounded-[26px] p-5 shadow-xs border border-black/5 space-y-4">
               <div className="flex items-center justify-between">
                 <div>
                   <h3 className="font-bold text-base text-[#1D1D1F]">
-                    Current Conditions
+                    Epidemiological Indicators
                   </h3>
                   <p className="text-[11px] text-gray-400 font-medium">
-                    Verified clinical readings • {currentState.name}
+                    2025 Validated Baseline &bull; {currentState.name}
                   </p>
                 </div>
                 <button
-                  onClick={() => setSelectedMetricModal('Current Conditions Breakdown')}
+                  onClick={() => setSelectedMetricModal('Epidemiological Baseline Breakdown')}
                   className="w-7 h-7 rounded-lg hover:bg-gray-100 flex items-center justify-center text-gray-400 hover:text-black transition-colors"
                 >
                   <Maximize2 className="w-3.5 h-3.5" />
@@ -599,43 +651,58 @@ export const SurveillanceHubConsole: React.FC<SurveillanceHubConsoleProps> = ({
               {/* 2x2 Metric Grid */}
               <div className="grid grid-cols-2 gap-2.5">
                 
-                {/* Tile 1: Active Sentinel PHCs */}
+                {/* Tile 1: New Leprosy Cases */}
                 <div className="bg-[#F6F6F8] rounded-2xl p-3.5 space-y-1">
                   <span className="text-[11px] text-gray-500 font-medium block">
-                    Active PHCs
+                    New Leprosy Cases
                   </span>
                   <span className="text-xl sm:text-2xl font-black text-[#1D1D1F] tracking-tight block">
-                    {currentState.activeFacilities} <span className="text-xs font-normal text-gray-400">sites</span>
+                    {currentState.leprosyCases} <span className="text-xs font-normal text-gray-400">cases</span>
+                  </span>
+                  <span className="text-[10px] text-gray-400 font-mono">
+                    PB: {currentState.leprosyPB} | MB: {currentState.leprosyMB}
                   </span>
                 </div>
 
-                {/* Tile 2: MDT Cure Rate */}
+                {/* Tile 2: Grade-2 Disability */}
                 <div className="bg-[#F6F6F8] rounded-2xl p-3.5 space-y-1">
                   <span className="text-[11px] text-gray-500 font-medium block">
-                    MDT Cure Rate
+                    Grade-2 Disability
                   </span>
-                  <span className="text-xl sm:text-2xl font-black text-emerald-600 tracking-tight block">
-                    {currentState.leprosyCureRate}%
+                  <span className="text-xl sm:text-2xl font-black text-[#DE322D] tracking-tight block">
+                    {currentState.leprosyG2D}%
+                  </span>
+                  <span className="text-[10px] text-gray-400 font-mono">
+                    {currentState.leprosyG2DCases} cases (Target &lt;4.8%)
                   </span>
                 </div>
 
-                {/* Tile 3: Total Screened */}
-                <div className="bg-[#F6F6F8] rounded-2xl p-3.5 space-y-1">
-                  <span className="text-[11px] text-gray-500 font-medium block">
-                    Total Screened
+                {/* Tile 3: Child Cases (New WHO Transmission Indicator) */}
+                <div className="bg-amber-50/60 rounded-2xl p-3.5 space-y-1 border border-amber-200/50">
+                  <div className="flex items-center justify-between">
+                    <span className="text-[11px] text-amber-900 font-bold block flex items-center gap-1">
+                      <Baby className="w-3 h-3 text-amber-600" />
+                      Child Rate (&lt;15)
+                    </span>
+                  </div>
+                  <span className="text-xl sm:text-2xl font-black text-amber-700 tracking-tight block">
+                    {currentState.childRate}%
                   </span>
-                  <span className="text-xl sm:text-2xl font-black text-[#1D1D1F] tracking-tight block">
-                    {currentState.totalScreened.toLocaleString()}
+                  <span className="text-[10px] text-amber-800 font-mono">
+                    {currentState.childCases} cases (WHO Target: 0%)
                   </span>
                 </div>
 
-                {/* Tile 4: Grade-2 Disability */}
+                {/* Tile 4: Buruli Ulcer Notified */}
                 <div className="bg-[#F6F6F8] rounded-2xl p-3.5 space-y-1">
                   <span className="text-[11px] text-gray-500 font-medium block">
-                    G2D Target
+                    Buruli Ulcer Cases
                   </span>
                   <span className="text-xl sm:text-2xl font-black text-[#0071E3] tracking-tight block">
-                    {currentState.leprosyG2D}%
+                    {currentState.buruliCases} <span className="text-xs font-normal text-gray-400">cases</span>
+                  </span>
+                  <span className="text-[10px] text-emerald-600 font-mono font-bold">
+                    PCR Confirmed: {currentState.buruliPcrRate}%
                   </span>
                 </div>
 
@@ -643,73 +710,12 @@ export const SurveillanceHubConsole: React.FC<SurveillanceHubConsoleProps> = ({
 
               <div className="flex items-center gap-1.5 text-[11px] text-gray-400 font-medium">
                 <Info className="w-3.5 h-3.5 shrink-0 text-gray-400" />
-                <span>Diagnostic verification synced from local health facilities.</span>
-              </div>
-
-              <button
-                onClick={() => setSelectedMetricModal('Detailed Clinical Telemetry')}
-                className="w-full bg-[#1D1D1F] hover:bg-black active:scale-[0.99] text-white py-3 rounded-2xl font-bold text-xs shadow-sm transition-all cursor-pointer"
-              >
-                View Detailed Report
-              </button>
-            </div>
-
-            {/* Card 2: MDT Consumption Breakdown */}
-            <div className="bg-white rounded-[26px] p-5 shadow-xs border border-black/5 space-y-3">
-              <div className="flex items-center justify-between">
-                <div className="flex items-center gap-1.5">
-                  <h3 className="font-bold text-base text-[#1D1D1F]">
-                    MDT Treatment Regimens
-                  </h3>
-                  <Info className="w-3.5 h-3.5 text-gray-400" />
-                </div>
-                <button
-                  onClick={() => setSelectedMetricModal('MDT Consumption Breakdown')}
-                  className="w-7 h-7 rounded-lg hover:bg-gray-100 flex items-center justify-center text-gray-400 hover:text-black transition-colors"
-                >
-                  <Maximize2 className="w-3.5 h-3.5" />
-                </button>
-              </div>
-
-              <div>
-                <span className="text-2xl sm:text-3xl font-black font-mono text-[#1D1D1F] tracking-tight">
-                  {(currentState.leprosyCases + currentState.buruliCases).toLocaleString()}{' '}
-                  <span className="text-xs font-sans font-medium text-gray-500">Active Regimens</span>
-                </span>
-              </div>
-
-              {/* Split Progress Bar */}
-              <div className="space-y-1.5">
-                <div className="flex items-center justify-between text-[10px] font-mono font-bold text-gray-500">
-                  <span className="flex items-center gap-1">
-                    <span className="w-2 h-2 rounded-full bg-[#00D26A]" />
-                    PB Leprosy: {currentState.leprosyPB}
-                  </span>
-                  <span className="flex items-center gap-1">
-                    <span className="w-2 h-2 rounded-full bg-[#0071E3]" />
-                    MB Leprosy: {currentState.leprosyMB}
-                  </span>
-                </div>
-
-                <div className="h-4 w-full bg-gray-100 rounded-lg overflow-hidden flex">
-                  <div
-                    style={{ width: `${Math.round((currentState.leprosyPB / (currentState.leprosyCases || 1)) * 100)}%` }}
-                    className="h-full bg-[#00D26A] flex items-center justify-center text-[9px] font-bold text-white transition-all"
-                  >
-                    PB
-                  </div>
-                  <div
-                    style={{ width: `${Math.round((currentState.leprosyMB / (currentState.leprosyCases || 1)) * 100)}%` }}
-                    className="h-full bg-[#0071E3] flex items-center justify-center text-[9px] font-bold text-white transition-all"
-                  >
-                    MB
-                  </div>
-                </div>
+                <span>Zero-PII anonymized registry from 312 sentinel health facilities.</span>
               </div>
             </div>
 
-            {/* Card 3: Reference Laboratory & Diagnostics Stream (Replaced Static Alerts) */}
-            <div className="bg-white rounded-[26px] p-5 shadow-xs border border-black/5 space-y-3.5 text-left">
+            {/* Card 2: Reference Laboratory Diagnostics & Route Matrix */}
+            <div className="bg-white rounded-[26px] p-5 shadow-xs border border-black/5 space-y-3 text-left">
               <div className="flex items-center justify-between">
                 <div className="flex items-center gap-2">
                   <div className="w-8 h-8 rounded-xl bg-purple-50 text-purple-600 flex items-center justify-center font-bold">
@@ -717,10 +723,10 @@ export const SurveillanceHubConsole: React.FC<SurveillanceHubConsoleProps> = ({
                   </div>
                   <div>
                     <h3 className="font-bold text-sm text-[#1D1D1F]">
-                      Reference Labs & Diagnostics
+                      Regional Reference Labs
                     </h3>
                     <p className="text-[10px] text-gray-400">
-                      Real-time PCR confirmation & staging telemetry
+                      IS2404 qPCR and GeneXpert diagnostic telemetry
                     </p>
                   </div>
                 </div>
@@ -731,28 +737,28 @@ export const SurveillanceHubConsole: React.FC<SurveillanceHubConsoleProps> = ({
                 {/* Lab 1 */}
                 <div className="p-3 bg-[#F8F9FB] rounded-2xl border border-black/5 space-y-1">
                   <div className="flex items-center justify-between font-bold text-[#1D1D1F]">
-                    <span>Mile 4 Reference Hospital Lab</span>
-                    <span className="text-[10px] font-mono text-emerald-600 bg-emerald-50 px-2 py-0.5 rounded-full">
-                      PCR Validated
+                    <span>UNTH Molecular Lab Hub</span>
+                    <span className="text-[10px] font-mono text-purple-700 bg-purple-100 px-2 py-0.5 rounded-full">
+                      IS2404 PCR Regional Hub
                     </span>
                   </div>
                   <div className="text-[11px] text-gray-500 flex items-center justify-between">
-                    <span>IS2404 DNA Extraction: Active</span>
-                    <span className="font-mono text-gray-700">Turnaround: 4.8d</span>
+                    <span>Enugu &amp; South-East qPCR Verification</span>
+                    <span className="font-mono text-gray-700">Turnaround: 3.2d</span>
                   </div>
                 </div>
 
                 {/* Lab 2 */}
                 <div className="p-3 bg-[#F8F9FB] rounded-2xl border border-black/5 space-y-1">
                   <div className="flex items-center justify-between font-bold text-[#1D1D1F]">
-                    <span>Oji River Diagnostic Lab</span>
-                    <span className="text-[10px] font-mono text-[#0071E3] bg-[#0071E3]/10 px-2 py-0.5 rounded-full">
-                      Slit-Skin Sync
+                    <span>Mile 4 Hospital Reference Center</span>
+                    <span className="text-[10px] font-mono text-emerald-700 bg-emerald-100 px-2 py-0.5 rounded-full">
+                      Specimen &amp; Smear Unit
                     </span>
                   </div>
                   <div className="text-[11px] text-gray-500 flex items-center justify-between">
-                    <span>Bacterial Index (BI) Mapping</span>
-                    <span className="font-mono text-gray-700">24hr Telemetry</span>
+                    <span>Abakaliki Clinical Staging &amp; GeneXpert</span>
+                    <span className="font-mono text-gray-700">Turnaround: 4.8d</span>
                   </div>
                 </div>
               </div>
@@ -787,11 +793,11 @@ export const SurveillanceHubConsole: React.FC<SurveillanceHubConsoleProps> = ({
                 </span>
               </div>
               <p className="text-xs text-gray-500 font-medium">
-                Capital: {currentState.capital} • {currentState.zone}
+                Capital: {currentState.capital} &bull; {currentState.zone}
               </p>
             </div>
 
-            {/* Key Metric Card: Active Cases */}
+            {/* Key Metric Card: Total Active Staging */}
             <div className="bg-gradient-to-br from-[#F5F9FF] to-[#EDF4FE] rounded-2xl p-4 border border-[#0071E3]/15 flex items-center justify-between">
               <div>
                 <span className="text-[11px] font-mono font-bold uppercase tracking-wider text-[#0071E3] block">
@@ -829,58 +835,58 @@ export const SurveillanceHubConsole: React.FC<SurveillanceHubConsoleProps> = ({
               {/* Tile 2 */}
               <div className="bg-[#F8F9FB] rounded-2xl p-3 border border-black/5 text-center space-y-0.5">
                 <span className="text-[10px] font-sans font-semibold text-gray-500 uppercase block">
-                  Sentinel Labs
+                  Child Cases
                 </span>
-                <span className="text-base font-black text-[#0071E3] block">
-                  {currentState.sentinelLabs}
+                <span className={`text-base font-black block ${currentState.childCases > 0 ? 'text-amber-600' : 'text-emerald-600'}`}>
+                  {currentState.childCases}
                 </span>
-                <span className="text-[10px] font-mono text-gray-400">Reference Sites</span>
+                <span className="text-[10px] font-mono text-gray-400">Transmission</span>
               </div>
 
               {/* Tile 3 */}
               <div className="bg-[#F8F9FB] rounded-2xl p-3 border border-black/5 text-center space-y-0.5">
                 <span className="text-[10px] font-sans font-semibold text-gray-500 uppercase block">
-                  PCR Accuracy
+                  PCR Confirmed
                 </span>
-                <span className="text-base font-black text-emerald-600 block">
+                <span className="text-base font-black text-purple-600 block">
                   {currentState.buruliPcrRate}%
                 </span>
-                <span className="text-[10px] font-mono text-gray-400">IS2404 Confirmed</span>
+                <span className="text-[10px] font-mono text-gray-400">IS2404 qPCR</span>
               </div>
             </div>
 
-            {/* Staging Distribution Progress */}
+            {/* Diagnostic Modality Bar */}
             <div className="space-y-1.5 pt-1">
               <div className="flex items-center justify-between text-[10px] font-mono text-gray-500">
-                <span>PB: {currentState.leprosyPB}</span>
-                <span>MB: {currentState.leprosyMB}</span>
-                <span>BU: {currentState.buruliCases}</span>
+                <span>PCR: {currentState.buruliPcrCases}</span>
+                <span>Clinical: {currentState.buruliClinicalCases}</span>
+                <span>Smear: {currentState.buruliMicroscopyCases}</span>
               </div>
-              <div className="h-2 w-full bg-gray-100 rounded-full overflow-hidden flex">
+              <div className="h-2.5 w-full bg-gray-100 rounded-full overflow-hidden flex">
                 <div 
-                  style={{ width: `${Math.round((currentState.leprosyPB / (currentState.leprosyCases + currentState.buruliCases || 1)) * 100)}%` }} 
-                  className="h-full bg-emerald-500" 
-                  title="PB Leprosy"
+                  style={{ width: `${Math.round((currentState.buruliPcrCases / (currentState.buruliCases || 1)) * 100)}%` }} 
+                  className="h-full bg-purple-600" 
+                  title="IS2404 PCR Confirmed"
                 />
                 <div 
-                  style={{ width: `${Math.round((currentState.leprosyMB / (currentState.leprosyCases + currentState.buruliCases || 1)) * 100)}%` }} 
+                  style={{ width: `${Math.round((currentState.buruliClinicalCases / (currentState.buruliCases || 1)) * 100)}%` }} 
                   className="h-full bg-[#0071E3]" 
-                  title="MB Leprosy"
+                  title="Clinical Diagnosis"
                 />
                 <div 
-                  style={{ width: `${Math.round((currentState.buruliCases / (currentState.leprosyCases + currentState.buruliCases || 1)) * 100)}%` }} 
-                  className="h-full bg-amber-500" 
-                  title="Buruli Ulcer"
+                  style={{ width: `${Math.round((currentState.buruliMicroscopyCases / (currentState.buruliCases || 1)) * 100)}%` }} 
+                  className="h-full bg-emerald-500" 
+                  title="Microscopy / Smear"
                 />
               </div>
             </div>
 
             {/* Quick Action Button */}
             <button
-              onClick={() => setSelectedMetricModal(`${currentState.name} Epidemiological Summary`)}
+              onClick={() => setActiveTab('pcr')}
               className="w-full bg-[#1D1D1F] hover:bg-[#0071E3] active:scale-[0.99] text-white py-3 rounded-2xl font-bold text-xs shadow-xs transition-all cursor-pointer flex items-center justify-center gap-2"
             >
-              <span>Explore {currentState.name} Telemetry</span>
+              <span>Explore Diagnostic Modalities</span>
               <ArrowUpRight className="w-3.5 h-3.5" />
             </button>
 
@@ -893,28 +899,23 @@ export const SurveillanceHubConsole: React.FC<SurveillanceHubConsoleProps> = ({
             <div className="flex items-center justify-between bg-white rounded-2xl px-4 py-3 shadow-xs border border-black/5 text-xs text-gray-600">
               <div className="flex items-center gap-2 font-medium">
                 <Calendar className="w-3.5 h-3.5 text-gray-400" />
-                <span>Today</span>
+                <span>Reporting Cycle</span>
                 <span className="text-gray-300">|</span>
-                <span className="font-mono text-gray-500">{currentState.lastUpdated}</span>
+                <span className="font-mono text-gray-500">2025 Reconciled (Aug 2026 Cycle)</span>
               </div>
               <span className="text-[10px] font-bold text-emerald-600 bg-emerald-50 px-2.5 py-0.5 rounded-full flex items-center gap-1">
                 <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-ping" />
-                Active Feed
+                Verified
               </span>
             </div>
 
-            {/* Card 1: Clinical Staging Metrics (2 SVG Arc Gauges) */}
+            {/* Card 1: Clinical Staging Gauges */}
             <div className="bg-white rounded-[26px] p-5 shadow-xs border border-black/5 space-y-4">
               <div className="flex items-center justify-between">
                 <h3 className="font-bold text-base text-[#1D1D1F]">
-                  Clinical Staging Metrics
+                  Disability &amp; Transmission Gauges
                 </h3>
-                <button
-                  onClick={() => setSelectedMetricModal('Staging Benchmarks')}
-                  className="w-7 h-7 rounded-lg hover:bg-gray-100 flex items-center justify-center text-gray-400 hover:text-black transition-colors"
-                >
-                  <Maximize2 className="w-3.5 h-3.5" />
-                </button>
+                <span className="text-[10px] font-mono text-gray-400 font-bold">WHO 2030 Targets</span>
               </div>
 
               {/* 2 Semicircular Arc Gauges */}
@@ -934,7 +935,7 @@ export const SurveillanceHubConsole: React.FC<SurveillanceHubConsoleProps> = ({
                       <path
                         d="M 10 50 A 40 40 0 0 1 55 12"
                         fill="none"
-                        stroke="#0071E3"
+                        stroke="#DE322D"
                         strokeWidth="8"
                         strokeLinecap="round"
                       />
@@ -944,11 +945,11 @@ export const SurveillanceHubConsole: React.FC<SurveillanceHubConsoleProps> = ({
                     </span>
                   </div>
                   <span className="text-[10px] text-gray-400 font-mono block">
-                    G2D Disability Rate
+                    G2D Disability (Target &lt;4.8%)
                   </span>
                 </div>
 
-                {/* Gauge 2: Cure Rate */}
+                {/* Gauge 2: Child Transmission */}
                 <div className="flex flex-col items-center space-y-1">
                   <div className="relative w-28 h-16 flex items-end justify-center">
                     <svg className="w-28 h-16" viewBox="0 0 100 55">
@@ -960,19 +961,19 @@ export const SurveillanceHubConsole: React.FC<SurveillanceHubConsoleProps> = ({
                         strokeLinecap="round"
                       />
                       <path
-                        d="M 10 50 A 40 40 0 0 1 80 25"
+                        d="M 10 50 A 40 40 0 0 1 35 22"
                         fill="none"
-                        stroke="#00D26A"
+                        stroke="#F59E0B"
                         strokeWidth="8"
                         strokeLinecap="round"
                       />
                     </svg>
                     <span className="absolute bottom-0 text-xl font-black font-mono text-[#1D1D1F]">
-                      {currentState.leprosyCureRate}%
+                      {currentState.childRate}%
                     </span>
                   </div>
                   <span className="text-[10px] text-gray-400 font-mono block">
-                    WHO MDT Cure Rate
+                    Child Cases (Target: 0%)
                   </span>
                 </div>
 
@@ -1054,7 +1055,7 @@ export const SurveillanceHubConsole: React.FC<SurveillanceHubConsoleProps> = ({
       )}
 
       {/* ══════════════════════════════════════════════════════════════════════
-          TAB 2: ANALYTICS (State-Reactive Epidemiological Dynamics & Graphs)
+          TAB 2: ANALYTICS (Longitudinal Epidemiological Trends 2021-2026)
       ══════════════════════════════════════════════════════════════════════ */}
       {activeTab === 'analytics' && (
         <div className="space-y-6 animate-in fade-in duration-300 text-left">
@@ -1063,13 +1064,13 @@ export const SurveillanceHubConsole: React.FC<SurveillanceHubConsoleProps> = ({
           <div className="bg-white rounded-[26px] p-6 shadow-xs border border-black/5 flex flex-col md:flex-row md:items-center justify-between gap-4">
             <div className="space-y-1">
               <span className="text-[11px] font-bold uppercase tracking-wider text-[#0071E3]">
-                State Epidemiological Profile
+                Longitudinal Multi-Year Surveillance (2021–2026)
               </span>
               <h3 className="text-2xl font-extrabold text-[#1D1D1F]">
-                {currentState.name} Longitudinal Analytics
+                {currentState.name} Epidemiological Trends
               </h3>
               <p className="text-xs text-gray-500">
-                10-quarter historical trends from 2024 Q1 to 2026 Q2 across {currentState.lgasCovered} LGAs.
+                Validated against RedAid Nigeria 5-State Leprosy &amp; Buruli Ulcer Registry Dataset.
               </p>
             </div>
 
@@ -1079,27 +1080,27 @@ export const SurveillanceHubConsole: React.FC<SurveillanceHubConsoleProps> = ({
                 <strong className="text-base text-emerald-600 font-bold">{currentState.leprosyCureRate}%</strong>
               </div>
               <div className="bg-[#F6F6F8] rounded-2xl px-4 py-3 text-center">
-                <span className="text-[10px] text-gray-400 uppercase font-mono block">G2D Reduction</span>
-                <strong className="text-base text-[#0071E3] font-bold">{currentState.leprosyG2D}%</strong>
+                <span className="text-[10px] text-gray-400 uppercase font-mono block">Child Cases</span>
+                <strong className="text-base text-amber-600 font-bold">{currentState.childCases} ({currentState.childRate}%)</strong>
               </div>
               <div className="bg-[#F6F6F8] rounded-2xl px-4 py-3 text-center">
-                <span className="text-[10px] text-gray-400 uppercase font-mono block">Lab Turnaround</span>
-                <strong className="text-base text-black font-bold">{currentState.avgLabTurnaroundDays}d</strong>
+                <span className="text-[10px] text-gray-400 uppercase font-mono block">PCR Confirmation</span>
+                <strong className="text-base text-purple-600 font-bold">{currentState.buruliPcrRate}%</strong>
               </div>
             </div>
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
             
-            {/* Graph 1: State Specific Longitudinal Trend */}
+            {/* Graph 1: 5-Year Case Notification Trend */}
             <div className="bg-white rounded-[28px] p-6 shadow-xs border border-black/5 space-y-4">
               <div className="flex items-center justify-between">
                 <div>
                   <h4 className="font-extrabold text-base text-[#1D1D1F]">
-                    {currentState.name} Case Reduction (2024–2026)
+                    {currentState.name} Annual Trend (2021–2026)
                   </h4>
                   <p className="text-xs text-gray-500">
-                    Quarterly active cases tracking Leprosy & Buruli Ulcer
+                    Leprosy vs Buruli Ulcer case notifications with child transmission tracking
                   </p>
                 </div>
                 <TrendingDown className="w-5 h-5 text-emerald-600" />
@@ -1119,16 +1120,16 @@ export const SurveillanceHubConsole: React.FC<SurveillanceHubConsoleProps> = ({
                           style={{ height: `${lepHeight}%` }}
                           className="w-full max-w-[20px] bg-[#0071E3] rounded-t-md transition-all group-hover/bar:brightness-110 relative"
                         >
-                          <span className="opacity-0 group-hover/bar:opacity-100 transition-opacity absolute -top-6 left-1/2 -translate-x-1/2 bg-black text-white text-[9px] px-1.5 py-0.5 rounded font-mono z-10 whitespace-nowrap">
-                            Lep: {q.leprosy}
+                          <span className="opacity-0 group-hover/bar:opacity-100 transition-opacity absolute -top-8 left-1/2 -translate-x-1/2 bg-black text-white text-[9px] px-1.5 py-0.5 rounded font-mono z-10 whitespace-nowrap">
+                            Lep: {q.leprosy} (Child: {q.child})
                           </span>
                         </div>
                         <div
                           style={{ height: `${burHeight}%` }}
                           className="w-full max-w-[20px] bg-[#F59E0B] rounded-t-md transition-all group-hover/bar:brightness-110 relative"
                         >
-                          <span className="opacity-0 group-hover/bar:opacity-100 transition-opacity absolute -top-6 left-1/2 -translate-x-1/2 bg-black text-white text-[9px] px-1.5 py-0.5 rounded font-mono z-10 whitespace-nowrap">
-                            Bur: {q.buruli}
+                          <span className="opacity-0 group-hover/bar:opacity-100 transition-opacity absolute -top-8 left-1/2 -translate-x-1/2 bg-black text-white text-[9px] px-1.5 py-0.5 rounded font-mono z-10 whitespace-nowrap">
+                            Buruli: {q.buruli} (PCR: {q.pcrRate}%)
                           </span>
                         </div>
                       </div>
@@ -1141,7 +1142,7 @@ export const SurveillanceHubConsole: React.FC<SurveillanceHubConsoleProps> = ({
               <div className="flex items-center justify-center gap-6 text-xs font-semibold text-gray-600">
                 <span className="flex items-center gap-2">
                   <span className="w-3 h-3 rounded-sm bg-[#0071E3]" />
-                  Leprosy Cases ({currentState.leprosyCases})
+                  Leprosy ({currentState.leprosyCases})
                 </span>
                 <span className="flex items-center gap-2">
                   <span className="w-3 h-3 rounded-sm bg-[#F59E0B]" />
@@ -1150,7 +1151,7 @@ export const SurveillanceHubConsole: React.FC<SurveillanceHubConsoleProps> = ({
               </div>
             </div>
 
-            {/* Graph 2: Sentinel LGA Density & Hotspot Distribution */}
+            {/* Graph 2: Sentinel LGA Hotspot Density */}
             <div className="bg-white rounded-[28px] p-6 shadow-xs border border-black/5 space-y-4">
               <div className="flex items-center justify-between">
                 <div>
@@ -1172,8 +1173,8 @@ export const SurveillanceHubConsole: React.FC<SurveillanceHubConsoleProps> = ({
                       <div className="flex items-center justify-between text-xs font-bold text-gray-700">
                         <span>{lga} LGA</span>
                         <span className="font-mono text-[#0071E3]">
-                          ~{Math.round(currentState.totalScreened / (idx + 4))} cases{' '}
-                          <span className="text-gray-400 font-normal">({pct}% screened)</span>
+                          ~{Math.round(currentState.totalScreened / (idx + 4))} screened{' '}
+                          <span className="text-gray-400 font-normal">({pct}% coverage)</span>
                         </span>
                       </div>
                       <div className="h-2 w-full bg-gray-100 rounded-full overflow-hidden">
@@ -1188,7 +1189,7 @@ export const SurveillanceHubConsole: React.FC<SurveillanceHubConsoleProps> = ({
               </div>
 
               <div className="p-3 bg-amber-50/60 rounded-2xl border border-amber-200/50 text-[11px] text-amber-900 leading-relaxed">
-                💡 <strong>Surveillance Insight:</strong> Routine early screening in {currentState.highRiskLgas[0] || 'primary LGAs'} prevents Grade-2 permanent disabilities before nerve impairment occurs.
+                💡 <strong>Surveillance Insight:</strong> Active case finding in {currentState.highRiskLgas[0] || 'endemic LGAs'} with Single-Dose Rifampicin Post-Exposure Prophylaxis (SDR-PEP) breaks the chain of household transmission.
               </div>
             </div>
 
@@ -1198,7 +1199,293 @@ export const SurveillanceHubConsole: React.FC<SurveillanceHubConsoleProps> = ({
       )}
 
       {/* ══════════════════════════════════════════════════════════════════════
-          TAB 3: MONITORING (Live Sentinel Facility Fleet & Logistics Status)
+          TAB 3: PCR DIAGNOSTICS & MOLECULAR LAB LINKAGE (Table 7 & Pillar 2)
+      ══════════════════════════════════════════════════════════════════════ */}
+      {activeTab === 'pcr' && (
+        <div className="space-y-6 animate-in fade-in duration-300 text-left">
+          
+          {/* Top Banner */}
+          <div className="bg-gradient-to-r from-purple-900 via-indigo-950 to-[#1D1D1F] text-white rounded-[28px] p-6 sm:p-8 shadow-xl flex flex-col md:flex-row md:items-center justify-between gap-6">
+            <div className="space-y-2">
+              <span className="text-xs font-mono font-bold tracking-widest text-purple-300 uppercase flex items-center gap-2">
+                <FlaskConical className="w-4 h-4 text-purple-400" />
+                NTBLCP Strategic Pillar 2: Scale-Up of Laboratory PCR Confirmation
+              </span>
+              <h3 className="text-2xl sm:text-3xl font-display font-black tracking-tight">
+                IS2404 Real-Time qPCR Diagnostic Telemetry
+              </h3>
+              <p className="text-xs sm:text-sm text-gray-300 max-w-2xl leading-relaxed">
+                WHO Buruli Ulcer confirmation guidelines require &gt;70% molecular confirmation. In Nigeria, PCR-confirmed cases jumped from 0.4% in 2023 to <strong>27.1% in 2025</strong>, aiming for <strong>78.5% by 2026</strong>.
+              </p>
+            </div>
+
+            <div className="flex items-center gap-3 shrink-0">
+              <div className="bg-white/10 backdrop-blur-md rounded-2xl p-4 text-center border border-white/10">
+                <span className="text-[10px] font-mono uppercase text-purple-200 block">PCR Positivity</span>
+                <strong className="text-2xl font-black text-white">{currentState.buruliPcrRate}%</strong>
+                <span className="text-[10px] text-emerald-400 block font-mono">IS2404 qPCR</span>
+              </div>
+              <div className="bg-white/10 backdrop-blur-md rounded-2xl p-4 text-center border border-white/10">
+                <span className="text-[10px] font-mono uppercase text-purple-200 block">Lab Turnaround</span>
+                <strong className="text-2xl font-black text-white">{currentState.avgLabTurnaroundDays}d</strong>
+                <span className="text-[10px] text-gray-300 block font-mono">Courier to Result</span>
+              </div>
+            </div>
+          </div>
+
+          {/* 3-Column Diagnostic Modality Breakdown (Table 7) */}
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-5">
+            
+            {/* Card 1: IS2404 qPCR */}
+            <div className="bg-white rounded-[26px] p-5 shadow-xs border border-purple-200 space-y-3">
+              <div className="flex items-center justify-between">
+                <span className="text-[11px] font-mono font-bold text-purple-700 bg-purple-100 px-2.5 py-1 rounded-full">
+                  Gold Standard (WHO)
+                </span>
+                <span className="text-xs font-mono font-bold text-gray-400">{currentState.buruliPcrRate}%</span>
+              </div>
+              <h4 className="font-extrabold text-base text-[#1D1D1F]">
+                IS2404 Real-Time PCR
+              </h4>
+              <p className="text-xs text-gray-500 leading-relaxed">
+                DNA amplification targeting the <em>IS2404</em> sequence of <em>M. ulcerans</em> with &gt;95% diagnostic specificity.
+              </p>
+              <div className="pt-2 border-t border-gray-100 flex items-center justify-between font-mono text-xs">
+                <span className="text-gray-400">Confirmed Cases:</span>
+                <strong className="text-purple-700 font-bold">{currentState.buruliPcrCases} cases</strong>
+              </div>
+            </div>
+
+            {/* Card 2: Direct Clinical Staging */}
+            <div className="bg-white rounded-[26px] p-5 shadow-xs border border-black/5 space-y-3">
+              <div className="flex items-center justify-between">
+                <span className="text-[11px] font-mono font-bold text-blue-700 bg-blue-100 px-2.5 py-1 rounded-full">
+                  Bedside Staging
+                </span>
+                <span className="text-xs font-mono font-bold text-gray-400">53.2%</span>
+              </div>
+              <h4 className="font-extrabold text-base text-[#1D1D1F]">
+                Clinical Lesion Staging
+              </h4>
+              <p className="text-xs text-gray-500 leading-relaxed">
+                Category I (&lt;5cm), Category II (5–15cm), and Category III (&gt;15cm) physical identification by trained field officers.
+              </p>
+              <div className="pt-2 border-t border-gray-100 flex items-center justify-between font-mono text-xs">
+                <span className="text-gray-400">Clinical Only:</span>
+                <strong className="text-blue-700 font-bold">{currentState.buruliClinicalCases} cases</strong>
+              </div>
+            </div>
+
+            {/* Card 3: ZN Direct Smear Microscopy */}
+            <div className="bg-white rounded-[26px] p-5 shadow-xs border border-black/5 space-y-3">
+              <div className="flex items-center justify-between">
+                <span className="text-[11px] font-mono font-bold text-emerald-700 bg-emerald-100 px-2.5 py-1 rounded-full">
+                  Light Microscopy
+                </span>
+                <span className="text-xs font-mono font-bold text-gray-400">19.7%</span>
+              </div>
+              <h4 className="font-extrabold text-base text-[#1D1D1F]">
+                Ziehl-Neelsen (ZN) Smear
+              </h4>
+              <p className="text-xs text-gray-500 leading-relaxed">
+                Direct acid-fast bacilli staining from wound edge swabs and fine-needle aspirates (FNA) at district hospital labs.
+              </p>
+              <div className="pt-2 border-t border-gray-100 flex items-center justify-between font-mono text-xs">
+                <span className="text-gray-400">Smear Verified:</span>
+                <strong className="text-emerald-700 font-bold">{currentState.buruliMicroscopyCases} cases</strong>
+              </div>
+            </div>
+
+          </div>
+
+          {/* Reference Laboratories Routing Hubs */}
+          <div className="bg-white rounded-[28px] p-6 shadow-xs border border-black/5 space-y-4">
+            <div className="flex items-center justify-between">
+              <div>
+                <h4 className="font-extrabold text-base text-[#1D1D1F]">
+                  South-East Sentinel Laboratory Network &amp; Transport Couriers
+                </h4>
+                <p className="text-xs text-gray-500">
+                  Specimen collection, cold-chain transport buffer, and result linkage times
+                </p>
+              </div>
+              <span className="text-xs font-mono font-bold text-emerald-600 bg-emerald-50 px-3 py-1 rounded-full">
+                {currentState.specimenLinkageRate}% Specimen Linkage in &le;7d
+              </span>
+            </div>
+
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div className="p-4 bg-[#F8F9FB] rounded-2xl border border-black/5 space-y-2">
+                <div className="flex items-center justify-between">
+                  <strong className="text-sm text-[#1D1D1F]">UNTH Molecular Laboratory Hub (Enugu)</strong>
+                  <span className="text-[10px] font-mono text-purple-700 bg-purple-100 px-2 py-0.5 rounded-full font-bold">qPCR Central Lab</span>
+                </div>
+                <p className="text-xs text-gray-600 leading-relaxed">
+                  Equipped with real-time thermal cyclers and -80°C bio-repository. Serves as the tertiary confirmation center for Enugu, Anambra, and Abia state referrals.
+                </p>
+                <div className="flex items-center justify-between text-xs font-mono text-gray-500 pt-1">
+                  <span>Turnaround Time: 3.2 days</span>
+                  <span className="text-emerald-600 font-bold">Specimen Linkage: 94.8%</span>
+                </div>
+              </div>
+
+              <div className="p-4 bg-[#F8F9FB] rounded-2xl border border-black/5 space-y-2">
+                <div className="flex items-center justify-between">
+                  <strong className="text-sm text-[#1D1D1F]">Mile 4 Hospital Reference Center (Ebonyi)</strong>
+                  <span className="text-[10px] font-mono text-emerald-700 bg-emerald-100 px-2 py-0.5 rounded-full font-bold">Frontline Referral Hub</span>
+                </div>
+                <p className="text-xs text-gray-600 leading-relaxed">
+                  Operates dedicated leprosy/TB clinical labs, GeneXpert units, and primary wound debridement theatre for Category III complex ulcer cases across the Ebonyi mining basin.
+                </p>
+                <div className="flex items-center justify-between text-xs font-mono text-gray-500 pt-1">
+                  <span>Turnaround Time: 4.8 days</span>
+                  <span className="text-emerald-600 font-bold">Specimen Linkage: 89.5%</span>
+                </div>
+              </div>
+            </div>
+          </div>
+
+        </div>
+      )}
+
+      {/* ══════════════════════════════════════════════════════════════════════
+          TAB 4: MEAL QUALITY & DIGITAL HEALTH GOVERNANCE (Table 12 Framework)
+      ══════════════════════════════════════════════════════════════════════ */}
+      {activeTab === 'meal' && (
+        <div className="space-y-6 animate-in fade-in duration-300 text-left">
+          
+          {/* Top Banner */}
+          <div className="bg-white rounded-[26px] p-6 shadow-xs border border-black/5 flex flex-col md:flex-row md:items-center justify-between gap-4">
+            <div className="space-y-1">
+              <span className="text-[11px] font-bold uppercase tracking-wider text-[#0071E3] flex items-center gap-1.5">
+                <ShieldCheck className="w-4 h-4 text-[#0071E3]" />
+                Monitoring, Evaluation, Accountability &amp; Learning (MEAL) Framework
+              </span>
+              <h3 className="text-2xl font-extrabold text-[#1D1D1F]">
+                Digital Data Quality &amp; Governance Matrix
+              </h3>
+              <p className="text-xs text-gray-500">
+                Formal indicators configured per NTBLCP 7th Ed. Guidelines &amp; WHO Data Quality Assurance Modules.
+              </p>
+            </div>
+
+            <div className="flex items-center gap-2">
+              <span className="bg-emerald-50 text-emerald-700 text-xs font-bold px-3.5 py-1.5 rounded-xl border border-emerald-200 flex items-center gap-1.5">
+                <CheckCheck className="w-4 h-4 text-emerald-600" />
+                100% Deterministic Rule Coverage
+              </span>
+            </div>
+          </div>
+
+          {/* 4 MEAL KPI Cards */}
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+            
+            {/* KPI 1 */}
+            <div className="bg-white rounded-2xl p-5 border border-black/5 shadow-xs space-y-2">
+              <div className="flex items-center justify-between">
+                <span className="text-[10px] font-mono uppercase text-gray-400 font-bold">Completeness</span>
+                <span className="text-[10px] font-mono text-emerald-700 bg-emerald-50 px-2 py-0.5 rounded-full font-bold">Target &ge;90%</span>
+              </div>
+              <span className="text-3xl font-black text-[#1D1D1F] block">{NATIONAL_SUMMARY.reportingCompleteness}%</span>
+              <p className="text-[11px] text-gray-500 leading-snug">
+                Submissions received vs expected across 312 active reporting units.
+              </p>
+            </div>
+
+            {/* KPI 2 */}
+            <div className="bg-white rounded-2xl p-5 border border-black/5 shadow-xs space-y-2">
+              <div className="flex items-center justify-between">
+                <span className="text-[10px] font-mono uppercase text-gray-400 font-bold">Timeliness</span>
+                <span className="text-[10px] font-mono text-emerald-700 bg-emerald-50 px-2 py-0.5 rounded-full font-bold">Target &ge;85%</span>
+              </div>
+              <span className="text-3xl font-black text-[#1D1D1F] block">{NATIONAL_SUMMARY.reportingTimeliness}%</span>
+              <p className="text-[11px] text-gray-500 leading-snug">
+                Reports received on or before the NTBLCP quarterly submission deadline.
+              </p>
+            </div>
+
+            {/* KPI 3 */}
+            <div className="bg-white rounded-2xl p-5 border border-black/5 shadow-xs space-y-2">
+              <div className="flex items-center justify-between">
+                <span className="text-[10px] font-mono uppercase text-gray-400 font-bold">Ingestion Latency</span>
+                <span className="text-[10px] font-mono text-[#0071E3] bg-blue-50 px-2 py-0.5 rounded-full font-bold">Target &le;24h</span>
+              </div>
+              <span className="text-3xl font-black text-[#0071E3] block">{NATIONAL_SUMMARY.ingestionLatencyHours}h</span>
+              <p className="text-[11px] text-gray-500 leading-snug">
+                Median time from clinic availability to platform synchronization.
+              </p>
+            </div>
+
+            {/* KPI 4 */}
+            <div className="bg-white rounded-2xl p-5 border border-black/5 shadow-xs space-y-2">
+              <div className="flex items-center justify-between">
+                <span className="text-[10px] font-mono uppercase text-gray-400 font-bold">Exception Resolution</span>
+                <span className="text-[10px] font-mono text-purple-700 bg-purple-50 px-2 py-0.5 rounded-full font-bold">Target &ge;80%</span>
+              </div>
+              <span className="text-3xl font-black text-purple-700 block">{NATIONAL_SUMMARY.highPriorityResolutionRate}%</span>
+              <p className="text-[11px] text-gray-500 leading-snug">
+                High-priority validation exceptions resolved in &le;10 working days.
+              </p>
+            </div>
+
+          </div>
+
+          {/* Indicator Reference Matrix Table */}
+          <div className="bg-white rounded-[28px] overflow-hidden shadow-xs border border-black/5 p-6 space-y-4">
+            <h4 className="font-extrabold text-base text-[#1D1D1F]">
+              Official Indicator Governance &amp; Concordance Status (Table 12)
+            </h4>
+            
+            <div className="overflow-x-auto">
+              <table className="w-full text-left text-xs">
+                <thead className="bg-[#F8F9FB] text-gray-500 font-mono text-[10px] uppercase border-b border-gray-200">
+                  <tr>
+                    <th className="py-3 px-4">Core Indicator</th>
+                    <th className="py-3 px-4">Primary Working Source</th>
+                    <th className="py-3 px-4">2025 Baseline Status</th>
+                    <th className="py-3 px-4">National Proposal Target</th>
+                    <th className="py-3 px-4">Concordance</th>
+                  </tr>
+                </thead>
+                <tbody className="divide-y divide-gray-100 text-gray-700 font-medium">
+                  <tr>
+                    <td className="py-3.5 px-4 font-bold text-[#1D1D1F]">Grade-2 Disability at Diagnosis</td>
+                    <td className="py-3.5 px-4 font-mono text-gray-500">RAN Workbook (5 States)</td>
+                    <td className="py-3.5 px-4 font-mono font-bold text-[#DE322D]">35/162 (21.6%)</td>
+                    <td className="py-3.5 px-4 font-mono text-emerald-600">&lt;4.8% (WHO 2030)</td>
+                    <td className="py-3.5 px-4"><span className="text-emerald-600 font-bold bg-emerald-50 px-2 py-0.5 rounded-full font-mono text-[10px]">100% Verified</span></td>
+                  </tr>
+                  <tr>
+                    <td className="py-3.5 px-4 font-bold text-[#1D1D1F]">Child Leprosy Proportion</td>
+                    <td className="py-3.5 px-4 font-mono text-gray-500">RAN Workbook (Table 5 &amp; 17)</td>
+                    <td className="py-3.5 px-4 font-mono font-bold text-amber-600">5/162 (3.1%)</td>
+                    <td className="py-3.5 px-4 font-mono text-emerald-600">0.0% (Zero-Transmission)</td>
+                    <td className="py-3.5 px-4"><span className="text-emerald-600 font-bold bg-emerald-50 px-2 py-0.5 rounded-full font-mono text-[10px]">100% Verified</span></td>
+                  </tr>
+                  <tr>
+                    <td className="py-3.5 px-4 font-bold text-[#1D1D1F]">Buruli Ulcer PCR Confirmation</td>
+                    <td className="py-3.5 px-4 font-mono text-gray-500">NTBLCP ZRM Report (Table 7)</td>
+                    <td className="py-3.5 px-4 font-mono font-bold text-purple-700">55/203 (27.1%)</td>
+                    <td className="py-3.5 px-4 font-mono text-emerald-600">&gt;70% (Strategic Pillar 2)</td>
+                    <td className="py-3.5 px-4"><span className="text-emerald-600 font-bold bg-emerald-50 px-2 py-0.5 rounded-full font-mono text-[10px]">100% Verified</span></td>
+                  </tr>
+                  <tr>
+                    <td className="py-3.5 px-4 font-bold text-[#1D1D1F]">Specimen-Result Linkage</td>
+                    <td className="py-3.5 px-4 font-mono text-gray-500">Laboratory Linkage Log</td>
+                    <td className="py-3.5 px-4 font-mono font-bold text-blue-700">91.2%</td>
+                    <td className="py-3.5 px-4 font-mono text-emerald-600">&ge;90% in &le;7 days</td>
+                    <td className="py-3.5 px-4"><span className="text-emerald-600 font-bold bg-emerald-50 px-2 py-0.5 rounded-full font-mono text-[10px]">100% Verified</span></td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+
+        </div>
+      )}
+
+      {/* ══════════════════════════════════════════════════════════════════════
+          TAB 5: MONITORING (Live Sentinel Fleet Telemetry)
       ══════════════════════════════════════════════════════════════════════ */}
       {activeTab === 'monitoring' && (
         <div className="space-y-6 animate-in fade-in duration-300 text-left">
@@ -1316,12 +1603,16 @@ export const SurveillanceHubConsole: React.FC<SurveillanceHubConsoleProps> = ({
                 <span className="font-bold text-[#0071E3]">{currentState.leprosyPB} / {currentState.leprosyMB}</span>
               </div>
               <div className="flex justify-between">
-                <span className="text-gray-500">Buruli Cases:</span>
-                <span className="font-bold text-[#F59E0B]">{currentState.buruliCases}</span>
+                <span className="text-gray-500">Child Transmission Cases:</span>
+                <span className="font-bold text-amber-600">{currentState.childCases} ({currentState.childRate}%)</span>
               </div>
               <div className="flex justify-between">
-                <span className="text-gray-500">PCR IS2404 Speed:</span>
-                <span className="font-bold text-emerald-600">{currentState.avgLabTurnaroundDays} days</span>
+                <span className="text-gray-500">Buruli Cases (PCR / Clin / Smear):</span>
+                <span className="font-bold text-[#F59E0B]">{currentState.buruliPcrCases} / {currentState.buruliClinicalCases} / {currentState.buruliMicroscopyCases}</span>
+              </div>
+              <div className="flex justify-between">
+                <span className="text-gray-500">PCR IS2404 Turnaround:</span>
+                <span className="font-bold text-purple-600">{currentState.avgLabTurnaroundDays} days</span>
               </div>
             </div>
 
