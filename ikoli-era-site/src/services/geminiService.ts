@@ -392,7 +392,7 @@ async function callOmniRoute(
 function simulateSmartClinicalResponse(prompt: string, attachment?: GeminiAttachment | null): GeminiResponse {
   const lower = prompt.trim().toLowerCase();
   let text = '';
-  const category = 'Surveillance Intelligence';
+  const category = 'IKOLI AI';
   let followUp: string | undefined = undefined;
 
   // 1. Greetings

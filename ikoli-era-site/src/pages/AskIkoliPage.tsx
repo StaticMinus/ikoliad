@@ -369,7 +369,7 @@ export const AskIkoliPage: React.FC<AskIkoliPageProps> = ({ onNavigate }) => {
                       }`}>
                         <div className="flex items-center gap-2">
                           <span className="text-[11px] font-mono font-bold uppercase tracking-wider text-[#10B981]">
-                            {msg.category || 'IKOLI Intelligence'}
+                            IKOLI AI
                           </span>
                         </div>
                         
