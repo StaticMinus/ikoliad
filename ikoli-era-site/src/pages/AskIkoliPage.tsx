@@ -41,14 +41,45 @@ interface ChatMessage {
   source?: 'omniroute-live' | 'gemini-live' | 'openrouter-live' | 'clinical-knowledge-base';
 }
 
+const CHAT_STORAGE_KEY = 'ikoli_chat_messages_v1';
+
 export const AskIkoliPage: React.FC<AskIkoliPageProps> = ({ onNavigate }) => {
   const [theme, setTheme] = useState<'dark' | 'light'>('light');
   // Audience Response Persona (Default: Public / Plain English)
   const persona: ResponsePersona = 'visitor';
-  const [messages, setMessages] = useState<ChatMessage[]>([]);
+  
+  // Persistent Multi-turn Session Messages State
+  const [messages, setMessages] = useState<ChatMessage[]>(() => {
+    try {
+      const saved = localStorage.getItem(CHAT_STORAGE_KEY);
+      if (saved) {
+        const parsed = JSON.parse(saved);
+        if (Array.isArray(parsed) && parsed.length > 0) {
+          return parsed;
+        }
+      }
+    } catch (err) {
+      console.warn('Failed to restore chat session:', err);
+    }
+    return [];
+  });
+
   const [inputQuery, setInputQuery] = useState('');
   const [isTyping, setIsTyping] = useState(false);
   const [copiedId, setCopiedId] = useState<string | null>(null);
+
+  // Sync messages to localStorage whenever messages change
+  useEffect(() => {
+    try {
+      if (messages.length > 0) {
+        localStorage.setItem(CHAT_STORAGE_KEY, JSON.stringify(messages));
+      } else {
+        localStorage.removeItem(CHAT_STORAGE_KEY);
+      }
+    } catch (err) {
+      console.warn('Failed to persist chat session:', err);
+    }
+  }, [messages]);
 
   const getPlaceholderText = () => {
     if (persona === 'visitor') {
@@ -255,6 +286,11 @@ export const AskIkoliPage: React.FC<AskIkoliPageProps> = ({ onNavigate }) => {
     setMessages([]);
     setInputQuery('');
     setAttachedFile(null);
+    try {
+      localStorage.removeItem(CHAT_STORAGE_KEY);
+    } catch (err) {
+      console.warn('Failed to clear storage:', err);
+    }
   };
 
   return (
