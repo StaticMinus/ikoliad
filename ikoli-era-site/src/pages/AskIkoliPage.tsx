@@ -1,14 +1,17 @@
 import React, { useState, useRef, useEffect } from 'react';
 import {
-  queryGeminiClinicalAI,
+  streamClinicalAI,
   type GeminiAttachment,
   type ResponsePersona,
 } from '../services/geminiService';
+import { webAudioService } from '../services/webAudioService';
 import { ClinicalMarkdown } from '../components/ui/ClinicalMarkdown';
 import { MagneticButton } from '../components/ui/MagneticButton';
 import { GlowingOrb } from '../components/cortex/GlowingOrb';
 import { FeatureActionCards } from '../components/cortex/FeatureActionCards';
 import { CortexSidebar, type ChatSession } from '../components/cortex/CortexSidebar';
+import { ProvenanceBadge } from '../components/cortex/ProvenanceBadge';
+import { ClinicalExportModal } from '../components/cortex/ClinicalExportModal';
 import {
   Paperclip,
   Mic,
@@ -25,14 +28,13 @@ import {
   Square,
   Share2,
   Download,
-  Atom,
   HelpCircle,
   Menu,
   PhoneCall,
   Plus,
   Globe,
   ChevronDown,
-  Image as ImageIcon,
+  ImageIcon,
   Edit3,
 } from 'lucide-react';
 
@@ -60,6 +62,7 @@ export const AskIkoliPage: React.FC<AskIkoliPageProps> = ({ onNavigate }) => {
   const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [deeperResearchActive, setDeeperResearchActive] = useState(true);
+  const [showExportModal, setShowExportModal] = useState(false);
   const persona: ResponsePersona = 'visitor';
 
   // ── 1. Multi-Session Persistent Storage ───────────────────────────
@@ -114,8 +117,10 @@ export const AskIkoliPage: React.FC<AskIkoliPageProps> = ({ onNavigate }) => {
   // Input & Messaging States
   const [inputQuery, setInputQuery] = useState('');
   const [isTyping, setIsTyping] = useState(false);
+  const [isStreaming, setIsStreaming] = useState(false);
   const [isActivelyTyping, setIsActivelyTyping] = useState(false);
   const typingTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const abortControllerRef = useRef<AbortController | null>(null);
 
   const handleInputChange = (val: string) => {
     setInputQuery(val);
@@ -171,6 +176,7 @@ export const AskIkoliPage: React.FC<AskIkoliPageProps> = ({ onNavigate }) => {
       return () => {
         try {
           window.speechSynthesis.cancel();
+          webAudioService.stopSpeechModulation();
         } catch {
           // ignore
         }
@@ -184,7 +190,7 @@ export const AskIkoliPage: React.FC<AskIkoliPageProps> = ({ onNavigate }) => {
   // Smooth scroll feed when messages change
   useEffect(() => {
     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
-  }, [messages, isTyping]);
+  }, [messages, isTyping, isStreaming]);
 
   // ── 2. Session Management Actions ─────────────────────────────────
   const handleNewSession = () => {
@@ -229,43 +235,14 @@ export const AskIkoliPage: React.FC<AskIkoliPageProps> = ({ onNavigate }) => {
     });
   };
 
-  // Export Active Conversation to Markdown
-  const handleExportChat = () => {
-    if (!currentSession || currentSession.messages.length === 0) return;
-
-    let content = `# IKOLI AI — Conversation Transcript\n`;
-    content += `**Topic:** ${currentSession.title}\n`;
-    content += `**Date:** ${new Date(currentSession.createdAt).toLocaleString()}\n`;
-    content += `**Platform:** Ask Ikoli Studio\n\n---\n\n`;
-
-    currentSession.messages.forEach((msg) => {
-      const senderName = msg.sender === 'user' ? '👤 User / Sentinel Officer' : '✨ Ask Ikoli Assistant';
-      content += `### ${senderName} (${msg.timestamp})\n\n${msg.text}\n\n`;
-      if (msg.attachment) {
-        content += `*Attachment:* ${msg.attachment.name} (${msg.attachment.type})\n\n`;
-      }
-      content += `---\n\n`;
-    });
-
-    const blob = new Blob([content], { type: 'text/markdown;charset=utf-8' });
-    const url = URL.createObjectURL(blob);
-    const link = document.createElement('a');
-    link.href = url;
-    link.download = `ikoli-consultation-${currentSession.id}.md`;
-    document.body.appendChild(link);
-    link.click();
-    document.body.removeChild(link);
-    URL.revokeObjectURL(url);
-  };
-
   const handleShareLink = () => {
     navigator.clipboard.writeText(window.location.href);
     setShowShareToast(true);
     setTimeout(() => setShowShareToast(false), 2500);
   };
 
-  // ── 3. Voice Recognition Handler ──────────────────────────────────
-  const handleToggleVoice = () => {
+  // ── 3. Voice Recognition Handler with WebAudio DSP ───────────────
+  const handleToggleVoice = async () => {
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const windowObj = window as any;
     const SpeechRecognition = windowObj.SpeechRecognition || windowObj.webkitSpeechRecognition;
@@ -278,6 +255,7 @@ export const AskIkoliPage: React.FC<AskIkoliPageProps> = ({ onNavigate }) => {
 
     if (isListening) {
       setIsListening(false);
+      webAudioService.stopMicrophone();
       return;
     }
 
@@ -287,9 +265,10 @@ export const AskIkoliPage: React.FC<AskIkoliPageProps> = ({ onNavigate }) => {
       recognition.interimResults = false;
       recognition.lang = 'en-NG'; // Nigerian English standard
 
-      recognition.onstart = () => {
+      recognition.onstart = async () => {
         setIsListening(true);
         setRecognitionError(null);
+        await webAudioService.startMicrophone();
       };
 
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -297,23 +276,27 @@ export const AskIkoliPage: React.FC<AskIkoliPageProps> = ({ onNavigate }) => {
         const transcript = event.results[0][0].transcript;
         setInputQuery((prev) => (prev ? `${prev} ${transcript}` : transcript));
         setIsListening(false);
+        webAudioService.stopMicrophone();
       };
 
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
       recognition.onerror = (event: any) => {
         setIsListening(false);
+        webAudioService.stopMicrophone();
         setRecognitionError(`Voice error: ${event.error}`);
         setTimeout(() => setRecognitionError(null), 4000);
       };
 
       recognition.onend = () => {
         setIsListening(false);
+        webAudioService.stopMicrophone();
       };
 
       recognition.start();
     } catch (err) {
       console.error('Speech recognition exception:', err);
       setIsListening(false);
+      webAudioService.stopMicrophone();
       setRecognitionError('Failed to initialize speech recognition.');
     }
   };
@@ -343,7 +326,7 @@ export const AskIkoliPage: React.FC<AskIkoliPageProps> = ({ onNavigate }) => {
     e.target.value = '';
   };
 
-  // ── 5. Main Send Message Dispatcher ───────────────────────────────
+  // ── 5. Main Send Message Dispatcher with Real-Time Streaming ──────
   const handleSend = async (overridePrompt?: string) => {
     const queryToSend = overridePrompt || inputQuery.trim();
     if (!queryToSend && !attachedFile) return;
@@ -367,9 +350,19 @@ export const AskIkoliPage: React.FC<AskIkoliPageProps> = ({ onNavigate }) => {
     const currentAttachment = attachedFile;
     setAttachedFile(null);
     setIsTyping(true);
+    setIsStreaming(true);
 
-    // Optimistically update session
-    const updatedMessages = [...messages, userMessage];
+    const aiMessageId = 'msg-' + (Date.now() + 1);
+    const initialAiMessage: ChatMessage = {
+      id: aiMessageId,
+      sender: 'ai',
+      text: '',
+      timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
+      source: 'clinical-knowledge-base',
+    };
+
+    // Optimistically update session with User Message + Initial AI placeholder
+    const baseMessages = [...messages, userMessage, initialAiMessage];
     setSessions((prev) =>
       prev.map((s) =>
         s.id === activeSessionId
@@ -377,45 +370,53 @@ export const AskIkoliPage: React.FC<AskIkoliPageProps> = ({ onNavigate }) => {
               ...s,
               title: sessionTitle,
               updatedAt: Date.now(),
-              messages: updatedMessages,
+              messages: baseMessages,
             }
           : s
       )
     );
 
+    // Abort controller for stream cancelation
+    const abortController = new AbortController();
+    abortControllerRef.current = abortController;
+
     try {
-      const aiResponse = await queryGeminiClinicalAI(
+      let latestAiMessage = initialAiMessage;
+
+      for await (const chunk of streamClinicalAI(
         queryToSend,
         currentAttachment || undefined,
-        persona
-      );
+        persona,
+        abortController.signal
+      )) {
+        setIsTyping(false); // First token arrived!
+        latestAiMessage = {
+          ...initialAiMessage,
+          text: chunk.fullText,
+          source: chunk.response.source,
+          category: chunk.response.category,
+          dimensions: chunk.response.dimensions,
+          followUpPrompt: chunk.response.followUpPrompt,
+        };
 
-      const aiMessage: ChatMessage = {
-        id: 'msg-' + (Date.now() + 1),
-        sender: 'ai',
-        text: aiResponse.text,
-        timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
-        source: aiResponse.source,
-        category: aiResponse.category,
-        dimensions: aiResponse.dimensions,
-        followUpPrompt: aiResponse.followUpPrompt,
-      };
+        setSessions((prev) =>
+          prev.map((s) =>
+            s.id === activeSessionId
+              ? {
+                  ...s,
+                  updatedAt: Date.now(),
+                  messages: [...messages, userMessage, latestAiMessage],
+                }
+              : s
+          )
+        );
+      }
 
-      setSessions((prev) =>
-        prev.map((s) =>
-          s.id === activeSessionId
-            ? {
-                ...s,
-                updatedAt: Date.now(),
-                messages: [...updatedMessages, aiMessage],
-              }
-            : s
-        )
-      );
-
+      setIsStreaming(false);
       setIsTyping(false);
     } catch (err) {
-      console.error('Send error:', err);
+      console.error('Send streaming error:', err);
+      setIsStreaming(false);
       setIsTyping(false);
     }
   };
@@ -426,6 +427,7 @@ export const AskIkoliPage: React.FC<AskIkoliPageProps> = ({ onNavigate }) => {
     setTimeout(() => setCopiedId(null), 2000);
   };
 
+  // ── 6. Speech Synthesis with Low-Latency Web Audio DSP ─────────────
   const handleSpeak = (id: string, text: string) => {
     if (typeof window === 'undefined' || !('speechSynthesis' in window)) {
       alert('Text-to-speech is not supported on this browser.');
@@ -436,6 +438,7 @@ export const AskIkoliPage: React.FC<AskIkoliPageProps> = ({ onNavigate }) => {
     if (speakingMessageId === id) {
       try {
         window.speechSynthesis.cancel();
+        webAudioService.stopSpeechModulation();
       } catch {
         // ignore
       }
@@ -451,7 +454,7 @@ export const AskIkoliPage: React.FC<AskIkoliPageProps> = ({ onNavigate }) => {
 
       // Clean text of markdown characters, citations, bullets
       const cleanText = text
-        .replace(/\[\^?\d+\]/g, '')
+        .replace(/\[\^?[^\]]+\]/g, '')
         .replace(/[*_#`~>]/g, '')
         .replace(/•/g, '')
         .replace(/\n+/g, '. ')
@@ -486,11 +489,13 @@ export const AskIkoliPage: React.FC<AskIkoliPageProps> = ({ onNavigate }) => {
       utterance.onstart = () => {
         setSpeakingMessageId(id);
         setIsSpeaking(true);
+        webAudioService.startSpeechModulation();
       };
 
       utterance.onend = () => {
         setSpeakingMessageId(null);
         setIsSpeaking(false);
+        webAudioService.stopSpeechModulation();
         utteranceRef.current = null;
       };
 
@@ -498,6 +503,7 @@ export const AskIkoliPage: React.FC<AskIkoliPageProps> = ({ onNavigate }) => {
         console.warn('Speech synthesis cancelled or encountered error:', e);
         setSpeakingMessageId(null);
         setIsSpeaking(false);
+        webAudioService.stopSpeechModulation();
         utteranceRef.current = null;
       };
 
@@ -508,6 +514,7 @@ export const AskIkoliPage: React.FC<AskIkoliPageProps> = ({ onNavigate }) => {
       console.error('Speech synthesis exception:', err);
       setSpeakingMessageId(null);
       setIsSpeaking(false);
+      webAudioService.stopSpeechModulation();
     }
   };
 
@@ -524,6 +531,16 @@ export const AskIkoliPage: React.FC<AskIkoliPageProps> = ({ onNavigate }) => {
         accept="image/*,.pdf,.doc,.docx"
         className="hidden"
       />
+
+      {/* Clinical Multi-format Export Modal */}
+      {currentSession && (
+        <ClinicalExportModal
+          session={currentSession}
+          isOpen={showExportModal}
+          onClose={() => setShowExportModal(false)}
+          isDark={isDark}
+        />
+      )}
 
       {/* ── Left Sidebar Drawer (Desktop Collapsible & Mobile Slide-Over) ── */}
       <CortexSidebar
@@ -614,19 +631,19 @@ export const AskIkoliPage: React.FC<AskIkoliPageProps> = ({ onNavigate }) => {
               <Share2 className="w-4 h-4" />
             </button>
 
-            {/* Desktop Export Chat Button */}
+            {/* Multi-Format Export Dossier Button */}
             <button
-              onClick={handleExportChat}
+              onClick={() => setShowExportModal(true)}
               disabled={messages.length === 0}
               className={`hidden sm:flex px-3 py-1.5 rounded-xl border text-xs font-semibold items-center gap-1.5 disabled:opacity-30 disabled:cursor-not-allowed transition-all cursor-pointer shadow-2xs ${
                 isDark
                   ? 'border-white/10 bg-white/5 text-gray-200 hover:bg-white/10'
                   : 'border-black/10 bg-white text-gray-800 hover:bg-gray-100'
               }`}
-              title="Download conversation transcript (.md)"
+              title="Export Consultation Dossier (Markdown, DHIS2 CSV, JSON)"
             >
-              <Download className="w-3.5 h-3.5" />
-              <span>Export</span>
+              <Download className="w-3.5 h-3.5 text-[#0071E3]" />
+              <span>Export Dossier</span>
             </button>
 
             {/* Theme Toggle Button */}
@@ -660,7 +677,7 @@ export const AskIkoliPage: React.FC<AskIkoliPageProps> = ({ onNavigate }) => {
               {/* 1. DESKTOP VIEW (Rich Studio with Composer Card & Feature Tiles) */}
               <div className="hidden md:block my-auto max-w-3xl w-full mx-auto space-y-8 text-center select-none py-6">
                 
-                {/* 3D Blue Orb */}
+                {/* 3D Blue Orb (Kinetic during typing/audio, still when idle) */}
                 <div className="flex items-center justify-center transform hover:scale-105 transition-transform duration-500 cursor-pointer">
                   <GlowingOrb
                     size={140}
@@ -748,99 +765,100 @@ export const AskIkoliPage: React.FC<AskIkoliPageProps> = ({ onNavigate }) => {
                     {/* Left: Deeper Research Pill */}
                     <button
                       onClick={() => setDeeperResearchActive(!deeperResearchActive)}
-                      className={`px-3 py-1 rounded-full text-xs font-semibold flex items-center gap-1.5 transition-all cursor-pointer ${
-                        isDark
-                          ? deeperResearchActive
-                            ? 'bg-blue-500/15 text-[#00D2FF] border border-blue-500/30'
-                            : 'bg-white/5 text-gray-400 border border-transparent'
-                          : deeperResearchActive
-                            ? 'bg-blue-50 text-[#0071E3] border border-blue-200'
-                            : 'bg-gray-100 text-gray-600 border border-transparent'
+                      className={`px-3 py-1 rounded-full text-xs font-semibold flex items-center gap-1.5 transition-all cursor-pointer border ${
+                        deeperResearchActive
+                          ? isDark
+                            ? 'bg-[#0071E3]/20 text-[#00D2FF] border-[#0071E3]/40 shadow-[0_0_12px_rgba(0,113,227,0.3)]'
+                            : 'bg-[#0071E3]/15 text-[#0071E3] border-[#0071E3]/30'
+                          : isDark
+                          ? 'bg-white/5 text-gray-400 border-white/5 hover:text-white'
+                          : 'bg-black/5 text-gray-500 border-black/5 hover:text-black'
                       }`}
                     >
-                      <Atom className={`w-3.5 h-3.5 ${isDark ? 'text-[#00D2FF]' : 'text-[#0071E3]'}`} />
-                      <span>NTBLCP Guidelines</span>
+                      <span className={`w-1.5 h-1.5 rounded-full ${deeperResearchActive ? 'bg-[#00D2FF] animate-pulse' : 'bg-gray-400'}`} />
+                      <span>Deeper research</span>
                     </button>
 
-                    {/* Right: Mic & Send Controls */}
+                    {/* Right: Attach, Mic, Send */}
                     <div className="flex items-center gap-2">
                       <button
                         onClick={() => fileInputRef.current?.click()}
-                        title="Attach clinical document or lesion photo"
                         className={`p-2 rounded-xl transition-colors cursor-pointer ${
-                          isDark
-                            ? 'text-gray-400 hover:text-[#00D2FF] hover:bg-white/5'
-                            : 'text-gray-500 hover:text-[#0071E3] hover:bg-blue-50'
+                          isDark ? 'text-gray-400 hover:text-[#00D2FF] hover:bg-white/5' : 'text-gray-500 hover:text-[#0071E3] hover:bg-black/5'
                         }`}
+                        title="Attach clinical document or image"
                       >
                         <Paperclip className="w-4 h-4" />
                       </button>
 
-                      {/* Mic Button */}
                       <button
                         onClick={handleToggleVoice}
-                        title={isListening ? 'Stop listening' : 'Start voice dictation'}
-                        className={`w-8 h-8 rounded-full flex items-center justify-center transition-all cursor-pointer ${
+                        className={`p-2 rounded-xl transition-all cursor-pointer ${
                           isListening
-                            ? 'bg-red-500 text-white animate-pulse'
+                            ? 'text-red-400 bg-red-500/10 animate-pulse'
                             : isDark
-                            ? 'bg-blue-500/20 text-[#00D2FF] hover:bg-blue-500/30 border border-blue-500/30'
-                            : 'bg-blue-50 text-[#0071E3] hover:bg-blue-100 border border-blue-200'
+                            ? 'text-gray-400 hover:text-[#00D2FF] hover:bg-white/5'
+                            : 'text-gray-500 hover:text-[#0071E3] hover:bg-black/5'
                         }`}
+                        title={isListening ? 'Stop listening' : 'Start voice input'}
                       >
-                        {isListening ? <MicOff className="w-3.5 h-3.5" /> : <Mic className="w-3.5 h-3.5" />}
+                        {isListening ? <MicOff className="w-4 h-4" /> : <Mic className="w-4 h-4" />}
                       </button>
 
-                      {/* Send Button */}
                       <MagneticButton onClick={() => handleSend()}>
                         <button
                           disabled={!inputQuery.trim() && !attachedFile}
-                          className="w-8 h-8 rounded-full bg-[#0071E3] hover:bg-[#0077ED] text-white flex items-center justify-center transition-transform hover:scale-105 active:scale-95 disabled:opacity-30 disabled:cursor-not-allowed cursor-pointer shadow-[0_0_12px_rgba(0,113,227,0.4)]"
+                          className="px-4 py-2 rounded-xl bg-[#0071E3] hover:bg-[#0077ED] text-white font-semibold text-xs flex items-center gap-1.5 transition-transform hover:scale-105 active:scale-95 disabled:opacity-30 cursor-pointer shadow-[0_0_12px_rgba(0,113,227,0.4)]"
                         >
-                          <ArrowUp className="w-4 h-4 stroke-[2.5]" />
+                          <span>Send</span>
+                          <ArrowUp className="w-3.5 h-3.5" />
                         </button>
                       </MagneticButton>
                     </div>
 
                   </div>
-
                 </div>
 
-                {/* 3-Column Feature Cards */}
-                <FeatureActionCards onSelectQuery={(q) => handleSend(q)} isDark={isDark} />
+                {/* Feature Quick Action Cards */}
+                <div className="pt-2">
+                  <FeatureActionCards onSelectQuery={(query: string) => handleSend(query)} isDark={isDark} />
+                </div>
 
               </div>
 
-              {/* 2. MOBILE VIEW (Ultra Minimal ChatGPT Mobile Style) */}
-              <div className="md:hidden flex-1 flex flex-col justify-between items-start py-4">
+              {/* 2. MOBILE VIEW (ChatGPT-Style Ultra Minimal) */}
+              <div className="md:hidden flex-1 flex flex-col justify-between py-6 max-w-sm mx-auto w-full">
                 
-                {/* Floating Centered 3D Orb */}
-                <div className="w-full flex items-center justify-center pt-6 pb-4">
-                  <div className="transform hover:scale-105 transition-transform duration-500 cursor-pointer">
-                    <GlowingOrb
-                      size={120}
-                      isTyping={isActivelyTyping}
-                      isAudioActive={isListening || isSpeaking}
-                    />
-                  </div>
+                {/* Centered Minimal 3D Blue Orb */}
+                <div className="my-auto flex flex-col items-center justify-center space-y-4">
+                  <GlowingOrb
+                    size={110}
+                    isTyping={isActivelyTyping}
+                    isAudioActive={isListening || isSpeaking}
+                  />
+                  <h2 className={`font-display font-bold text-lg tracking-tight ${
+                    isDark ? 'text-white' : 'text-[#1D1D1F]'
+                  }`}>
+                    What can I help with?
+                  </h2>
                 </div>
 
-                {/* Clean Vertical Action List matching ChatGPT screenshot */}
-                <div className="w-full space-y-3 pb-4">
+                {/* Clean Vertical Action List */}
+                <div className="space-y-2 pt-4">
                   <button
-                    onClick={() => handleSend("Generate an epidemiological breakdown and chart of 2025 SDR-PEP coverage across Ebonyi, Anambra, and Enugu.")}
+                    onClick={() => handleSend("Generate an epidemiological breakdown and chart of 2025 SDR-PEP coverage vs case reduction.")}
                     className={`w-full flex items-center gap-3.5 p-3.5 rounded-2xl border transition-all text-left text-sm font-medium cursor-pointer ${
                       isDark
                         ? 'bg-white/5 border-white/10 text-gray-200 hover:bg-white/10'
                         : 'bg-white border-black/8 text-[#1D1D1F] hover:bg-gray-50 shadow-xs'
                     }`}
                   >
-                    <ImageIcon className="w-5 h-5 text-[#00D2FF] shrink-0" />
+                    <ImageIcon className="w-5 h-5 text-purple-400 shrink-0" />
                     <span>Create an image or clinical chart</span>
                   </button>
 
                   <button
-                    onClick={() => handleSend("Draft a standard clinical referral note for suspected multibacillary leprosy with sensory loss.")}
+                    onClick={() => handleSend("Draft a clinical referral note for a suspected multibacillary patient at Mile 4 Hospital.")}
                     className={`w-full flex items-center gap-3.5 p-3.5 rounded-2xl border transition-all text-left text-sm font-medium cursor-pointer ${
                       isDark
                         ? 'bg-white/5 border-white/10 text-gray-200 hover:bg-white/10'
@@ -860,7 +878,7 @@ export const AskIkoliPage: React.FC<AskIkoliPageProps> = ({ onNavigate }) => {
                     }`}
                   >
                     <Globe className="w-5 h-5 text-blue-400 shrink-0" />
-                    <span>Search surveillance & WHO guidelines</span>
+                    <span>Search surveillance &amp; WHO guidelines</span>
                   </button>
                 </div>
 
@@ -871,104 +889,129 @@ export const AskIkoliPage: React.FC<AskIkoliPageProps> = ({ onNavigate }) => {
           {/* ── B. ACTIVE CHAT CONVERSATION STREAM ───────────────────────── */}
           {messages.length > 0 && (
             <div className="max-w-3xl w-full mx-auto space-y-6 pb-4">
-              {messages.map((msg) => (
-                <div
-                  key={msg.id}
-                  className={`flex items-start gap-3 sm:gap-3.5 ${
-                    msg.sender === 'user' ? 'justify-end' : 'justify-start'
-                  }`}
-                >
-                  {/* AI Avatar Mini Orb */}
-                  {msg.sender === 'ai' && (
-                    <div className="w-8 h-8 flex items-center justify-center shrink-0 mt-0.5">
-                      <GlowingOrb
-                        size={28}
-                        interactive={false}
-                        isAudioActive={speakingMessageId === msg.id}
-                      />
-                    </div>
-                  )}
-
-                  {/* Message Bubble Card */}
+              {messages.map((msg, idx) => {
+                const userQuery = idx > 0 ? messages[idx - 1]?.text : '';
+                return (
                   <div
-                    className={`max-w-[85%] sm:max-w-[78%] rounded-[24px] p-4 sm:p-5 shadow-xs transition-all ${
-                      msg.sender === 'user'
-                        ? 'bg-[#0071E3] text-white font-medium rounded-tr-xs'
-                        : isDark
-                        ? 'bg-[#141418] border border-white/10 text-gray-100 rounded-tl-xs'
-                        : 'bg-white border border-black/8 text-[#1D1D1F] rounded-tl-xs shadow-[0_4px_20px_rgba(0,0,0,0.03)]'
+                    key={msg.id}
+                    className={`flex items-start gap-3 sm:gap-3.5 ${
+                      msg.sender === 'user' ? 'justify-end' : 'justify-start'
                     }`}
                   >
-                    {/* Attachment Preview */}
-                    {msg.attachment && (
-                      <div className={`mb-3 p-2.5 rounded-xl border text-xs flex items-center gap-2 font-mono ${
-                        isDark ? 'bg-white/5 border-white/10' : 'bg-black/5 border-black/5'
-                      }`}>
-                        <FileText className="w-4 h-4 text-[#0071E3]" />
-                        <span className="truncate">{msg.attachment.name}</span>
+                    {/* AI Avatar Mini Orb */}
+                    {msg.sender === 'ai' && (
+                      <div className="w-8 h-8 flex items-center justify-center shrink-0 mt-0.5">
+                        <GlowingOrb
+                          size={28}
+                          interactive={false}
+                          isAudioActive={speakingMessageId === msg.id}
+                          isTyping={isStreaming && idx === messages.length - 1}
+                        />
                       </div>
                     )}
 
-                    <ClinicalMarkdown content={msg.text} />
-
-                    {/* AI Response Tools */}
-                    {msg.sender === 'ai' && (
-                      <div className={`flex items-center justify-between gap-3 pt-3 mt-3 border-t text-[11px] ${
-                        isDark ? 'border-white/5 text-gray-400' : 'border-black/5 text-gray-500'
-                      }`}>
-                        <div className="flex items-center gap-3">
-                          <button
-                            onClick={() => handleCopy(msg.id, msg.text)}
-                            className={`flex items-center gap-1 transition-colors cursor-pointer ${
-                              isDark ? 'hover:text-[#00D2FF]' : 'hover:text-[#0071E3]'
-                            }`}
-                          >
-                            {copiedId === msg.id ? <Check className="w-3.5 h-3.5 text-emerald-500" /> : <Copy className="w-3.5 h-3.5" />}
-                            <span>{copiedId === msg.id ? 'Copied' : 'Copy'}</span>
-                          </button>
-
-                          <button
-                            onClick={() => handleSpeak(msg.id, msg.text)}
-                            className={`flex items-center gap-1.5 transition-colors cursor-pointer ${
-                              speakingMessageId === msg.id
-                                ? 'text-red-400 font-semibold'
-                                : isDark
-                                ? 'hover:text-[#00D2FF] text-gray-400'
-                                : 'hover:text-[#0071E3] text-gray-500'
-                            }`}
-                            title={speakingMessageId === msg.id ? 'Stop listening' : 'Listen to response'}
-                          >
-                            {speakingMessageId === msg.id ? (
-                              <>
-                                <Square className="w-3 h-3 fill-red-400 text-red-400 animate-pulse" />
-                                <span>Stop</span>
-                              </>
-                            ) : (
-                              <>
-                                <Volume2 className="w-3.5 h-3.5" />
-                                <span>Listen</span>
-                              </>
-                            )}
-                          </button>
+                    {/* Message Bubble Card */}
+                    <div
+                      className={`max-w-[85%] sm:max-w-[78%] rounded-[24px] p-4 sm:p-5 shadow-xs transition-all space-y-3 ${
+                        msg.sender === 'user'
+                          ? 'bg-[#0071E3] text-white font-medium rounded-tr-xs'
+                          : isDark
+                          ? 'bg-[#141418] border border-white/10 text-gray-100 rounded-tl-xs'
+                          : 'bg-white border border-black/8 text-[#1D1D1F] rounded-tl-xs shadow-[0_4px_20px_rgba(0,0,0,0.03)]'
+                      }`}
+                    >
+                      {/* Attachment Preview */}
+                      {msg.attachment && (
+                        <div className={`p-2.5 rounded-xl border text-xs flex items-center gap-2 font-mono ${
+                          isDark ? 'bg-white/5 border-white/10' : 'bg-black/5 border-black/5'
+                        }`}>
+                          <FileText className="w-4 h-4 text-[#0071E3]" />
+                          <span className="truncate">{msg.attachment.name}</span>
                         </div>
+                      )}
 
-                        <span className="font-mono text-[10px] opacity-70">
-                          {msg.timestamp}
-                        </span>
+                      {/* Content Rendered with Citations & GenUI */}
+                      <ClinicalMarkdown
+                        content={msg.text}
+                        onSelectOption={(opt) => handleSend(opt)}
+                        isDark={isDark}
+                      />
+
+                      {/* Typewriter pulse cursor when actively streaming */}
+                      {isStreaming && idx === messages.length - 1 && msg.sender === 'ai' && (
+                        <span className="inline-block w-2 h-4 bg-[#00D2FF] ml-1 animate-pulse align-middle" />
+                      )}
+
+                      {/* Cryptographic Provenance Badge for AI Responses */}
+                      {msg.sender === 'ai' && msg.text && (
+                        <ProvenanceBadge
+                          query={userQuery}
+                          responseText={msg.text}
+                          timestamp={msg.timestamp}
+                          source={msg.source}
+                          isDark={isDark}
+                        />
+                      )}
+
+                      {/* AI Response Tools */}
+                      {msg.sender === 'ai' && msg.text && (
+                        <div className={`flex items-center justify-between gap-3 pt-2 border-t text-[11px] ${
+                          isDark ? 'border-white/5 text-gray-400' : 'border-black/5 text-gray-500'
+                        }`}>
+                          <div className="flex items-center gap-3">
+                            <button
+                              onClick={() => handleCopy(msg.id, msg.text)}
+                              className={`flex items-center gap-1 transition-colors cursor-pointer ${
+                                isDark ? 'hover:text-[#00D2FF]' : 'hover:text-[#0071E3]'
+                              }`}
+                            >
+                              {copiedId === msg.id ? <Check className="w-3.5 h-3.5 text-emerald-500" /> : <Copy className="w-3.5 h-3.5" />}
+                              <span>{copiedId === msg.id ? 'Copied' : 'Copy'}</span>
+                            </button>
+
+                            <button
+                              onClick={() => handleSpeak(msg.id, msg.text)}
+                              className={`flex items-center gap-1.5 transition-colors cursor-pointer ${
+                                speakingMessageId === msg.id
+                                  ? 'text-red-400 font-semibold'
+                                  : isDark
+                                  ? 'hover:text-[#00D2FF] text-gray-400'
+                                  : 'hover:text-[#0071E3] text-gray-500'
+                              }`}
+                              title={speakingMessageId === msg.id ? 'Stop listening' : 'Listen to response'}
+                            >
+                              {speakingMessageId === msg.id ? (
+                                <>
+                                  <Square className="w-3 h-3 fill-red-400 text-red-400 animate-pulse" />
+                                  <span>Stop</span>
+                                </>
+                              ) : (
+                                <>
+                                  <Volume2 className="w-3.5 h-3.5" />
+                                  <span>Listen</span>
+                                </>
+                              )}
+                            </button>
+                          </div>
+
+                          <span className="font-mono text-[10px] opacity-70">
+                            {msg.timestamp}
+                          </span>
+                        </div>
+                      )}
+                    </div>
+
+                    {/* User Avatar */}
+                    {msg.sender === 'user' && (
+                      <div className="w-8 h-8 rounded-full bg-[#0071E3] text-white flex items-center justify-center shrink-0 shadow-xs mt-0.5">
+                        <User className="w-4 h-4" />
                       </div>
                     )}
                   </div>
+                );
+              })}
 
-                  {/* User Avatar */}
-                  {msg.sender === 'user' && (
-                    <div className="w-8 h-8 rounded-full bg-[#0071E3] text-white flex items-center justify-center shrink-0 shadow-xs mt-0.5">
-                      <User className="w-4 h-4" />
-                    </div>
-                  )}
-                </div>
-              ))}
-
-              {/* AI Typing / Thinking Indicator */}
+              {/* AI Thinking Indicator (before first token stream) */}
               {isTyping && (
                 <div className="flex items-start gap-3.5 justify-start">
                   <div className="w-8 h-8 flex items-center justify-center shrink-0">
@@ -980,7 +1023,7 @@ export const AskIkoliPage: React.FC<AskIkoliPageProps> = ({ onNavigate }) => {
                       : 'bg-white border-black/8 text-[#0071E3]'
                   }`}>
                     <span className="w-2 h-2 rounded-full bg-[#0071E3] shadow-[0_0_8px_#0071E3] animate-ping" />
-                    <span className="font-sans font-medium">Thinking…</span>
+                    <span className="font-sans font-medium">Synthesizing clinical evidence…</span>
                   </div>
                 </div>
               )}
@@ -1048,7 +1091,7 @@ export const AskIkoliPage: React.FC<AskIkoliPageProps> = ({ onNavigate }) => {
 
                 <MagneticButton onClick={() => handleSend()}>
                   <button
-                    disabled={!inputQuery.trim() && !attachedFile}
+                    disabled={(!inputQuery.trim() && !attachedFile) || isStreaming}
                     className="px-3.5 py-1.5 rounded-xl bg-[#0071E3] hover:bg-[#0077ED] text-white font-semibold text-xs flex items-center gap-1.5 transition-transform hover:scale-105 active:scale-95 disabled:opacity-30 cursor-pointer shadow-[0_0_10px_rgba(0,113,227,0.4)]"
                   >
                     <span>Send</span>
@@ -1111,7 +1154,7 @@ export const AskIkoliPage: React.FC<AskIkoliPageProps> = ({ onNavigate }) => {
             {inputQuery.trim() || attachedFile ? (
               <button
                 onClick={() => handleSend()}
-                disabled={isTyping}
+                disabled={isTyping || isStreaming}
                 className="w-8 h-8 rounded-full bg-[#0071E3] text-white flex items-center justify-center shrink-0 shadow-xs cursor-pointer active:scale-95 transition-all"
               >
                 <ArrowUp className="w-4 h-4 stroke-[2.5]" />

@@ -1,20 +1,25 @@
 import React, { useEffect, useRef, useState } from 'react';
 import * as THREE from 'three';
+import { webAudioService } from '../../services/webAudioService';
 
-// ── GLSL 3D Simplex Noise Shader Definition ────────────────────────────────
+// ── GLSL 3D Simplex Noise Shader with Multi-Band Audio FFT Coupling ─────────
 const vertexShader = `
   uniform float uTime;
   uniform float uSpeed;
   uniform float uDistortion;
   uniform float uFrequency;
   uniform vec2 uMouse;
-  uniform float uEnergy;       // 0.0 = completely stopped & still, 1.0 = fully active
-  uniform float uAudioEnergy;  // Audio frequency pulse
+  uniform float uEnergy;       // 0.0 = completely stopped, 1.0 = fully active
+  uniform float uAudioLow;     // Bass energy (20-250Hz)
+  uniform float uAudioMid;     // Vocal midrange (250-2000Hz)
+  uniform float uAudioHigh;    // Treble harmonics (2000-8000Hz)
+  uniform float uAudioEnergy;  // Overall audio volume
 
   varying vec3 vNormal;
   varying vec3 vPosition;
   varying float vDisplacement;
   varying vec2 vUv;
+  varying float vAudioAura;
 
   // Simplex 3D noise functions
   vec4 permute(vec4 x) { return mod(((x*34.0)+1.0)*x, 289.0); }
@@ -24,11 +29,9 @@ const vertexShader = `
     const vec2 C = vec2(1.0/6.0, 1.0/3.0);
     const vec4 D = vec4(0.0, 0.5, 1.0, 2.0);
 
-    // First corner
     vec3 i  = floor(v + dot(v, C.yyy));
     vec3 x0 = v - i + dot(i, C.xxx);
 
-    // Other corners
     vec3 g = step(x0.yzx, x0.xyz);
     vec3 l = 1.0 - g;
     vec3 i1 = min(g.xyz, l.zxy);
@@ -38,15 +41,13 @@ const vertexShader = `
     vec3 x2 = x0 - i2 + 2.0 * C.xxx;
     vec3 x3 = x0 - 1.0 + 3.0 * C.xxx;
 
-    // Permutations
     i = mod(i, 289.0);
     vec4 p = permute(permute(permute(
               i.z + vec4(0.0, i1.z, i2.z, 1.0))
             + i.y + vec4(0.0, i1.y, i2.y, 1.0))
             + i.x + vec4(0.0, i1.x, i2.x, 1.0));
 
-    // Gradients
-    float n_ = 0.142857142857; // 1.0/7.0
+    float n_ = 0.142857142857;
     vec3  ns = n_ * D.wyz - D.xzx;
 
     vec4 j = p - 49.0 * floor(p * ns.z * ns.z);
@@ -73,14 +74,12 @@ const vertexShader = `
     vec3 p2 = vec3(a1.xy, h.z);
     vec3 p3 = vec3(a1.zw, h.w);
 
-    // Normalise gradients
     vec4 norm = taylorInvSqrt(vec4(dot(p0,p0), dot(p1,p1), dot(p2, p2), dot(p3,p3)));
     p0 *= norm.x;
     p1 *= norm.y;
     p2 *= norm.z;
     p3 *= norm.w;
 
-    // Mix final noise value
     vec4 m = max(0.6 - vec4(dot(x0,x0), dot(x1,x1), dot(x2,x2), dot(x3,x3)), 0.0);
     m = m * m;
     return 42.0 * dot(m*m, vec4(dot(p0,x0), dot(p1,x1), dot(p2,x2), dot(p3,x3)));
@@ -89,10 +88,11 @@ const vertexShader = `
   void main() {
     vUv = uv;
     
-    // Multi-octave organic displacement strictly gated by uEnergy
+    // Multi-octave organic displacement strictly gated by active energy
     float time = uTime * uSpeed;
-    float freq = uFrequency + (uEnergy * 0.8) + (uAudioEnergy * 1.2);
+    float freq = uFrequency + (uEnergy * 0.6) + (uAudioMid * 1.5);
     
+    // Noise wave displaced by bass and midrange voice formants
     float noise1 = snoise(position * freq + vec3(time * 0.4, time * 0.5, time * 0.3));
     float noise2 = snoise(position * (freq * 2.2) - vec3(time * 0.3, time * 0.2, time * 0.4)) * 0.5;
     
@@ -100,19 +100,23 @@ const vertexShader = `
     float mouseDistance = length(position.xy - vec3(uMouse * 1.5, 0.0).xy);
     float mouseWave = sin(mouseDistance * 4.0 - time * 2.0) * 0.08 * uEnergy;
 
-    // Fast micro-tremor wave when active
+    // Fast micro-tremor wave when typing
     float tremor = sin(time * 16.0 + position.y * 12.0) * (uEnergy * 0.06);
 
-    // Audio harmonic pulse waves
-    float audioRipples = sin(position.z * 10.0 + time * 6.0) * (uAudioEnergy * 0.09);
+    // Audio FFT harmonic ripples: Bass expands equator, Highs create crisp ripple ripples
+    float bassBulge = uAudioLow * 0.22 * sin(position.y * 3.1415);
+    float trebleRipples = sin(position.z * 18.0 + time * 8.0) * (uAudioHigh * 0.12);
+    float midFormant = sin(position.x * 10.0 + time * 5.0) * (uAudioMid * 0.14);
 
-    float displacement = (noise1 + noise2 + mouseWave + tremor + audioRipples) * uDistortion * uEnergy;
+    float audioDisplacement = (bassBulge + trebleRipples + midFormant) * (uAudioEnergy + 0.1);
+
+    float displacement = ((noise1 + noise2 + mouseWave + tremor) * uDistortion + audioDisplacement) * uEnergy;
     vDisplacement = displacement;
+    vAudioAura = uAudioEnergy;
 
     vec3 newPosition = position + normal * displacement;
     vPosition = newPosition;
     
-    // Approximate displaced normal
     vNormal = normalize(normalMatrix * (normal + vec3(noise1 * 0.3, noise2 * 0.3, noise1 * 0.2) * uEnergy));
 
     gl_Position = projectionMatrix * modelViewMatrix * vec4(newPosition, 1.0);
@@ -123,6 +127,9 @@ const fragmentShader = `
   uniform float uTime;
   uniform float uEnergy;
   uniform float uAudioEnergy;
+  uniform float uAudioLow;
+  uniform float uAudioMid;
+  uniform float uAudioHigh;
   uniform vec3 uColorA;     // Deep Cobalt Blue
   uniform vec3 uColorB;     // Electric Royal Blue
   uniform vec3 uColorC;     // Luminous Cyan / Azure
@@ -133,12 +140,13 @@ const fragmentShader = `
   varying vec3 vPosition;
   varying float vDisplacement;
   varying vec2 vUv;
+  varying float vAudioAura;
 
   void main() {
     vec3 normal = normalize(vNormal);
     vec3 viewDir = normalize(-vPosition);
 
-    // Fresnel glow along curvature edges (Apple Spatial glass pearl effect)
+    // Fresnel glow along curvature edges
     float fresnel = pow(1.0 - max(0.0, dot(normal, vec3(0.0, 0.0, 1.0))), 2.4);
     
     // Top-left primary light source for specular glints
@@ -149,15 +157,16 @@ const fragmentShader = `
     vec3 reflectDir = reflect(-lightDir, normal);
     float spec = pow(max(dot(viewDir, reflectDir), 0.0), 32.0);
 
-    // Dynamic color gradient based on displacement elevation and view angle
-    float colorMix = clamp((vDisplacement * 2.8) + 0.5 + (uEnergy * 0.15) + (uAudioEnergy * 0.2), 0.0, 1.0);
+    // Dynamic color gradient based on displacement elevation, audio frequencies, and view angle
+    float colorMix = clamp((vDisplacement * 2.8) + 0.5 + (uEnergy * 0.15) + (uAudioMid * 0.3), 0.0, 1.0);
     
     vec3 baseColor = mix(uColorA, uColorB, colorMix);
     vec3 shimmerColor = mix(baseColor, uColorC, smoothstep(0.3, 0.8, colorMix + fresnel * 0.4));
     vec3 pearlColor = mix(shimmerColor, uColorD, fresnel * 0.75);
 
-    // Dynamic luminous flash when typing or audio is active
-    vec3 activeBurst = uColorC * ((uEnergy * 0.2) + (uAudioEnergy * 0.35));
+    // Dynamic luminous flash when typing or audio is active (boosted by treble harmonics)
+    vec3 audioColor = mix(uColorC, vec3(1.0, 1.0, 1.0), uAudioHigh * 0.5);
+    vec3 activeBurst = audioColor * ((uEnergy * 0.2) + (uAudioEnergy * 0.5) + (uAudioLow * 0.2));
 
     // Core volumetric radiance
     vec3 finalColor = pearlColor + activeBurst + (uColorCore * spec * 0.9) + (uColorC * fresnel * 0.6);
@@ -232,8 +241,10 @@ export const GlowingOrb: React.FC<GlowingOrbProps> = ({
       uFrequency: { value: 1.4 },
       uEnergy: { value: 0 },
       uAudioEnergy: { value: 0 },
+      uAudioLow: { value: 0 },
+      uAudioMid: { value: 0 },
+      uAudioHigh: { value: 0 },
       uMouse: { value: new THREE.Vector2(0, 0) },
-      // Curated Palette: Pinterest/Cortex Iridescent Electric Blue Orb
       uColorA: { value: new THREE.Color('#003896') },    // Deep royal cobalt
       uColorB: { value: new THREE.Color('#0066E6') },    // Electric Apple Blue
       uColorC: { value: new THREE.Color('#00D2FF') },    // Shimmering Cyan
@@ -281,11 +292,10 @@ export const GlowingOrb: React.FC<GlowingOrbProps> = ({
       container.addEventListener('mouseleave', handleMouseLeave);
     }
 
-    // ── 4. 60fps Animation Render Loop (Moves when active, Stops when idle) ─
+    // ── 4. 60fps Animation Render Loop with Live FFT Audio Processing ──────
     let animationFrameId: number;
     let clock = new THREE.Clock();
     let currentEnergy = 0;
-    let currentAudioEnergy = 0;
     let accumulatedTime = 0;
 
     const animate = () => {
@@ -294,38 +304,44 @@ export const GlowingOrb: React.FC<GlowingOrbProps> = ({
       const delta = clock.getDelta();
       const isActive = isTypingRef.current || isAudioActiveRef.current;
 
-      // Target Energy: 1.0 when typing/audio, 0.0 when stopped
+      // Sample WebAudio FFT metrics
+      const audioMetrics = webAudioService.getFrequencyMetrics();
+
+      // Target Energy: 1.0 when active, 0.0 when stopped
       const targetEnergy = isActive ? 1.0 : isHovered ? 0.25 : 0.0;
-      currentEnergy = THREE.MathUtils.lerp(currentEnergy, targetEnergy, isActive ? 0.15 : 0.08);
+      currentEnergy = THREE.MathUtils.lerp(currentEnergy, targetEnergy, isActive ? 0.18 : 0.08);
       uniforms.uEnergy.value = currentEnergy;
 
-      // Audio frequency modulation
-      const targetAudio = isAudioActiveRef.current ? 1.0 : 0.0;
-      currentAudioEnergy = THREE.MathUtils.lerp(currentAudioEnergy, targetAudio, 0.12);
-      uniforms.uAudioEnergy.value = currentAudioEnergy;
+      // Map FFT Spectrum into Shader Uniforms
+      uniforms.uAudioLow.value = audioMetrics.low;
+      uniforms.uAudioMid.value = audioMetrics.mid;
+      uniforms.uAudioHigh.value = audioMetrics.high;
+      uniforms.uAudioEnergy.value = isAudioActiveRef.current ? Math.max(audioMetrics.volume, 0.2) : audioMetrics.volume;
 
       // Advance shader time ONLY when energy is present
       if (currentEnergy > 0.001) {
-        const speedMultiplier = isAudioActiveRef.current ? 2.5 : 2.0;
+        const speedMultiplier = isAudioActiveRef.current ? 2.5 + audioMetrics.mid * 1.5 : 2.0;
         accumulatedTime += delta * speedMultiplier * currentEnergy;
         uniforms.uTime.value = accumulatedTime;
 
         uniforms.uSpeed.value = 1.0;
-        uniforms.uDistortion.value = THREE.MathUtils.lerp(0.0, isAudioActiveRef.current ? 0.34 : 0.28, currentEnergy);
+        uniforms.uDistortion.value = THREE.MathUtils.lerp(
+          0.0,
+          isAudioActiveRef.current ? 0.32 + audioMetrics.low * 0.15 : 0.28,
+          currentEnergy
+        );
 
         // Continuous 3D rotation while active
-        const rotSpeed = (isAudioActiveRef.current ? 0.024 : 0.016) * currentEnergy;
+        const rotSpeed = (isAudioActiveRef.current ? 0.024 + audioMetrics.mid * 0.015 : 0.016) * currentEnergy;
         sphereMesh.rotation.y += rotSpeed;
 
-        // Kinetic micro-shake / audio pulsation
+        // Acoustic rhythm pulsation
         if (isAudioActiveRef.current) {
-          // Acoustic rhythm pulsation
-          const audioPulse = 1.0 + Math.sin(accumulatedTime * 8.0) * (0.05 * currentAudioEnergy);
-          sphereMesh.scale.set(audioPulse, audioPulse, audioPulse);
-          sphereMesh.position.x = Math.sin(accumulatedTime * 24.0) * 0.025 * currentAudioEnergy;
-          sphereMesh.position.y = Math.cos(accumulatedTime * 28.0) * 0.025 * currentAudioEnergy;
+          const bassExpansion = 1.0 + (audioMetrics.low * 0.08 + audioMetrics.volume * 0.04);
+          sphereMesh.scale.set(bassExpansion, bassExpansion, bassExpansion);
+          sphereMesh.position.x = Math.sin(accumulatedTime * 20.0) * 0.025 * (audioMetrics.volume + 0.1);
+          sphereMesh.position.y = Math.cos(accumulatedTime * 24.0) * 0.025 * (audioMetrics.volume + 0.1);
         } else if (isTypingRef.current) {
-          // Typing tremor
           sphereMesh.position.x = Math.sin(accumulatedTime * 32.0) * 0.035 * currentEnergy;
           sphereMesh.position.y = Math.cos(accumulatedTime * 38.0) * 0.035 * currentEnergy;
           const pulseScale = 1.0 + Math.sin(accumulatedTime * 20.0) * 0.03 * currentEnergy;
