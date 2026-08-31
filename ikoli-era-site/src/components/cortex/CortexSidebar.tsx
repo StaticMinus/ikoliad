@@ -10,8 +10,8 @@ import {
   Trash2,
   ChevronLeft,
   ChevronRight,
-  Sparkles,
 } from 'lucide-react';
+import { GlowingOrb } from './GlowingOrb';
 
 export interface ChatSession {
   id: string;
@@ -43,7 +43,7 @@ export const CortexSidebar: React.FC<CortexSidebarProps> = ({
   onNavigate,
   isCollapsed,
   onToggleCollapse,
-  isDark = false,
+  isDark = true,
 }) => {
   const [searchQuery, setSearchQuery] = useState('');
 
@@ -71,8 +71,8 @@ export const CortexSidebar: React.FC<CortexSidebarProps> = ({
         isCollapsed ? 'w-16' : 'w-64 sm:w-72'
       } ${
         isDark
-          ? 'bg-[#121215] border-white/10 text-gray-200'
-          : 'bg-[#F9F9FB] border-black/5 text-[#1D1D1F]'
+          ? 'bg-[#111114] border-white/10 text-gray-200'
+          : 'bg-[#F9F9FB] border-black/8 text-[#1D1D1F]'
       }`}
     >
       {/* ── TOP SECTION: BRAND & NEW CHAT ─────────────────────────── */}
@@ -83,15 +83,17 @@ export const CortexSidebar: React.FC<CortexSidebarProps> = ({
           {!isCollapsed && (
             <div
               onClick={() => onNavigate('home')}
-              className="flex items-center gap-2 cursor-pointer group"
+              className="flex items-center gap-2.5 cursor-pointer group"
             >
-              <div className="w-8 h-8 rounded-xl bg-gradient-to-tr from-[#9333EA] to-[#6366F1] flex items-center justify-center text-white shadow-xs group-hover:scale-105 transition-transform">
-                <Sparkles className="w-4 h-4" />
+              <div className="w-7 h-7 flex items-center justify-center shrink-0 group-hover:scale-110 transition-transform">
+                <GlowingOrb size={28} interactive={false} />
               </div>
               <div className="text-left">
-                <span className="font-display font-black text-sm tracking-tight text-[#1D1D1F] dark:text-white flex items-center gap-1">
-                  <span>IKOLI</span>
-                  <span className="text-[#9333EA] font-semibold text-xs">Cortex</span>
+                <span className={`font-display font-bold text-sm tracking-tight flex items-center gap-1.5 ${
+                  isDark ? 'text-white' : 'text-[#1D1D1F]'
+                }`}>
+                  <span>Ask</span>
+                  <span className="text-[#0071E3] font-bold">Ikoli</span>
                 </span>
               </div>
             </div>
@@ -100,10 +102,10 @@ export const CortexSidebar: React.FC<CortexSidebarProps> = ({
           {isCollapsed && (
             <div
               onClick={() => onNavigate('home')}
-              className="w-8 h-8 mx-auto rounded-xl bg-gradient-to-tr from-[#9333EA] to-[#6366F1] flex items-center justify-center text-white shadow-xs cursor-pointer"
-              title="IKOLI Cortex"
+              className="w-7 h-7 mx-auto flex items-center justify-center cursor-pointer hover:scale-110 transition-transform"
+              title="Ask Ikoli"
             >
-              <Sparkles className="w-4 h-4" />
+              <GlowingOrb size={28} interactive={false} />
             </div>
           )}
 
@@ -112,7 +114,7 @@ export const CortexSidebar: React.FC<CortexSidebarProps> = ({
             className={`p-1.5 rounded-lg border transition-colors cursor-pointer ${
               isDark
                 ? 'bg-white/5 border-white/10 text-gray-400 hover:text-white hover:bg-white/10'
-                : 'bg-white border-black/5 text-gray-500 hover:text-black hover:bg-gray-100 shadow-2xs'
+                : 'bg-white border-black/10 text-gray-600 hover:text-black hover:bg-gray-100 shadow-2xs'
             }`}
             title={isCollapsed ? 'Expand sidebar' : 'Collapse sidebar'}
             aria-label="Toggle sidebar"
@@ -125,7 +127,11 @@ export const CortexSidebar: React.FC<CortexSidebarProps> = ({
         {!isCollapsed ? (
           <button
             onClick={onNewSession}
-            className="w-full py-2.5 px-3.5 rounded-xl bg-[#1D1D1F] hover:bg-[#2D2D30] dark:bg-white dark:hover:bg-gray-100 text-white dark:text-[#1D1D1F] font-semibold text-xs flex items-center justify-center gap-2 shadow-xs transition-all cursor-pointer active:scale-98"
+            className={`w-full py-2.5 px-3.5 rounded-xl font-semibold text-xs flex items-center justify-center gap-2 shadow-xs transition-all cursor-pointer active:scale-98 ${
+              isDark
+                ? 'bg-white/10 hover:bg-white/20 text-white border border-white/10'
+                : 'bg-[#1D1D1F] hover:bg-[#2D2D30] text-white shadow-xs'
+            }`}
           >
             <Plus className="w-4 h-4" />
             <span>New chat</span>
@@ -133,7 +139,9 @@ export const CortexSidebar: React.FC<CortexSidebarProps> = ({
         ) : (
           <button
             onClick={onNewSession}
-            className="w-10 h-10 mx-auto rounded-xl bg-[#1D1D1F] dark:bg-white text-white dark:text-[#1D1D1F] flex items-center justify-center shadow-xs hover:scale-105 active:scale-95 transition-transform cursor-pointer"
+            className={`w-10 h-10 mx-auto rounded-xl flex items-center justify-center shadow-xs hover:scale-105 active:scale-95 transition-transform cursor-pointer ${
+              isDark ? 'bg-white/10 text-white border border-white/10' : 'bg-[#1D1D1F] text-white'
+            }`}
             title="New chat"
           >
             <Plus className="w-4 h-4" />
@@ -151,8 +159,8 @@ export const CortexSidebar: React.FC<CortexSidebarProps> = ({
               placeholder="Search chats"
               className={`w-full pl-8 pr-7 py-1.5 rounded-xl text-xs outline-none border transition-all ${
                 isDark
-                  ? 'bg-white/5 border-white/10 text-white placeholder-gray-500 focus:border-purple-400/50'
-                  : 'bg-white border-black/10 text-gray-800 placeholder-gray-400 focus:border-purple-500/50 shadow-2xs'
+                  ? 'bg-white/5 border-white/10 text-white placeholder-gray-500 focus:border-blue-400/50'
+                  : 'bg-white border-black/10 text-gray-800 placeholder-gray-400 focus:border-blue-500/50 shadow-2xs'
               }`}
             />
             <span className="absolute right-2.5 top-1/2 -translate-y-1/2 text-[9px] font-mono text-gray-400">
@@ -166,21 +174,33 @@ export const CortexSidebar: React.FC<CortexSidebarProps> = ({
           <div className="space-y-0.5 pt-1 text-xs font-medium">
             <button
               onClick={() => onNavigate('dashboard')}
-              className="w-full flex items-center gap-2.5 px-3 py-1.5 rounded-lg hover:bg-black/5 dark:hover:bg-white/5 text-gray-600 dark:text-gray-300 transition-colors cursor-pointer"
+              className={`w-full flex items-center gap-2.5 px-3 py-1.5 rounded-lg transition-colors cursor-pointer ${
+                isDark
+                  ? 'hover:bg-white/5 text-gray-300'
+                  : 'hover:bg-black/5 text-gray-700'
+              }`}
             >
               <Compass className="w-3.5 h-3.5 text-blue-500" />
               <span>Explore Surveillance</span>
             </button>
             <button
               onClick={() => onNavigate('diseases')}
-              className="w-full flex items-center gap-2.5 px-3 py-1.5 rounded-lg hover:bg-black/5 dark:hover:bg-white/5 text-gray-600 dark:text-gray-300 transition-colors cursor-pointer"
+              className={`w-full flex items-center gap-2.5 px-3 py-1.5 rounded-lg transition-colors cursor-pointer ${
+                isDark
+                  ? 'hover:bg-white/5 text-gray-300'
+                  : 'hover:bg-black/5 text-gray-700'
+              }`}
             >
               <BookOpen className="w-3.5 h-3.5 text-purple-500" />
               <span>Disease Library</span>
             </button>
             <button
               onClick={() => onNavigate('api')}
-              className="w-full flex items-center gap-2.5 px-3 py-1.5 rounded-lg hover:bg-black/5 dark:hover:bg-white/5 text-gray-600 dark:text-gray-300 transition-colors cursor-pointer"
+              className={`w-full flex items-center gap-2.5 px-3 py-1.5 rounded-lg transition-colors cursor-pointer ${
+                isDark
+                  ? 'hover:bg-white/5 text-gray-300'
+                  : 'hover:bg-black/5 text-gray-700'
+              }`}
             >
               <FolderArchive className="w-3.5 h-3.5 text-emerald-500" />
               <span>MEAL Datasets &amp; API</span>
@@ -191,7 +211,7 @@ export const CortexSidebar: React.FC<CortexSidebarProps> = ({
       </div>
 
       {/* ── MIDDLE SECTION: CHAT HISTORY STREAM ───────────────────── */}
-      <div className="flex-1 overflow-y-auto px-2 space-y-4 text-left scrollbar-thin scrollbar-thumb-gray-300 dark:scrollbar-thumb-gray-700">
+      <div className="flex-1 overflow-y-auto px-2 space-y-4 text-left scrollbar-thin">
         
         {!isCollapsed && (
           <>
@@ -290,8 +310,10 @@ export const CortexSidebar: React.FC<CortexSidebarProps> = ({
                 onClick={() => onSelectSession(session.id)}
                 className={`w-9 h-9 mx-auto rounded-xl flex items-center justify-center transition-all cursor-pointer ${
                   session.id === activeSessionId
-                    ? 'bg-purple-600 text-white shadow-xs'
-                    : 'text-gray-400 hover:bg-black/5 dark:hover:bg-white/10 hover:text-black dark:hover:text-white'
+                    ? 'bg-[#0071E3] text-white shadow-xs'
+                    : isDark
+                    ? 'text-gray-400 hover:bg-white/10 hover:text-white'
+                    : 'text-gray-500 hover:bg-black/5 hover:text-black'
                 }`}
                 title={session.title}
               >
@@ -301,7 +323,6 @@ export const CortexSidebar: React.FC<CortexSidebarProps> = ({
           </div>
         )}
 
-      {/* Middle Section closes cleanly without bottom profile */}
       </div>
 
     </aside>
@@ -323,7 +344,7 @@ const SessionItem: React.FC<{
         isActive
           ? isDark
             ? 'bg-white/15 text-white shadow-xs font-semibold'
-            : 'bg-white text-[#1D1D1F] shadow-xs font-semibold border border-black/5'
+            : 'bg-white text-[#1D1D1F] shadow-xs font-semibold border border-black/10'
           : isDark
           ? 'text-gray-400 hover:bg-white/5 hover:text-white'
           : 'text-gray-600 hover:bg-black/5 hover:text-black'

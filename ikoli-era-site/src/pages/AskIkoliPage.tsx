@@ -10,7 +10,6 @@ import { GlowingOrb } from '../components/cortex/GlowingOrb';
 import { FeatureActionCards } from '../components/cortex/FeatureActionCards';
 import { CortexSidebar, type ChatSession } from '../components/cortex/CortexSidebar';
 import {
-  Sparkles,
   Paperclip,
   Mic,
   MicOff,
@@ -106,6 +105,20 @@ export const AskIkoliPage: React.FC<AskIkoliPageProps> = ({ onNavigate }) => {
   // Input & Messaging States
   const [inputQuery, setInputQuery] = useState('');
   const [isTyping, setIsTyping] = useState(false);
+  const [isActivelyTyping, setIsActivelyTyping] = useState(false);
+  const typingTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+
+  const handleInputChange = (val: string) => {
+    setInputQuery(val);
+    setIsActivelyTyping(true);
+    if (typingTimerRef.current) {
+      clearTimeout(typingTimerRef.current);
+    }
+    typingTimerRef.current = setTimeout(() => {
+      setIsActivelyTyping(false);
+    }, 1200);
+  };
+
   const [copiedId, setCopiedId] = useState<string | null>(null);
   const [showShareToast, setShowShareToast] = useState(false);
 
@@ -319,6 +332,8 @@ export const AskIkoliPage: React.FC<AskIkoliPageProps> = ({ onNavigate }) => {
     );
 
     setInputQuery('');
+    setIsActivelyTyping(false);
+    if (typingTimerRef.current) clearTimeout(typingTimerRef.current);
     const currentAttachment = attachedFile;
     setAttachedFile(null);
     setIsTyping(true);
@@ -386,7 +401,9 @@ export const AskIkoliPage: React.FC<AskIkoliPageProps> = ({ onNavigate }) => {
   };
 
   return (
-    <div className="w-screen h-screen overflow-hidden bg-[#0A0A0C] text-white flex select-none font-sans antialiased">
+    <div className={`w-screen h-screen overflow-hidden flex select-none font-sans antialiased transition-colors duration-300 ${
+      isDark ? 'bg-[#0A0A0C] text-white' : 'bg-[#FBFBFD] text-[#1D1D1F]'
+    }`}>
       
       {/* Hidden File Input */}
       <input
@@ -411,31 +428,49 @@ export const AskIkoliPage: React.FC<AskIkoliPageProps> = ({ onNavigate }) => {
       />
 
       {/* ── Main Right Studio Workspace (Full Width) ────────────────────── */}
-      <main className="flex-1 h-full flex flex-col justify-between overflow-hidden bg-[#0D0D11] relative">
+      <main className={`flex-1 h-full flex flex-col justify-between overflow-hidden relative transition-colors duration-300 ${
+        isDark ? 'bg-[#0D0D11]' : 'bg-[#F5F5F7]'
+      }`}>
         
         {/* ── Top Header Toolbar ────────────────────────────────────────── */}
-        <header className="h-14 px-4 sm:px-6 border-b border-white/10 flex items-center justify-between shrink-0 select-none bg-[#0D0D11]/90 backdrop-blur-md z-20">
+        <header className={`h-14 px-4 sm:px-6 border-b flex items-center justify-between shrink-0 select-none backdrop-blur-md z-20 transition-colors duration-300 ${
+          isDark
+            ? 'border-white/10 bg-[#0D0D11]/90 text-white'
+            : 'border-black/5 bg-white/90 text-[#1D1D1F]'
+        }`}>
           
           {/* Left: Model / Mode Pill Dropdown */}
           <div className="flex items-center gap-2">
             <button
-              className="px-3.5 py-1.5 rounded-full border border-white/10 bg-white/5 text-gray-200 text-xs font-semibold flex items-center gap-2 hover:bg-white/10 transition-all cursor-pointer shadow-xs"
+              className={`px-3.5 py-1.5 rounded-full border text-xs font-semibold flex items-center gap-2 transition-all cursor-pointer shadow-xs ${
+                isDark
+                  ? 'border-white/10 bg-white/5 text-gray-200 hover:bg-white/10'
+                  : 'border-black/10 bg-[#EBEBED] text-[#1D1D1F] hover:bg-gray-200'
+              }`}
             >
               <div className="w-2 h-2 rounded-full bg-[#0071E3] shadow-[0_0_8px_#0071E3] animate-pulse" />
-              <span className="tracking-tight font-display font-bold text-white">IKOLI-AI v0.1</span>
+              <span className={`tracking-tight font-display font-bold ${
+                isDark ? 'text-white' : 'text-[#1D1D1F]'
+              }`}>
+                IKOLI-AI v0.1
+              </span>
               <span className="text-[10px] text-gray-400 font-mono hidden sm:inline">
                 &bull; Public Assistant
               </span>
             </button>
           </div>
 
-          {/* Right: Actions (Share, Export, Theme, EDCTP3 Tag) */}
+          {/* Right: Actions (Share, Export, Theme) */}
           <div className="flex items-center gap-2">
             
             {/* Share Button */}
             <button
               onClick={handleShareLink}
-              className="p-2 rounded-xl text-gray-400 hover:text-white hover:bg-white/5 transition-colors cursor-pointer"
+              className={`p-2 rounded-xl transition-colors cursor-pointer ${
+                isDark
+                  ? 'text-gray-400 hover:text-white hover:bg-white/5'
+                  : 'text-gray-600 hover:text-black hover:bg-black/5'
+              }`}
               title="Copy conversation link"
             >
               <Share2 className="w-4 h-4" />
@@ -445,26 +480,29 @@ export const AskIkoliPage: React.FC<AskIkoliPageProps> = ({ onNavigate }) => {
             <button
               onClick={handleExportChat}
               disabled={messages.length === 0}
-              className="px-3 py-1.5 rounded-xl border border-white/10 bg-white/5 text-xs font-semibold flex items-center gap-1.5 text-gray-200 hover:bg-white/10 disabled:opacity-30 disabled:cursor-not-allowed transition-all cursor-pointer shadow-xs"
+              className={`px-3 py-1.5 rounded-xl border text-xs font-semibold flex items-center gap-1.5 disabled:opacity-30 disabled:cursor-not-allowed transition-all cursor-pointer shadow-2xs ${
+                isDark
+                  ? 'border-white/10 bg-white/5 text-gray-200 hover:bg-white/10'
+                  : 'border-black/10 bg-white text-gray-800 hover:bg-gray-100'
+              }`}
               title="Download conversation transcript (.md)"
             >
               <Download className="w-3.5 h-3.5" />
               <span className="hidden sm:inline">Export chat</span>
             </button>
 
-            {/* Theme Toggle */}
+            {/* Theme Toggle Button */}
             <button
               onClick={() => setTheme(isDark ? 'light' : 'dark')}
-              className="p-2 rounded-xl text-gray-400 hover:text-white hover:bg-white/5 transition-colors cursor-pointer"
+              className={`p-2 rounded-xl transition-colors cursor-pointer ${
+                isDark
+                  ? 'text-yellow-400 hover:bg-white/5'
+                  : 'text-gray-700 hover:bg-black/5'
+              }`}
               title={isDark ? 'Switch to Light Theme' : 'Switch to Dark Theme'}
             >
-              {isDark ? <Sun className="w-4 h-4 text-yellow-400" /> : <Moon className="w-4 h-4" />}
+              {isDark ? <Sun className="w-4 h-4" /> : <Moon className="w-4 h-4" />}
             </button>
-
-            {/* EDCTP3 Tag */}
-            <span className="hidden md:inline-flex px-3 py-1 rounded-full bg-white/10 border border-white/15 text-white text-[11px] font-bold tracking-tight shadow-xs">
-              EDCTP3 Demo
-            </span>
           </div>
 
         </header>
@@ -486,45 +524,56 @@ export const AskIkoliPage: React.FC<AskIkoliPageProps> = ({ onNavigate }) => {
               
               {/* Bigger, Electric Blue 3D Artificial Orb */}
               <div className="flex items-center justify-center transform hover:scale-105 transition-transform duration-500 cursor-pointer">
-                <GlowingOrb size={140} />
+                <GlowingOrb size={140} isTyping={isActivelyTyping || Boolean(inputQuery.trim())} />
               </div>
 
-              {/* Greeting & Headline */}
+              {/* Headline */}
               <div className="space-y-2">
-                <p className="font-semibold text-sm sm:text-base text-[#00D2FF] tracking-tight">
-                  Hello, Health Officer
-                </p>
-                <h1 className="font-display font-black text-3xl sm:text-5xl text-white tracking-tight leading-tight">
+                <h1 className={`font-display font-black text-3xl sm:text-5xl tracking-tight leading-tight ${
+                  isDark ? 'text-white' : 'text-[#1D1D1F]'
+                }`}>
                   How can I assist you today?
                 </h1>
               </div>
 
               {/* Demonstration Notice */}
-              <div className="max-w-xl mx-auto bg-amber-500/10 border border-amber-500/20 rounded-full px-4 py-1.5 text-[11px] text-amber-300 font-medium flex items-center justify-center gap-2">
+              <div className={`max-w-xl mx-auto rounded-full px-4 py-1.5 text-[11px] font-medium flex items-center justify-center gap-2 border ${
+                isDark
+                  ? 'bg-amber-500/10 border-amber-500/20 text-amber-300'
+                  : 'bg-amber-500/10 border-amber-500/30 text-amber-900'
+              }`}>
                 <span className="w-1.5 h-1.5 rounded-full bg-amber-500 shrink-0" />
                 <span>
                   <strong>Demonstration environment:</strong> Data are synthetic/illustrative.
                 </span>
               </div>
 
-              {/* Elevated Initial Composer Card (Dark Cyber Theme) */}
-              <div className="bg-[#141418] rounded-[26px] p-4 sm:p-5 border border-white/10 shadow-[0_16px_50px_rgba(0,0,0,0.3)] space-y-3 text-left">
+              {/* Elevated Initial Composer Card */}
+              <div className={`rounded-[26px] p-4 sm:p-5 border space-y-3 text-left transition-all ${
+                isDark
+                  ? 'bg-[#141418] border-white/10 shadow-[0_16px_50px_rgba(0,0,0,0.3)]'
+                  : 'bg-white border-black/8 shadow-[0_16px_50px_rgba(0,0,0,0.06)]'
+              }`}>
                 
                 {recognitionError && (
-                  <div className="p-2 rounded-xl bg-red-950/40 border border-red-800 text-xs text-red-300">
+                  <div className={`p-2 rounded-xl border text-xs ${
+                    isDark ? 'bg-red-950/40 border-red-800 text-red-300' : 'bg-red-50 border-red-200 text-red-700'
+                  }`}>
                     {recognitionError}
                   </div>
                 )}
 
                 {attachedFile && (
-                  <div className="p-2.5 rounded-xl bg-blue-950/40 border border-blue-800 flex items-center justify-between text-xs">
-                    <div className="flex items-center gap-2 text-blue-200 truncate">
-                      <FileText className="w-4 h-4 shrink-0 text-[#00D2FF]" />
+                  <div className={`p-2.5 rounded-xl border flex items-center justify-between text-xs ${
+                    isDark ? 'bg-blue-950/40 border-blue-800 text-blue-200' : 'bg-blue-50 border-blue-200 text-blue-900'
+                  }`}>
+                    <div className="flex items-center gap-2 truncate">
+                      <FileText className="w-4 h-4 shrink-0 text-[#0071E3]" />
                       <span className="truncate font-medium">{attachedFile.name}</span>
                     </div>
                     <button
                       onClick={() => setAttachedFile(null)}
-                      className="p-1 hover:bg-blue-900/50 rounded-full text-blue-300"
+                      className="p-1 hover:opacity-70 rounded-full"
                     >
                       <X className="w-3.5 h-3.5" />
                     </button>
@@ -534,7 +583,7 @@ export const AskIkoliPage: React.FC<AskIkoliPageProps> = ({ onNavigate }) => {
                 {/* Textarea Input */}
                 <textarea
                   value={inputQuery}
-                  onChange={(e) => setInputQuery(e.target.value)}
+                  onChange={(e) => handleInputChange(e.target.value)}
                   onKeyDown={(e) => {
                     if (e.key === 'Enter' && !e.shiftKey) {
                       e.preventDefault();
@@ -542,22 +591,30 @@ export const AskIkoliPage: React.FC<AskIkoliPageProps> = ({ onNavigate }) => {
                     }
                   }}
                   placeholder="Ask about leprosy early signs, 2025 South-East cases, or WHO protocols..."
-                  className="w-full bg-transparent text-sm sm:text-base outline-none resize-none min-h-[64px] font-sans leading-relaxed text-white placeholder-gray-500"
+                  className={`w-full bg-transparent text-sm sm:text-base outline-none resize-none min-h-[64px] font-sans leading-relaxed ${
+                    isDark ? 'text-white placeholder-gray-500' : 'text-[#1D1D1F] placeholder-gray-400'
+                  }`}
                 />
 
                 {/* Inside Composer Toolbar */}
-                <div className="flex items-center justify-between pt-2 border-t border-white/5">
+                <div className={`flex items-center justify-between pt-2 border-t ${
+                  isDark ? 'border-white/5' : 'border-black/5'
+                }`}>
                   
                   {/* Left: Deeper Research Pill */}
                   <button
                     onClick={() => setDeeperResearchActive(!deeperResearchActive)}
                     className={`px-3 py-1 rounded-full text-xs font-semibold flex items-center gap-1.5 transition-all cursor-pointer ${
-                      deeperResearchActive
-                        ? 'bg-blue-500/15 text-[#00D2FF] border border-blue-500/30'
-                        : 'bg-white/5 text-gray-400 border border-transparent'
+                      isDark
+                        ? deeperResearchActive
+                          ? 'bg-blue-500/15 text-[#00D2FF] border border-blue-500/30'
+                          : 'bg-white/5 text-gray-400 border border-transparent'
+                        : deeperResearchActive
+                          ? 'bg-blue-50 text-[#0071E3] border border-blue-200'
+                          : 'bg-gray-100 text-gray-600 border border-transparent'
                     }`}
                   >
-                    <Atom className="w-3.5 h-3.5 text-[#00D2FF]" />
+                    <Atom className={`w-3.5 h-3.5 ${isDark ? 'text-[#00D2FF]' : 'text-[#0071E3]'}`} />
                     <span>NTBLCP Guidelines</span>
                   </button>
 
@@ -566,7 +623,11 @@ export const AskIkoliPage: React.FC<AskIkoliPageProps> = ({ onNavigate }) => {
                     <button
                       onClick={() => fileInputRef.current?.click()}
                       title="Attach clinical document or lesion photo"
-                      className="p-2 rounded-xl text-gray-400 hover:text-[#00D2FF] hover:bg-white/5 transition-colors cursor-pointer"
+                      className={`p-2 rounded-xl transition-colors cursor-pointer ${
+                        isDark
+                          ? 'text-gray-400 hover:text-[#00D2FF] hover:bg-white/5'
+                          : 'text-gray-500 hover:text-[#0071E3] hover:bg-blue-50'
+                      }`}
                     >
                       <Paperclip className="w-4 h-4" />
                     </button>
@@ -578,7 +639,9 @@ export const AskIkoliPage: React.FC<AskIkoliPageProps> = ({ onNavigate }) => {
                       className={`w-8 h-8 rounded-full flex items-center justify-center transition-all cursor-pointer ${
                         isListening
                           ? 'bg-red-500 text-white animate-pulse'
-                          : 'bg-blue-500/20 text-[#00D2FF] hover:bg-blue-500/30 border border-blue-500/30'
+                          : isDark
+                          ? 'bg-blue-500/20 text-[#00D2FF] hover:bg-blue-500/30 border border-blue-500/30'
+                          : 'bg-blue-50 text-[#0071E3] hover:bg-blue-100 border border-blue-200'
                       }`}
                     >
                       {isListening ? <MicOff className="w-3.5 h-3.5" /> : <Mic className="w-3.5 h-3.5" />}
@@ -588,7 +651,7 @@ export const AskIkoliPage: React.FC<AskIkoliPageProps> = ({ onNavigate }) => {
                     <MagneticButton onClick={() => handleSend()}>
                       <button
                         disabled={!inputQuery.trim() && !attachedFile}
-                        className="w-8 h-8 rounded-full bg-[#0071E3] hover:bg-[#0077ED] text-white flex items-center justify-center transition-transform hover:scale-105 active:scale-95 disabled:opacity-30 disabled:cursor-not-allowed cursor-pointer shadow-[0_0_12px_rgba(0,113,227,0.5)]"
+                        className="w-8 h-8 rounded-full bg-[#0071E3] hover:bg-[#0077ED] text-white flex items-center justify-center transition-transform hover:scale-105 active:scale-95 disabled:opacity-30 disabled:cursor-not-allowed cursor-pointer shadow-[0_0_12px_rgba(0,113,227,0.4)]"
                       >
                         <ArrowUp className="w-4 h-4 stroke-[2.5]" />
                       </button>
@@ -600,7 +663,7 @@ export const AskIkoliPage: React.FC<AskIkoliPageProps> = ({ onNavigate }) => {
               </div>
 
               {/* 3-Column Feature Cards */}
-              <FeatureActionCards onSelectQuery={(q) => handleSend(q)} isDark={true} />
+              <FeatureActionCards onSelectQuery={(q) => handleSend(q)} isDark={isDark} />
 
             </div>
           )}
@@ -617,8 +680,8 @@ export const AskIkoliPage: React.FC<AskIkoliPageProps> = ({ onNavigate }) => {
                 >
                   {/* AI Avatar */}
                   {msg.sender === 'ai' && (
-                    <div className="w-8 h-8 rounded-xl bg-gradient-to-tr from-[#0071E3] to-[#00D2FF] text-white flex items-center justify-center shrink-0 shadow-[0_0_10px_rgba(0,113,227,0.4)] mt-0.5">
-                      <Sparkles className="w-4 h-4" />
+                    <div className="w-8 h-8 flex items-center justify-center shrink-0 mt-0.5">
+                      <GlowingOrb size={28} interactive={false} />
                     </div>
                   )}
 
@@ -626,13 +689,19 @@ export const AskIkoliPage: React.FC<AskIkoliPageProps> = ({ onNavigate }) => {
                   <div
                     className={`rounded-[22px] p-4 sm:p-5 text-sm sm:text-base leading-relaxed max-w-[90%] sm:max-w-[84%] border transition-all ${
                       msg.sender === 'user'
-                        ? 'bg-[#1C1C22] text-white border-white/10 shadow-md'
-                        : 'bg-[#141418] text-gray-100 border-white/10 shadow-md'
+                        ? isDark
+                          ? 'bg-[#1C1C22] text-white border-white/10 shadow-md'
+                          : 'bg-[#1D1D1F] text-white border-black/10 shadow-md'
+                        : isDark
+                        ? 'bg-[#141418] text-gray-100 border-white/10 shadow-md'
+                        : 'bg-white text-[#1D1D1F] border-black/8 shadow-xs'
                     }`}
                   >
                     {msg.attachment && (
-                      <div className="mb-3 p-2.5 rounded-xl bg-white/5 border border-white/10 text-xs flex items-center gap-2 font-mono">
-                        <FileText className="w-4 h-4 text-[#00D2FF]" />
+                      <div className={`mb-3 p-2.5 rounded-xl border text-xs flex items-center gap-2 font-mono ${
+                        isDark ? 'bg-white/5 border-white/10' : 'bg-black/5 border-black/5'
+                      }`}>
+                        <FileText className="w-4 h-4 text-[#0071E3]" />
                         <span className="truncate">{msg.attachment.name}</span>
                       </div>
                     )}
@@ -641,19 +710,25 @@ export const AskIkoliPage: React.FC<AskIkoliPageProps> = ({ onNavigate }) => {
 
                     {/* AI Response Tools */}
                     {msg.sender === 'ai' && (
-                      <div className="flex items-center justify-between gap-3 pt-3 mt-3 border-t border-white/5 text-[11px] text-gray-400">
+                      <div className={`flex items-center justify-between gap-3 pt-3 mt-3 border-t text-[11px] ${
+                        isDark ? 'border-white/5 text-gray-400' : 'border-black/5 text-gray-500'
+                      }`}>
                         <div className="flex items-center gap-3">
                           <button
                             onClick={() => handleCopy(msg.id, msg.text)}
-                            className="hover:text-[#00D2FF] flex items-center gap-1 transition-colors cursor-pointer"
+                            className={`flex items-center gap-1 transition-colors cursor-pointer ${
+                              isDark ? 'hover:text-[#00D2FF]' : 'hover:text-[#0071E3]'
+                            }`}
                           >
-                            {copiedId === msg.id ? <Check className="w-3.5 h-3.5 text-emerald-400" /> : <Copy className="w-3.5 h-3.5" />}
+                            {copiedId === msg.id ? <Check className="w-3.5 h-3.5 text-emerald-500" /> : <Copy className="w-3.5 h-3.5" />}
                             <span>{copiedId === msg.id ? 'Copied' : 'Copy'}</span>
                           </button>
 
                           <button
                             onClick={() => handleSpeak(msg.text)}
-                            className="hover:text-[#00D2FF] flex items-center gap-1 transition-colors cursor-pointer"
+                            className={`flex items-center gap-1 transition-colors cursor-pointer ${
+                              isDark ? 'hover:text-[#00D2FF]' : 'hover:text-[#0071E3]'
+                            }`}
                           >
                             <Volume2 className="w-3.5 h-3.5" />
                             <span>Listen</span>
@@ -679,11 +754,15 @@ export const AskIkoliPage: React.FC<AskIkoliPageProps> = ({ onNavigate }) => {
               {/* AI Typing / Thinking Indicator */}
               {isTyping && (
                 <div className="flex items-start gap-3.5 justify-start">
-                  <div className="w-8 h-8 rounded-xl bg-gradient-to-tr from-[#0071E3] to-[#00D2FF] text-white flex items-center justify-center shrink-0 shadow-xs animate-pulse">
-                    <Sparkles className="w-4 h-4" />
+                  <div className="w-8 h-8 flex items-center justify-center shrink-0">
+                    <GlowingOrb size={28} interactive={false} isTyping={true} />
                   </div>
-                  <div className="p-4 rounded-2xl bg-[#141418] border border-white/10 shadow-xs flex items-center gap-2.5 text-xs text-[#00D2FF] font-medium">
-                    <span className="w-2 h-2 rounded-full bg-[#00D2FF] shadow-[0_0_8px_#00D2FF] animate-ping" />
+                  <div className={`p-4 rounded-2xl border shadow-xs flex items-center gap-2.5 text-xs font-medium ${
+                    isDark
+                      ? 'bg-[#141418] border-white/10 text-[#00D2FF]'
+                      : 'bg-white border-black/8 text-[#0071E3]'
+                  }`}>
+                    <span className="w-2 h-2 rounded-full bg-[#0071E3] shadow-[0_0_8px_#0071E3] animate-ping" />
                     <span className="font-sans font-medium">Thinking…</span>
                   </div>
                 </div>
@@ -697,11 +776,17 @@ export const AskIkoliPage: React.FC<AskIkoliPageProps> = ({ onNavigate }) => {
 
         {/* ── Sticky Bottom Composer (When Messages Exist) ──────────────── */}
         {messages.length > 0 && (
-          <div className="p-4 sm:p-6 border-t border-white/10 bg-[#0D0D11]/95 backdrop-blur-xl shrink-0">
-            <div className="max-w-3xl mx-auto bg-[#141418] rounded-2xl p-3 border border-white/10 shadow-md space-y-2 text-left">
+          <div className={`p-4 sm:p-6 border-t backdrop-blur-xl shrink-0 transition-colors ${
+            isDark ? 'border-white/10 bg-[#0D0D11]/95' : 'border-black/5 bg-white/95'
+          }`}>
+            <div className={`max-w-3xl mx-auto rounded-2xl p-3 border shadow-md space-y-2 text-left transition-colors ${
+              isDark ? 'bg-[#141418] border-white/10 text-white' : 'bg-[#F9F9FB] border-black/10 text-[#1D1D1F]'
+            }`}>
               
               {attachedFile && (
-                <div className="p-2 rounded-lg bg-blue-950/40 text-xs flex items-center justify-between text-blue-200">
+                <div className={`p-2 rounded-lg text-xs flex items-center justify-between ${
+                  isDark ? 'bg-blue-950/40 text-blue-200' : 'bg-blue-50 text-blue-900'
+                }`}>
                   <span className="truncate font-medium">{attachedFile.name}</span>
                   <button onClick={() => setAttachedFile(null)} className="p-1 hover:text-red-400">
                     <X className="w-3.5 h-3.5" />
@@ -711,7 +796,7 @@ export const AskIkoliPage: React.FC<AskIkoliPageProps> = ({ onNavigate }) => {
 
               <textarea
                 value={inputQuery}
-                onChange={(e) => setInputQuery(e.target.value)}
+                onChange={(e) => handleInputChange(e.target.value)}
                 onKeyDown={(e) => {
                   if (e.key === 'Enter' && !e.shiftKey) {
                     e.preventDefault();
@@ -719,20 +804,24 @@ export const AskIkoliPage: React.FC<AskIkoliPageProps> = ({ onNavigate }) => {
                   }
                 }}
                 placeholder="Ask a follow-up question or query surveillance records..."
-                className="w-full bg-transparent text-sm outline-none resize-none min-h-[44px] text-white placeholder-gray-500"
+                className={`w-full bg-transparent text-sm outline-none resize-none min-h-[44px] ${
+                  isDark ? 'text-white placeholder-gray-500' : 'text-[#1D1D1F] placeholder-gray-400'
+                }`}
               />
 
               <div className="flex items-center justify-between pt-1">
                 <div className="flex items-center gap-2">
                   <button
                     onClick={() => fileInputRef.current?.click()}
-                    className="p-1.5 rounded-lg text-gray-400 hover:text-[#00D2FF] hover:bg-white/5"
+                    className={`p-1.5 rounded-lg transition-colors ${
+                      isDark ? 'text-gray-400 hover:text-[#00D2FF] hover:bg-white/5' : 'text-gray-500 hover:text-[#0071E3] hover:bg-black/5'
+                    }`}
                   >
                     <Paperclip className="w-4 h-4" />
                   </button>
                   <button
                     onClick={handleToggleVoice}
-                    className={`p-1.5 rounded-lg ${isListening ? 'text-red-400 animate-pulse' : 'text-gray-400 hover:text-[#00D2FF]'}`}
+                    className={`p-1.5 rounded-lg ${isListening ? 'text-red-400 animate-pulse' : isDark ? 'text-gray-400 hover:text-[#00D2FF]' : 'text-gray-500 hover:text-[#0071E3]'}`}
                   >
                     {isListening ? <MicOff className="w-4 h-4" /> : <Mic className="w-4 h-4" />}
                   </button>
@@ -753,7 +842,9 @@ export const AskIkoliPage: React.FC<AskIkoliPageProps> = ({ onNavigate }) => {
         )}
 
         {/* ── Studio Bottom Footer ──────────────────────────────────────── */}
-        <footer className="h-9 px-6 border-t border-white/5 flex items-center justify-between text-[11px] text-gray-500 shrink-0 select-none bg-[#0A0A0C]">
+        <footer className={`h-9 px-6 border-t flex items-center justify-between text-[11px] shrink-0 select-none transition-colors ${
+          isDark ? 'border-white/5 bg-[#0A0A0C] text-gray-500' : 'border-black/5 bg-[#F5F5F7] text-gray-500'
+        }`}>
           <span className="truncate">
             IKOLI Consortium &bull; RedAid Nigeria (RAN), DAHW Germany &amp; NTBLCP
           </span>
@@ -761,7 +852,9 @@ export const AskIkoliPage: React.FC<AskIkoliPageProps> = ({ onNavigate }) => {
           <div className="flex items-center gap-3">
             <button
               onClick={() => onNavigate('protocols')}
-              className="hover:text-[#00D2FF] flex items-center gap-1 cursor-pointer transition-colors"
+              className={`flex items-center gap-1 cursor-pointer transition-colors ${
+                isDark ? 'hover:text-[#00D2FF]' : 'hover:text-[#0071E3]'
+              }`}
             >
               <HelpCircle className="w-3.5 h-3.5" />
               <span className="hidden sm:inline">WHO Protocols</span>
