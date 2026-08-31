@@ -501,11 +501,11 @@ export const SurveillanceHubConsole: React.FC<SurveillanceHubConsoleProps> = ({
       {/* ══════════════════════════════════════════════════════════════════════
           TOP NAVIGATION BAR (Apple Clean Minimalist Style)
       ══════════════════════════════════════════════════════════════════════ */}
-      <div className="flex flex-col md:flex-row items-center justify-between gap-4 border-b border-black/5 pb-5">
+      <div className="flex flex-col lg:flex-row items-start lg:items-center justify-between gap-4 border-b border-black/5 pb-4">
         
         {/* Left: Geometric Three-Petal Logo Badge + Official Title */}
-        <div className="flex items-center gap-3 self-start md:self-auto">
-          <div className="w-10 h-10 rounded-2xl bg-[#1D1D1F] flex items-center justify-center text-white shadow-sm">
+        <div className="flex items-center gap-3">
+          <div className="w-10 h-10 rounded-2xl bg-[#1D1D1F] flex items-center justify-center text-white shadow-xs shrink-0">
             <svg className="w-5 h-5" viewBox="0 0 24 24" fill="currentColor">
               <circle cx="12" cy="7" r="4" opacity="0.9" />
               <circle cx="7" cy="15" r="4" opacity="0.9" />
@@ -515,106 +515,113 @@ export const SurveillanceHubConsole: React.FC<SurveillanceHubConsoleProps> = ({
           <div>
             <div className="flex items-center gap-2">
               <h2 className="font-extrabold text-base tracking-tight text-[#1D1D1F]">
-                IKOLI AI • SURVEILLANCE &amp; MEAL HUB
+                IKOLI AI
               </h2>
-              <span className="text-[10px] font-mono font-bold text-emerald-700 bg-emerald-100 px-2 py-0.5 rounded-full border border-emerald-300/40">
-                2025 Reconciled
+              <span className="text-gray-300">/</span>
+              <span className="text-xs font-semibold text-gray-600">
+                Surveillance Console
+              </span>
+              <span className="hidden sm:inline-flex items-center gap-1.5 text-[10px] font-mono font-bold text-emerald-700 bg-emerald-100/80 px-2 py-0.5 rounded-full border border-emerald-300/40">
+                <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" />
+                2025 Baseline
               </span>
             </div>
             <p className="text-[11px] text-gray-500 font-medium">
-              NTBLCP National Roadmap 2023–2030 &bull; RedAid Nigeria Working Baseline
+              National Skin NTD Surveillance &bull; NTBLCP &amp; RedAid Nigeria
             </p>
           </div>
         </div>
 
-        {/* Center: 5 Segmented Floating Pill Switchers */}
-        <div className="bg-[#DEDEDE] p-1 rounded-full flex flex-wrap items-center gap-1 shadow-inner">
-          <button
-            onClick={() => setActiveTab('overview')}
-            className={`px-4 py-1.5 rounded-full text-xs font-bold transition-all cursor-pointer ${
-              activeTab === 'overview'
-                ? 'bg-white text-[#1D1D1F] shadow-sm'
-                : 'text-gray-600 hover:text-[#1D1D1F]'
-            }`}
-          >
-            Overview
-          </button>
-          <button
-            onClick={() => setActiveTab('analytics')}
-            className={`px-4 py-1.5 rounded-full text-xs font-bold transition-all cursor-pointer ${
-              activeTab === 'analytics'
-                ? 'bg-white text-[#1D1D1F] shadow-sm'
-                : 'text-gray-600 hover:text-[#1D1D1F]'
-            }`}
-          >
-            Longitudinal
-          </button>
-          <button
-            onClick={() => setActiveTab('pcr')}
-            className={`px-4 py-1.5 rounded-full text-xs font-bold transition-all cursor-pointer flex items-center gap-1.5 ${
-              activeTab === 'pcr'
-                ? 'bg-purple-600 text-white shadow-sm'
-                : 'text-gray-600 hover:text-[#1D1D1F]'
-            }`}
-          >
-            <FlaskConical className="w-3.5 h-3.5" />
-            <span>PCR Diagnostics</span>
-          </button>
-          <button
-            onClick={() => setActiveTab('meal')}
-            className={`px-4 py-1.5 rounded-full text-xs font-bold transition-all cursor-pointer flex items-center gap-1.5 ${
-              activeTab === 'meal'
-                ? 'bg-[#0071E3] text-white shadow-sm'
-                : 'text-gray-600 hover:text-[#1D1D1F]'
-            }`}
-          >
-            <ShieldCheck className="w-3.5 h-3.5" />
-            <span>MEAL Quality</span>
-          </button>
-          <button
-            onClick={() => setActiveTab('monitoring')}
-            className={`px-4 py-1.5 rounded-full text-xs font-bold transition-all cursor-pointer ${
-              activeTab === 'monitoring'
-                ? 'bg-white text-[#1D1D1F] shadow-sm'
-                : 'text-gray-600 hover:text-[#1D1D1F]'
-            }`}
-          >
-            Fleet Telemetry
-          </button>
+        {/* Center: Apple-style Segmented Glass Capsule Switcher (No awkward wrapping) */}
+        <div className="w-full lg:w-auto overflow-x-auto scrollbar-none py-0.5">
+          <div className="bg-[#E5E5EA] p-1 rounded-full flex items-center gap-1 shrink-0 w-max mx-auto shadow-inner border border-black/5">
+            <button
+              onClick={() => setActiveTab('overview')}
+              className={`px-4 py-1.5 rounded-full text-xs font-semibold transition-all duration-200 cursor-pointer whitespace-nowrap ${
+                activeTab === 'overview'
+                  ? 'bg-white text-[#1D1D1F] shadow-[0_2px_8px_rgba(0,0,0,0.08)]'
+                  : 'text-[#86868B] hover:text-[#1D1D1F]'
+              }`}
+            >
+              Overview
+            </button>
+            <button
+              onClick={() => setActiveTab('analytics')}
+              className={`px-4 py-1.5 rounded-full text-xs font-semibold transition-all duration-200 cursor-pointer whitespace-nowrap ${
+                activeTab === 'analytics'
+                  ? 'bg-white text-[#1D1D1F] shadow-[0_2px_8px_rgba(0,0,0,0.08)]'
+                  : 'text-[#86868B] hover:text-[#1D1D1F]'
+              }`}
+            >
+              Trends
+            </button>
+            <button
+              onClick={() => setActiveTab('pcr')}
+              className={`px-4 py-1.5 rounded-full text-xs font-semibold transition-all duration-200 cursor-pointer whitespace-nowrap flex items-center gap-1.5 ${
+                activeTab === 'pcr'
+                  ? 'bg-white text-purple-700 shadow-[0_2px_8px_rgba(0,0,0,0.08)]'
+                  : 'text-[#86868B] hover:text-[#1D1D1F]'
+              }`}
+            >
+              <FlaskConical className="w-3 h-3" />
+              <span>PCR Labs</span>
+            </button>
+            <button
+              onClick={() => setActiveTab('meal')}
+              className={`px-4 py-1.5 rounded-full text-xs font-semibold transition-all duration-200 cursor-pointer whitespace-nowrap flex items-center gap-1.5 ${
+                activeTab === 'meal'
+                  ? 'bg-white text-[#0071E3] shadow-[0_2px_8px_rgba(0,0,0,0.08)]'
+                  : 'text-[#86868B] hover:text-[#1D1D1F]'
+              }`}
+            >
+              <ShieldCheck className="w-3 h-3" />
+              <span>MEAL Quality</span>
+            </button>
+            <button
+              onClick={() => setActiveTab('monitoring')}
+              className={`px-4 py-1.5 rounded-full text-xs font-semibold transition-all duration-200 cursor-pointer whitespace-nowrap ${
+                activeTab === 'monitoring'
+                  ? 'bg-white text-[#1D1D1F] shadow-[0_2px_8px_rgba(0,0,0,0.08)]'
+                  : 'text-[#86868B] hover:text-[#1D1D1F]'
+              }`}
+            >
+              Facilities
+            </button>
+          </div>
         </div>
 
-        {/* Right: Export to Excel / CSV Action Button */}
-        <div className="flex items-center gap-2.5 self-start md:self-auto">
+        {/* Right: Export to Excel / CSV Minimal Pill Button */}
+        <div className="flex items-center gap-2 shrink-0 self-end lg:self-auto">
           <button
             onClick={handleExportExcel}
-            className="bg-white hover:bg-gray-100 text-[#1D1D1F] border border-black/10 px-3.5 py-1.5 rounded-full text-xs font-bold shadow-xs flex items-center gap-2 transition-all hover:scale-105 active:scale-95 cursor-pointer group"
+            className="bg-white hover:bg-[#F5F5F7] text-[#1D1D1F] border border-black/10 px-4 py-1.5 rounded-full text-xs font-semibold shadow-xs flex items-center gap-2 transition-all hover:scale-102 active:scale-98 cursor-pointer group"
             title="Download full dataset in NTBLCP/RedAid MEAL CSV format"
           >
             <FileSpreadsheet className="w-3.5 h-3.5 text-emerald-600 group-hover:scale-110 transition-transform" />
-            <span>Export MEAL Dataset</span>
+            <span>Export CSV</span>
             <Download className="w-3 h-3 text-gray-400" />
           </button>
         </div>
 
       </div>
 
-      {/* ── 5 Pilot States Fast Switcher ──────────────────────────────── */}
+      {/* ── 5 Pilot States Minimalist Capsule Filter ──────────────────── */}
       <div className="flex items-center justify-between gap-3 overflow-x-auto pb-1 scrollbar-none">
-        <span className="text-[11px] font-bold uppercase tracking-wider text-gray-400 shrink-0">
-          Selected State:
+        <span className="text-[10px] font-mono font-bold uppercase tracking-wider text-gray-400 shrink-0">
+          State View:
         </span>
-        <div className="flex items-center gap-2">
+        <div className="flex items-center gap-1.5">
           {pilotStates.map((s) => (
             <button
               key={s.id}
               onClick={() => handleStateChange(s.id)}
-              className={`px-4 py-2 rounded-xl text-xs font-bold transition-all cursor-pointer whitespace-nowrap ${
+              className={`px-3.5 py-1.5 rounded-xl text-xs transition-all cursor-pointer whitespace-nowrap ${
                 selectedStateId === s.id
-                  ? 'bg-[#0071E3] text-white shadow-xs'
-                  : 'bg-white text-gray-700 hover:text-black hover:bg-gray-100 border border-black/5'
+                  ? 'bg-[#0071E3] text-white font-bold shadow-xs'
+                  : 'bg-white/80 text-gray-700 hover:text-black hover:bg-white border border-black/5 font-medium'
               }`}
             >
-              {s.name}
+              {s.name.replace(' State', '').replace('South-East Zone (All 5 States)', 'All 5 States')}
             </button>
           ))}
         </div>
