@@ -1,5 +1,7 @@
 import React, { useState } from 'react';
 import { X, Send, Sparkles } from 'lucide-react';
+import { queryGeminiClinicalAI } from '../services/geminiService';
+import { ClinicalMarkdown } from './ui/ClinicalMarkdown';
 
 interface AskIkoliModalProps {
   isOpen: boolean;
@@ -11,7 +13,7 @@ export const AskIkoliModal: React.FC<AskIkoliModalProps> = ({ isOpen, onClose })
   const [messages, setMessages] = useState<Array<{ sender: 'user' | 'ai'; text: string; time: string }>>([
     {
       sender: 'ai',
-      text: "Hello! I am Ikoli AI, your specialized Skin NTD clinical intelligence assistant. How can I assist you with clinical lesion assessments, Buruli ulcer staging, or sentinel telemetry in South-East Nigeria?",
+      text: "Hello! I am **IKOLI AI (v1.1)**, your Skin NTD clinical intelligence assistant. You can ask about lesion diagnosis, MDT regimens, PCR testing, or exact surveillance figures for Enugu, Ebonyi, Abia, Anambra, and Imo.",
       time: 'Just now',
     },
   ]);
@@ -19,30 +21,40 @@ export const AskIkoliModal: React.FC<AskIkoliModalProps> = ({ isOpen, onClose })
 
   if (!isOpen) return null;
 
-  const handleSend = (e: React.FormEvent) => {
-    e.preventDefault();
-    if (!query.trim()) return;
+  const handleSend = async (textToSend: string) => {
+    const userText = textToSend.trim();
+    if (!userText) return;
 
-    const userText = query;
     setMessages((prev) => [...prev, { sender: 'user', text: userText, time: 'Just now' }]);
     setQuery('');
     setIsTyping(true);
 
-    setTimeout(() => {
-      let aiResponse = "According to national NTBLCP and RedAid Nigeria clinical guidelines, single hypopigmented macules with definite sensory loss are classified as Paucibacillary (PB) Leprosy, treated with a 6-month MDT blister pack regimen. Buruli ulcer presenting as a painless nodule <5cm is Category I, treated with Rifampicin and Clarithromycin for 8 weeks.";
-
-      if (userText.toLowerCase().includes('state') || userText.toLowerCase().includes('enugu') || userText.toLowerCase().includes('ebonyi')) {
-        aiResponse = "South-East Sentinel Telemetry: Enugu reports 64 active clinics anchored by UNTH Ituku-Ozalla. Ebonyi operates 78 sentinel nodes coordinated by Mile 4 Hospital Abakaliki. All field data undergo local zero-PII UUID cryptographic hashing before State STBLCO verification.";
-      }
-
-      setMessages((prev) => [...prev, { sender: 'ai', text: aiResponse, time: 'Just now' }]);
+    try {
+      const res = await queryGeminiClinicalAI(userText);
+      setMessages((prev) => [...prev, { sender: 'ai', text: res.text, time: 'Just now' }]);
+    } catch (err) {
+      console.error('Modal query error:', err);
+      setMessages((prev) => [
+        ...prev,
+        {
+          sender: 'ai',
+          text: "I am ready to assist with clinical staging and state surveillance data under NTBLCP protocols. Please try asking again.",
+          time: 'Just now',
+        },
+      ]);
+    } finally {
       setIsTyping(false);
-    }, 900);
+    }
+  };
+
+  const onSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    handleSend(query);
   };
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/70 backdrop-blur-md animate-fade-in">
-      <div className="bg-[#0A0C10] border border-white/10 w-full max-w-2xl rounded-3xl shadow-2xl overflow-hidden flex flex-col h-[600px] text-white">
+    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/70 backdrop-blur-md animate-fade-in text-left">
+      <div className="bg-[#0A0C10] border border-white/10 w-full max-w-3xl rounded-3xl shadow-2xl overflow-hidden flex flex-col h-[640px] text-white">
         
         {/* Modal Header */}
         <div className="p-5 px-6 border-b border-white/10 flex items-center justify-between bg-[#121824]">
@@ -57,13 +69,13 @@ export const AskIkoliModal: React.FC<AskIkoliModalProps> = ({ isOpen, onClose })
                   ZERO-PII SECURE
                 </span>
               </div>
-              <span className="text-xs text-gray-400 font-sans">Multimodal Skin NTD Intelligence & Clinical Support</span>
+              <span className="text-xs text-gray-400 font-sans">Frontline Skin NTD Intelligence &amp; Surveillance Support</span>
             </div>
           </div>
 
           <button
             onClick={onClose}
-            className="p-2 rounded-full bg-white/5 hover:bg-white/10 text-gray-400 hover:text-white transition-colors"
+            className="p-2 rounded-full bg-white/5 hover:bg-white/10 text-gray-400 hover:text-white transition-colors cursor-pointer"
           >
             <X className="w-5 h-5" />
           </button>
@@ -74,13 +86,17 @@ export const AskIkoliModal: React.FC<AskIkoliModalProps> = ({ isOpen, onClose })
           {messages.map((m, i) => (
             <div key={i} className={`flex ${m.sender === 'user' ? 'justify-end' : 'justify-start'}`}>
               <div
-                className={`max-w-[80%] p-4 rounded-2xl ${
+                className={`max-w-[88%] p-4 sm:p-5 rounded-2xl ${
                   m.sender === 'user'
                     ? 'bg-[#0082FF] text-white rounded-br-none'
                     : 'bg-[#121824] text-gray-200 border border-white/10 rounded-bl-none shadow-lg leading-relaxed'
                 }`}
               >
-                {m.text}
+                <ClinicalMarkdown
+                  content={m.text}
+                  onSelectOption={(opt) => handleSend(opt)}
+                  isDark={true}
+                />
               </div>
             </div>
           ))}
@@ -91,24 +107,25 @@ export const AskIkoliModal: React.FC<AskIkoliModalProps> = ({ isOpen, onClose })
                 <span className="w-2 h-2 rounded-full bg-[#0082FF] animate-bounce" />
                 <span className="w-2 h-2 rounded-full bg-[#0082FF] animate-bounce delay-100" />
                 <span className="w-2 h-2 rounded-full bg-[#0082FF] animate-bounce delay-200" />
-                <span>Ikoli AI is analyzing clinical evidence...</span>
+                <span>Ikoli AI is analyzing validated clinical evidence...</span>
               </div>
             </div>
           )}
         </div>
 
         {/* Input Footer */}
-        <form onSubmit={handleSend} className="p-4 bg-[#121824] border-t border-white/10 flex items-center gap-3">
+        <form onSubmit={onSubmit} className="p-4 bg-[#121824] border-t border-white/10 flex items-center gap-3">
           <input
             type="text"
             value={query}
             onChange={(e) => setQuery(e.target.value)}
-            placeholder="Ask about skin lesions, Buruli staging, or state surveillance..."
+            placeholder="Ask: 'How many cases were recorded in Enugu last year?' or about lesion diagnosis..."
             className="flex-1 bg-[#0A0C10] border border-white/10 rounded-full px-5 py-3 text-sm text-white placeholder-gray-500 focus:outline-none focus:border-[#0082FF]"
           />
           <button
             type="submit"
-            className="bg-[#0082FF] hover:bg-[#0066CC] text-white p-3 rounded-full transition-all hover:scale-105 shadow-md flex items-center justify-center cursor-pointer"
+            disabled={!query.trim()}
+            className="bg-[#0082FF] hover:bg-[#0066CC] disabled:opacity-40 text-white p-3 rounded-full transition-all hover:scale-105 shadow-md flex items-center justify-center cursor-pointer"
           >
             <Send className="w-4 h-4" />
           </button>

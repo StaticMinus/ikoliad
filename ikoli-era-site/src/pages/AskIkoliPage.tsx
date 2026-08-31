@@ -611,10 +611,11 @@ export const AskIkoliPage: React.FC<AskIkoliPageProps> = ({ onNavigate }) => {
           <div className="flex flex-wrap items-center justify-center gap-2 pt-1 text-xs">
             <span className={isDark ? 'text-gray-500' : 'text-gray-400'}>Suggested queries:</span>
             {[
-              'Who is the CEO of RedAid Nigeria?',
-              'Staging Buruli Category I vs II',
+              'How many cases were recorded in Enugu last year?',
+              'What is the PCR confirmation rate for Buruli ulcer?',
+              'How many child cases were found in Ebonyi?',
               'Leprosy PB vs MB MDT pack',
-              'Mile 4 Lab PCR turnaround',
+              'Which state had the highest Buruli burden?',
             ].map((p, idx) => (
               <MagneticButton key={idx} onClick={() => handleSend(p)}>
                 <button

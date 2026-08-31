@@ -18,17 +18,13 @@ export const ClinicalMarkdown: React.FC<ClinicalMarkdownProps> = ({
     .replace(/\\n/g, '\n')
     .trim();
 
-  const lines = cleanContent.split('\n');
+  const rawLines = cleanContent.split('\n');
 
   // Interactive questions / choices extractor
   const detectedInteractiveOptions: string[] = [];
 
   // Helper to safely format inline bold/italic and strip all stray asterisks
   const formatInlineText = (text: string): React.ReactNode[] => {
-    // 1. First tokenize markdown bold **...** and italic *...*
-    const parts: React.ReactNode[] = [];
-    
-    // Replace double asterisks with a token
     const boldTokens: string[] = [];
     let processed = text.replace(/\*\*(.*?)\*\*/g, (_, p1) => {
       const idx = boldTokens.length;
@@ -36,7 +32,6 @@ export const ClinicalMarkdown: React.FC<ClinicalMarkdownProps> = ({
       return `___BOLD_TOKEN_${idx}___`;
     });
 
-    // Replace single asterisk italic with a token
     const italicTokens: string[] = [];
     processed = processed.replace(/\*(.*?)\*/g, (_, p1) => {
       const idx = italicTokens.length;
@@ -44,11 +39,10 @@ export const ClinicalMarkdown: React.FC<ClinicalMarkdownProps> = ({
       return `___ITALIC_TOKEN_${idx}___`;
     });
 
-    // Remove any remaining stray asterisks from the plain text
     processed = processed.replace(/\*/g, '');
 
-    // Now split and reconstruct React elements
     const tokenRegex = /___(BOLD|ITALIC)_TOKEN_(\d+)___/g;
+    const parts: React.ReactNode[] = [];
     let lastIndex = 0;
     let match: RegExpExecArray | null;
 
@@ -64,7 +58,7 @@ export const ClinicalMarkdown: React.FC<ClinicalMarkdownProps> = ({
         parts.push(
           <strong
             key={`b-${match.index}`}
-            className={isDark ? 'text-white font-semibold' : 'text-gray-900 font-semibold'}
+            className={isDark ? 'text-white font-bold' : 'text-[#1D1D1F] font-bold'}
           >
             {boldTokens[tokenIdx]}
           </strong>
@@ -90,106 +84,200 @@ export const ClinicalMarkdown: React.FC<ClinicalMarkdownProps> = ({
     return parts;
   };
 
+  // Group lines into blocks (Tables, Headings, Lists, Paragraphs)
+  type Block =
+    | { type: 'empty' }
+    | { type: 'divider' }
+    | { type: 'heading'; level: number; text: string }
+    | { type: 'bullet'; text: string }
+    | { type: 'number'; num: string; text: string }
+    | { type: 'table'; headers: string[]; rows: string[][] }
+    | { type: 'paragraph'; text: string };
+
+  const blocks: Block[] = [];
+  let i = 0;
+
+  while (i < rawLines.length) {
+    const trimmed = rawLines[i].trim();
+
+    if (!trimmed) {
+      blocks.push({ type: 'empty' });
+      i++;
+      continue;
+    }
+
+    if (trimmed === '---' || trimmed === '___' || trimmed.startsWith('***')) {
+      blocks.push({ type: 'divider' });
+      i++;
+      continue;
+    }
+
+    if (trimmed.startsWith('#')) {
+      const level = trimmed.match(/^#+/)?.[0].length || 1;
+      const text = trimmed.replace(/^#+\s*/, '').replace(/\*/g, '');
+      blocks.push({ type: 'heading', level, text });
+      i++;
+      continue;
+    }
+
+    // Check if start of a Markdown table (| ... |)
+    if (trimmed.startsWith('|') && trimmed.endsWith('|')) {
+      const tableLines: string[] = [];
+      while (i < rawLines.length && rawLines[i].trim().startsWith('|') && rawLines[i].trim().endsWith('|')) {
+        tableLines.push(rawLines[i].trim());
+        i++;
+      }
+
+      if (tableLines.length > 0) {
+        const parsedRows = tableLines.map((row) =>
+          row
+            .split('|')
+            .filter((_, cIdx, arr) => cIdx > 0 && cIdx < arr.length - 1)
+            .map((c) => c.trim())
+        );
+
+        // Filter out separator lines (|---|---|)
+        const validRows = parsedRows.filter((r) => !r.every((c) => /^-+$/.test(c)));
+        if (validRows.length > 0) {
+          const headers = validRows[0];
+          const rows = validRows.slice(1);
+          blocks.push({ type: 'table', headers, rows });
+        }
+      }
+      continue;
+    }
+
+    if (/^[•\-\*]\s+/.test(trimmed)) {
+      const bulletBody = trimmed.replace(/^[•\-\*]\s+/, '');
+      blocks.push({ type: 'bullet', text: bulletBody });
+      i++;
+      continue;
+    }
+
+    if (/^\d+[\.\)]\s+/.test(trimmed)) {
+      const numberMatch = trimmed.match(/^(\d+)[\.\)]\s+(.*)/);
+      if (numberMatch) {
+        const num = numberMatch[1];
+        const itemBody = numberMatch[2];
+        if (itemBody.length < 100 && onSelectOption) {
+          const cleanItem = itemBody.replace(/\*/g, '').trim();
+          if (cleanItem.length > 5 && !detectedInteractiveOptions.includes(cleanItem)) {
+            detectedInteractiveOptions.push(cleanItem);
+          }
+        }
+        blocks.push({ type: 'number', num, text: itemBody });
+        i++;
+        continue;
+      }
+    }
+
+    blocks.push({ type: 'paragraph', text: trimmed });
+    i++;
+  }
+
   return (
     <div className={`space-y-3 font-sans text-sm sm:text-base leading-relaxed ${isDark ? 'text-gray-200' : 'text-gray-800'}`}>
-      {lines.map((line, idx) => {
-        const trimmed = line.trim();
-
-        // Empty line
-        if (!trimmed) {
-          return <div key={idx} className="h-1.5" />;
+      {blocks.map((block, idx) => {
+        if (block.type === 'empty') {
+          return <div key={idx} className="h-1" />;
         }
 
-        // Horizontal divider
-        if (trimmed === '---' || trimmed === '___' || trimmed.startsWith('***')) {
+        if (block.type === 'divider') {
           return <hr key={idx} className={`my-3 border-t ${isDark ? 'border-white/10' : 'border-black/10'}`} />;
         }
 
-        // Headings (# or ## or ###)
-        if (trimmed.startsWith('#')) {
-          const headingText = trimmed.replace(/^#+\s*/, '').replace(/\*/g, '');
+        if (block.type === 'heading') {
           return (
             <h4
               key={idx}
-              className={`font-bold tracking-tight text-sm sm:text-base mt-3 mb-1.5 flex items-center gap-2 ${
+              className={`font-bold tracking-tight text-base sm:text-lg mt-3 mb-1.5 flex items-center gap-2 ${
                 isDark ? 'text-[#00D2FF]' : 'text-[#0071E3]'
               }`}
             >
-              <span>{headingText}</span>
+              <span>{block.text}</span>
             </h4>
           );
         }
 
-        // Bullet points (• or - or *)
-        if (/^[•\-\*]\s+/.test(trimmed)) {
-          const bulletBody = trimmed.replace(/^[•\-\*]\s+/, '');
+        if (block.type === 'bullet') {
           return (
             <div key={idx} className="flex items-start gap-2.5 pl-1 my-1">
               <span className="text-[#10B981] font-bold text-base leading-none shrink-0 mt-1">•</span>
-              <div className="flex-1 leading-relaxed">
-                {formatInlineText(bulletBody)}
-              </div>
+              <div className="flex-1 leading-relaxed">{formatInlineText(block.text)}</div>
             </div>
           );
         }
 
-        // Numbered list items (1. 2. 3.)
-        if (/^\d+[\.\)]\s+/.test(trimmed)) {
-          const numberMatch = trimmed.match(/^(\d+)[\.\)]\s+(.*)/);
-          if (numberMatch) {
-            const num = numberMatch[1];
-            const itemBody = numberMatch[2];
-
-            // If item looks like an option or step, extract for interactive button
-            if (itemBody.length < 100 && onSelectOption) {
-              const cleanItem = itemBody.replace(/\*/g, '').trim();
-              if (cleanItem.length > 5 && !detectedInteractiveOptions.includes(cleanItem)) {
-                detectedInteractiveOptions.push(cleanItem);
-              }
-            }
-
-            return (
-              <div key={idx} className="flex items-start gap-2.5 pl-1 my-1.5">
-                <span className={`px-2 py-0.5 rounded-full text-[11px] font-mono font-bold shrink-0 ${
-                  isDark ? 'bg-white/10 text-gray-300' : 'bg-gray-200 text-gray-800'
-                }`}>
-                  {num}
-                </span>
-                <div className="flex-1 leading-relaxed">
-                  {formatInlineText(itemBody)}
-                </div>
-              </div>
-            );
-          }
-        }
-
-        // Table Rows (starts with |)
-        if (trimmed.startsWith('|') && trimmed.endsWith('|')) {
-          const cells = trimmed
-            .split('|')
-            .filter((_, cIdx, arr) => cIdx > 0 && cIdx < arr.length - 1)
-            .map((c) => c.trim());
-
-          // Skip separator rows (|---|---|)
-          if (cells.every((c) => /^-+$/.test(c))) {
-            return null;
-          }
-
+        if (block.type === 'number') {
           return (
-            <div key={idx} className="grid grid-cols-2 gap-2 my-1 text-xs sm:text-sm font-mono border-b border-white/5 pb-1">
-              {cells.map((cell, cIdx) => (
-                <div key={cIdx} className={cIdx === 0 ? 'font-bold text-[#10B981]' : 'text-gray-300'}>
-                  {formatInlineText(cell)}
-                </div>
-              ))}
+            <div key={idx} className="flex items-start gap-2.5 pl-1 my-1.5">
+              <span
+                className={`px-2 py-0.5 rounded-full text-[11px] font-mono font-bold shrink-0 ${
+                  isDark ? 'bg-white/10 text-gray-300' : 'bg-gray-200 text-gray-800'
+                }`}
+              >
+                {block.num}
+              </span>
+              <div className="flex-1 leading-relaxed">{formatInlineText(block.text)}</div>
             </div>
           );
         }
 
-        // Standard Paragraph
+        if (block.type === 'table') {
+          return (
+            <div
+              key={idx}
+              className={`my-3 overflow-x-auto rounded-2xl border shadow-xs ${
+                isDark ? 'bg-[#151515] border-white/10' : 'bg-white border-black/10'
+              }`}
+            >
+              <table className="w-full text-left text-xs sm:text-sm">
+                <thead className={`border-b font-mono uppercase text-[10px] sm:text-[11px] ${
+                  isDark ? 'bg-white/5 border-white/10 text-gray-300' : 'bg-[#F6F6F8] border-black/10 text-gray-700'
+                }`}>
+                  <tr>
+                    {block.headers.map((h, hIdx) => (
+                      <th key={hIdx} className="py-2.5 px-3.5 font-bold whitespace-nowrap">
+                        {formatInlineText(h)}
+                      </th>
+                    ))}
+                  </tr>
+                </thead>
+                <tbody className={`divide-y font-mono ${isDark ? 'divide-white/5' : 'divide-gray-100'}`}>
+                  {block.rows.map((row, rIdx) => (
+                    <tr
+                      key={rIdx}
+                      className={`transition-colors ${
+                        isDark ? 'hover:bg-white/5' : 'hover:bg-gray-50'
+                      }`}
+                    >
+                      {row.map((cell, cIdx) => (
+                        <td
+                          key={cIdx}
+                          className={`py-2.5 px-3.5 whitespace-nowrap ${
+                            cIdx === 0
+                              ? isDark
+                                ? 'font-bold text-white'
+                                : 'font-bold text-[#1D1D1F]'
+                              : isDark
+                              ? 'text-gray-300'
+                              : 'text-gray-700'
+                          }`}
+                        >
+                          {formatInlineText(cell)}
+                        </td>
+                      ))}
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          );
+        }
+
         return (
           <p key={idx} className="leading-relaxed">
-            {formatInlineText(trimmed)}
+            {formatInlineText(block.text)}
           </p>
         );
       })}
