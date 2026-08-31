@@ -2,17 +2,17 @@ import React, { useEffect, useRef, useState } from 'react';
 import * as THREE from 'three';
 import { webAudioService } from '../../services/webAudioService';
 
-// ── GLSL 3D Simplex Noise Shader — Calm, Silky & Mild Apple Liquid Glass ─────────
+// ── GLSL 3D Simplex Noise Shader with Multi-Band Audio FFT Coupling ─────────
 const vertexShader = `
   uniform float uTime;
   uniform float uSpeed;
   uniform float uDistortion;
   uniform float uFrequency;
   uniform vec2 uMouse;
-  uniform float uEnergy;       // 0.0 = completely still & quiet, 1.0 = active
-  uniform float uAudioLow;     // Subtle bass breathing
-  uniform float uAudioMid;     // Vocal melody wave
-  uniform float uAudioHigh;    // Soft specular sparkle
+  uniform float uEnergy;       // 0.0 = completely stopped, 1.0 = fully active
+  uniform float uAudioLow;     // Bass energy (20-250Hz)
+  uniform float uAudioMid;     // Vocal midrange (250-2000Hz)
+  uniform float uAudioHigh;    // Treble harmonics (2000-8000Hz)
   uniform float uAudioEnergy;  // Overall audio volume
 
   varying vec3 vNormal;
@@ -21,7 +21,7 @@ const vertexShader = `
   varying vec2 vUv;
   varying float vAudioAura;
 
-  // Classic Simplex 3D noise for ultra-smooth liquid flow
+  // Simplex 3D noise functions
   vec4 permute(vec4 x) { return mod(((x*34.0)+1.0)*x, 289.0); }
   vec4 taylorInvSqrt(vec4 r) { return 1.79284291400159 - 0.85373472095314 * r; }
 
@@ -88,40 +88,36 @@ const vertexShader = `
   void main() {
     vUv = uv;
     
-    // Low-frequency, smooth, laminar liquid wave motion
+    // Multi-octave organic displacement strictly gated by active energy
     float time = uTime * uSpeed;
-    float freq = uFrequency;
+    float freq = uFrequency + (uEnergy * 0.6) + (uAudioMid * 1.5);
     
-    // Pure, gentle primary fluid noise (low frequency, velvety smooth)
-    vec3 noiseCoord = position * freq + vec3(time * 0.18, time * 0.22, time * 0.15);
-    float fluidWave1 = snoise(noiseCoord);
+    // Noise wave displaced by bass and midrange voice formants
+    float noise1 = snoise(position * freq + vec3(time * 0.4, time * 0.5, time * 0.3));
+    float noise2 = snoise(position * (freq * 2.2) - vec3(time * 0.3, time * 0.2, time * 0.4)) * 0.5;
     
-    // Very subtle secondary harmonic (soft, non-spiky)
-    vec3 noiseCoord2 = position * (freq * 1.5) - vec3(time * 0.12, time * 0.14, time * 0.1);
-    float fluidWave2 = snoise(noiseCoord2) * 0.3;
-    
-    // Subtle interactive mouse liquid push
-    float mouseDist = length(position.xy - vec3(uMouse * 1.2, 0.0).xy);
-    float mouseRipple = sin(mouseDist * 2.5 - time * 1.2) * 0.03 * uEnergy;
+    // Interactive mouse push
+    float mouseDistance = length(position.xy - vec3(uMouse * 1.5, 0.0).xy);
+    float mouseWave = sin(mouseDistance * 4.0 - time * 2.0) * 0.08 * uEnergy;
 
-    // Harmonic Audio Breathing (soft equatorial expansion & slow gentle ripples)
-    float bassBreath = sin(position.y * 2.0 + time * 1.5) * (uAudioLow * 0.05);
-    float vocalMelody = sin(position.x * 3.0 + position.z * 2.0 + time * 2.0) * (uAudioMid * 0.035);
-    float audioRipples = (bassBreath + vocalMelody) * (uAudioEnergy + 0.1);
+    // Fast micro-tremor wave when typing
+    float tremor = sin(time * 16.0 + position.y * 12.0) * (uEnergy * 0.06);
 
-    // Total displacement: mild, calm, controlled amplitude (never exceeding smooth curvature)
-    float totalWave = (fluidWave1 + fluidWave2 + mouseRipple) * uDistortion + audioRipples;
-    float displacement = totalWave * uEnergy;
+    // Audio FFT harmonic ripples: Bass expands equator, Highs create crisp ripple ripples
+    float bassBulge = uAudioLow * 0.22 * sin(position.y * 3.1415);
+    float trebleRipples = sin(position.z * 18.0 + time * 8.0) * (uAudioHigh * 0.12);
+    float midFormant = sin(position.x * 10.0 + time * 5.0) * (uAudioMid * 0.14);
+
+    float audioDisplacement = (bassBulge + trebleRipples + midFormant) * (uAudioEnergy + 0.1);
+
+    float displacement = ((noise1 + noise2 + mouseWave + tremor) * uDistortion + audioDisplacement) * uEnergy;
     vDisplacement = displacement;
     vAudioAura = uAudioEnergy;
 
-    // Deform vertex position along its normal
     vec3 newPosition = position + normal * displacement;
     vPosition = newPosition;
     
-    // Smoothly blended normal for silky light reflection
-    vec3 smoothPerturb = vec3(fluidWave1 * 0.12, fluidWave2 * 0.12, fluidWave1 * 0.08) * uEnergy;
-    vNormal = normalize(normalMatrix * (normal + smoothPerturb));
+    vNormal = normalize(normalMatrix * (normal + vec3(noise1 * 0.3, noise2 * 0.3, noise1 * 0.2) * uEnergy));
 
     gl_Position = projectionMatrix * modelViewMatrix * vec4(newPosition, 1.0);
   }
@@ -134,11 +130,11 @@ const fragmentShader = `
   uniform float uAudioLow;
   uniform float uAudioMid;
   uniform float uAudioHigh;
-  uniform vec3 uColorA;     // Deep Sapphire / Midnight Blue
-  uniform vec3 uColorB;     // Pure Apple Blue (#0071E3)
-  uniform vec3 uColorC;     // Luminous Azure / Cyan (#00D2FF)
-  uniform vec3 uColorD;     // Ethereal Soft Pearl / Lilac (#A78BFA)
-  uniform vec3 uColorCore;  // Diamond Pure White (#FFFFFF)
+  uniform vec3 uColorA;     // Deep Cobalt Blue
+  uniform vec3 uColorB;     // Electric Royal Blue
+  uniform vec3 uColorC;     // Luminous Cyan / Azure
+  uniform vec3 uColorD;     // Ethereal Soft Violet / Pearl Lavender
+  uniform vec3 uColorCore;  // Bright White Core
 
   varying vec3 vNormal;
   varying vec3 vPosition;
@@ -150,39 +146,30 @@ const fragmentShader = `
     vec3 normal = normalize(vNormal);
     vec3 viewDir = normalize(-vPosition);
 
-    // Soft, velvety Fresnel rim glow along edges
-    float fresnel = pow(1.0 - max(0.0, dot(normal, vec3(0.0, 0.0, 1.0))), 2.6);
+    // Fresnel glow along curvature edges
+    float fresnel = pow(1.0 - max(0.0, dot(normal, vec3(0.0, 0.0, 1.0))), 2.4);
     
-    // Gentle primary light for crisp specular highlight
-    vec3 lightDir = normalize(vec3(0.6, 0.8, 1.0));
+    // Top-left primary light source for specular glints
+    vec3 lightDir = normalize(vec3(0.7, 0.9, 1.2));
     float diff = max(0.0, dot(normal, lightDir));
     
-    // Smooth specular highlight (crystal pearl sheen)
+    // Specular highlight
     vec3 reflectDir = reflect(-lightDir, normal);
-    float spec = pow(max(dot(viewDir, reflectDir), 0.0), 40.0);
+    float spec = pow(max(dot(viewDir, reflectDir), 0.0), 32.0);
 
-    // Secondary subtle fill light from bottom right
-    vec3 fillLight = normalize(vec3(-0.5, -0.6, 0.8));
-    float fillDiff = max(0.0, dot(normal, fillLight)) * 0.3;
-
-    // Harmonious color gradient transition
-    float colorMix = clamp((vDisplacement * 3.5) + 0.45 + (uEnergy * 0.1) + (uAudioMid * 0.15), 0.0, 1.0);
+    // Dynamic color gradient based on displacement elevation, audio frequencies, and view angle
+    float colorMix = clamp((vDisplacement * 2.8) + 0.5 + (uEnergy * 0.15) + (uAudioMid * 0.3), 0.0, 1.0);
     
     vec3 baseColor = mix(uColorA, uColorB, colorMix);
-    vec3 cyanGlow = mix(baseColor, uColorC, smoothstep(0.25, 0.75, colorMix + fresnel * 0.35));
-    vec3 pearlAccent = mix(cyanGlow, uColorD, fresnel * 0.65);
+    vec3 shimmerColor = mix(baseColor, uColorC, smoothstep(0.3, 0.8, colorMix + fresnel * 0.4));
+    vec3 pearlColor = mix(shimmerColor, uColorD, fresnel * 0.75);
 
-    // Calm audio luminosity glow
-    vec3 vocalSheen = mix(uColorC, vec3(1.0, 1.0, 1.0), uAudioHigh * 0.4);
-    vec3 gentleBurst = vocalSheen * ((uEnergy * 0.08) + (uAudioEnergy * 0.25) + (uAudioLow * 0.1));
+    // Dynamic luminous flash when typing or audio is active (boosted by treble harmonics)
+    vec3 audioColor = mix(uColorC, vec3(1.0, 1.0, 1.0), uAudioHigh * 0.5);
+    vec3 activeBurst = audioColor * ((uEnergy * 0.2) + (uAudioEnergy * 0.5) + (uAudioLow * 0.2));
 
-    // Final combined crystal liquid color
-    vec3 finalColor = pearlAccent 
-      + (diff * 0.25 * uColorB) 
-      + (fillDiff * uColorA) 
-      + gentleBurst 
-      + (uColorCore * spec * 0.85) 
-      + (uColorC * fresnel * 0.45);
+    // Core volumetric radiance
+    vec3 finalColor = pearlColor + activeBurst + (uColorCore * spec * 0.9) + (uColorC * fresnel * 0.6);
 
     gl_FragColor = vec4(finalColor, 0.98);
   }
@@ -223,7 +210,7 @@ export const GlowingOrb: React.FC<GlowingOrbProps> = ({
     const scene = new THREE.Scene();
     
     const camera = new THREE.PerspectiveCamera(45, 1, 0.1, 100);
-    camera.position.z = 3.4;
+    camera.position.z = 3.6;
 
     let renderer: THREE.WebGLRenderer;
     try {
@@ -239,30 +226,30 @@ export const GlowingOrb: React.FC<GlowingOrbProps> = ({
     renderer.setSize(size, size);
     renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
     renderer.toneMapping = THREE.ACESFilmicToneMapping;
-    renderer.toneMappingExposure = 1.05;
+    renderer.toneMappingExposure = 1.1;
 
     container.innerHTML = '';
     container.appendChild(renderer.domElement);
 
-    // ── 2. High-Density Sphere Geometry (128x128 for pristine roundness) ───
-    const geometry = new THREE.SphereGeometry(1.02, 128, 128);
+    // ── 2. Sphere Geometry & Fluid Organic Material ────────────────────────
+    const geometry = new THREE.SphereGeometry(1.05, 96, 96);
 
     const uniforms = {
       uTime: { value: 0 },
       uSpeed: { value: 0 },
       uDistortion: { value: 0 },
-      uFrequency: { value: 0.9 }, // Calm, low-frequency wave
+      uFrequency: { value: 1.4 },
       uEnergy: { value: 0 },
       uAudioEnergy: { value: 0 },
       uAudioLow: { value: 0 },
       uAudioMid: { value: 0 },
       uAudioHigh: { value: 0 },
       uMouse: { value: new THREE.Vector2(0, 0) },
-      uColorA: { value: new THREE.Color('#002B7A') },    // Deep Midnight Sapphire
-      uColorB: { value: new THREE.Color('#0071E3') },    // Semantic Apple Blue
-      uColorC: { value: new THREE.Color('#38BDF8') },    // Ethereal Soft Azure
-      uColorD: { value: new THREE.Color('#818CF8') },    // Pearl Lilac Lavender
-      uColorCore: { value: new THREE.Color('#FFFFFF') }, // Specular White Highlight
+      uColorA: { value: new THREE.Color('#003896') },    // Deep royal cobalt
+      uColorB: { value: new THREE.Color('#0066E6') },    // Electric Apple Blue
+      uColorC: { value: new THREE.Color('#00D2FF') },    // Shimmering Cyan
+      uColorD: { value: new THREE.Color('#9333EA') },    // Pearl Violet highlight
+      uColorCore: { value: new THREE.Color('#FFFFFF') }, // Specular White
     };
 
     const material = new THREE.ShaderMaterial({
@@ -287,9 +274,9 @@ export const GlowingOrb: React.FC<GlowingOrbProps> = ({
       const x = ((e.clientX - rect.left) / rect.width) * 2 - 1;
       const y = -(((e.clientY - rect.top) / rect.height) * 2 - 1);
 
-      targetMouse.set(x * 0.5, y * 0.5);
-      targetRotation.y = x * 0.18;
-      targetRotation.x = -y * 0.18;
+      targetMouse.set(x, y);
+      targetRotation.y = x * 0.35;
+      targetRotation.x = -y * 0.35;
     };
 
     const handleMouseEnter = () => setIsHovered(true);
@@ -305,7 +292,7 @@ export const GlowingOrb: React.FC<GlowingOrbProps> = ({
       container.addEventListener('mouseleave', handleMouseLeave);
     }
 
-    // ── 4. 60fps Calm Animation Render Loop with Silky Flow ───────────────
+    // ── 4. 60fps Animation Render Loop with Live FFT Audio Processing ──────
     let animationFrameId: number;
     let clock = new THREE.Clock();
     let currentEnergy = 0;
@@ -320,60 +307,60 @@ export const GlowingOrb: React.FC<GlowingOrbProps> = ({
       // Sample WebAudio FFT metrics
       const audioMetrics = webAudioService.getFrequencyMetrics();
 
-      // Smooth energy ramp: 1.0 when active, 0.0 when still
-      const targetEnergy = isActive ? 1.0 : isHovered ? 0.2 : 0.0;
-      currentEnergy = THREE.MathUtils.lerp(currentEnergy, targetEnergy, isActive ? 0.12 : 0.06);
+      // Target Energy: 1.0 when active, 0.0 when stopped
+      const targetEnergy = isActive ? 1.0 : isHovered ? 0.25 : 0.0;
+      currentEnergy = THREE.MathUtils.lerp(currentEnergy, targetEnergy, isActive ? 0.18 : 0.08);
       uniforms.uEnergy.value = currentEnergy;
 
-      // Map FFT Spectrum into Shader Uniforms with smooth damping
-      uniforms.uAudioLow.value = audioMetrics.low * 0.6;
-      uniforms.uAudioMid.value = audioMetrics.mid * 0.6;
-      uniforms.uAudioHigh.value = audioMetrics.high * 0.5;
-      uniforms.uAudioEnergy.value = isAudioActiveRef.current ? Math.min(audioMetrics.volume * 0.8, 0.5) : 0;
+      // Map FFT Spectrum into Shader Uniforms
+      uniforms.uAudioLow.value = audioMetrics.low;
+      uniforms.uAudioMid.value = audioMetrics.mid;
+      uniforms.uAudioHigh.value = audioMetrics.high;
+      uniforms.uAudioEnergy.value = isAudioActiveRef.current ? Math.max(audioMetrics.volume, 0.2) : audioMetrics.volume;
 
-      // Advance shader time ONLY when energy is present (silky, peaceful pace)
+      // Advance shader time ONLY when energy is present
       if (currentEnergy > 0.001) {
-        const paceMultiplier = isAudioActiveRef.current ? 1.2 + audioMetrics.mid * 0.5 : 0.85;
-        accumulatedTime += delta * paceMultiplier * currentEnergy;
+        const speedMultiplier = isAudioActiveRef.current ? 2.5 + audioMetrics.mid * 1.5 : 2.0;
+        accumulatedTime += delta * speedMultiplier * currentEnergy;
         uniforms.uTime.value = accumulatedTime;
 
         uniforms.uSpeed.value = 1.0;
-        
-        // Controlled, gentle amplitude: 0.06 - 0.09 (silky waves, never spiky)
         uniforms.uDistortion.value = THREE.MathUtils.lerp(
           0.0,
-          isAudioActiveRef.current ? 0.08 + audioMetrics.low * 0.03 : 0.065,
+          isAudioActiveRef.current ? 0.32 + audioMetrics.low * 0.15 : 0.28,
           currentEnergy
         );
 
-        // Calm, graceful 3D rotation
-        const rotSpeed = (isAudioActiveRef.current ? 0.008 : 0.005) * currentEnergy;
+        // Continuous 3D rotation while active
+        const rotSpeed = (isAudioActiveRef.current ? 0.024 + audioMetrics.mid * 0.015 : 0.016) * currentEnergy;
         sphereMesh.rotation.y += rotSpeed;
 
-        // Gentle organic breathing scale (smooth, serene)
+        // Acoustic rhythm pulsation
         if (isAudioActiveRef.current) {
-          const vocalExpansion = 1.0 + (audioMetrics.low * 0.03 + audioMetrics.volume * 0.02);
-          sphereMesh.scale.set(vocalExpansion, vocalExpansion, vocalExpansion);
-          sphereMesh.position.set(0, 0, 0);
+          const bassExpansion = 1.0 + (audioMetrics.low * 0.08 + audioMetrics.volume * 0.04);
+          sphereMesh.scale.set(bassExpansion, bassExpansion, bassExpansion);
+          sphereMesh.position.x = Math.sin(accumulatedTime * 20.0) * 0.025 * (audioMetrics.volume + 0.1);
+          sphereMesh.position.y = Math.cos(accumulatedTime * 24.0) * 0.025 * (audioMetrics.volume + 0.1);
         } else if (isTypingRef.current) {
-          const breathScale = 1.0 + Math.sin(accumulatedTime * 3.5) * 0.015 * currentEnergy;
-          sphereMesh.scale.set(breathScale, breathScale, breathScale);
-          sphereMesh.position.set(0, 0, 0); // No erratic jitter!
+          sphereMesh.position.x = Math.sin(accumulatedTime * 32.0) * 0.035 * currentEnergy;
+          sphereMesh.position.y = Math.cos(accumulatedTime * 38.0) * 0.035 * currentEnergy;
+          const pulseScale = 1.0 + Math.sin(accumulatedTime * 20.0) * 0.03 * currentEnergy;
+          sphereMesh.scale.set(pulseScale, pulseScale, pulseScale);
         }
       } else {
-        // Completely STILL, PRISTINE, and QUIET
+        // Completely STOPPED and STILL
         uniforms.uDistortion.value = 0;
         uniforms.uSpeed.value = 0;
         sphereMesh.position.set(0, 0, 0);
         sphereMesh.scale.set(1, 1, 1);
       }
 
-      // Smooth subtle mouse parallax
-      currentMouse.lerp(targetMouse, 0.06);
+      // Smooth mouse parallax interpolation
+      currentMouse.lerp(targetMouse, 0.08);
       uniforms.uMouse.value.copy(currentMouse);
 
-      sphereMesh.rotation.x = THREE.MathUtils.lerp(sphereMesh.rotation.x, targetRotation.x, 0.05);
-      sphereMesh.rotation.z = THREE.MathUtils.lerp(sphereMesh.rotation.z, -targetRotation.y * 0.3, 0.05);
+      sphereMesh.rotation.x = THREE.MathUtils.lerp(sphereMesh.rotation.x, targetRotation.x, 0.06);
+      sphereMesh.rotation.z = THREE.MathUtils.lerp(sphereMesh.rotation.z, -targetRotation.y * 0.5, 0.06);
 
       renderer.render(scene, camera);
     };
@@ -399,24 +386,33 @@ export const GlowingOrb: React.FC<GlowingOrbProps> = ({
 
   return (
     <div
-      className={`relative flex items-center justify-center select-none group transition-transform duration-500 ease-out ${
-        isOrbMoving ? 'scale-102' : ''
+      className={`relative flex items-center justify-center select-none group cursor-grab active:cursor-grabbing transition-transform duration-300 ${
+        isOrbMoving ? 'scale-105' : ''
       }`}
       style={{ width: size, height: size }}
     >
-      {/* Soft, Diffused Apple Atmosphere Glow (Subtle & Calming) */}
+      {/* Dynamic Multi-layered Ambient Atmosphere Glow */}
       <div
-        className={`absolute -inset-2 rounded-full bg-gradient-to-tr from-[#0052CC]/25 via-[#0071E3]/20 to-[#38BDF8]/30 blur-xl transition-all duration-700 pointer-events-none ${
+        className={`absolute -inset-4 rounded-full bg-gradient-to-tr from-[#0052CC]/40 via-[#0071E3]/35 to-[#00D2FF]/45 blur-2xl transition-all duration-500 pointer-events-none ${
           isOrbMoving
-            ? 'scale-110 opacity-75 from-[#0052CC]/40 via-[#0071E3]/35 to-[#38BDF8]/50'
-            : 'opacity-30 group-hover:opacity-50'
+            ? 'scale-125 opacity-100 from-[#0052CC]/60 via-[#0071E3]/55 to-[#00D2FF]/70'
+            : 'opacity-50 group-hover:opacity-80'
         }`}
       />
       
+      {/* Soft Ethereal Violet Pearl Halo */}
+      <div
+        className={`absolute inset-0 rounded-full bg-gradient-to-b from-[#9333EA]/20 via-transparent to-[#00D2FF]/30 blur-xl pointer-events-none transition-all duration-500 ${
+          isOrbMoving ? 'scale-115 opacity-90' : 'opacity-40'
+        }`}
+      />
+
       {/* 3D WebGL Canvas Container */}
       <div
         ref={containerRef}
-        className="relative z-10 w-full h-full rounded-full overflow-visible flex items-center justify-center filter drop-shadow-[0_12px_28px_rgba(0,113,227,0.25)] transition-all"
+        className={`relative z-10 w-full h-full rounded-full overflow-visible flex items-center justify-center filter drop-shadow-[0_20px_40px_rgba(0,113,227,0.35)] transition-all ${
+          isOrbMoving ? 'drop-shadow-[0_25px_50px_rgba(0,210,255,0.6)]' : ''
+        }`}
       />
     </div>
   );
