@@ -10,7 +10,6 @@ import {
   Trash2,
   ChevronLeft,
   ChevronRight,
-  LogOut,
   Sparkles,
 } from 'lucide-react';
 
@@ -302,43 +301,7 @@ export const CortexSidebar: React.FC<CortexSidebarProps> = ({
           </div>
         )}
 
-      </div>
-
-      {/* ── BOTTOM SECTION: USER PROFILE CAPSULE ──────────────────── */}
-      <div className={`p-3 border-t shrink-0 ${isDark ? 'border-white/10' : 'border-black/5'}`}>
-        {!isCollapsed ? (
-          <div className="flex items-center justify-between gap-2 p-2 rounded-2xl hover:bg-black/5 dark:hover:bg-white/5 transition-colors">
-            <div className="flex items-center gap-2.5 truncate">
-              <div className="w-8 h-8 rounded-full bg-gradient-to-br from-purple-500 to-indigo-600 text-white font-bold text-xs flex items-center justify-center shrink-0 shadow-2xs">
-                SO
-              </div>
-              <div className="truncate text-left">
-                <span className="font-semibold text-xs text-[#1D1D1F] dark:text-white block truncate">
-                  Sentinel Officer
-                </span>
-                <span className="text-[10px] text-gray-400 font-mono block truncate">
-                  ran.surveillance@ikoli.ng
-                </span>
-              </div>
-            </div>
-
-            <button
-              onClick={() => onNavigate('home')}
-              title="Return to National Portal"
-              className="p-1.5 rounded-lg text-gray-400 hover:text-red-500 hover:bg-red-50 dark:hover:bg-red-950/30 transition-colors cursor-pointer shrink-0"
-            >
-              <LogOut className="w-3.5 h-3.5" />
-            </button>
-          </div>
-        ) : (
-          <button
-            onClick={() => onNavigate('home')}
-            title="Return to Portal"
-            className="w-9 h-9 mx-auto rounded-full bg-purple-100 dark:bg-purple-950 text-purple-700 dark:text-purple-300 flex items-center justify-center cursor-pointer"
-          >
-            <LogOut className="w-3.5 h-3.5" />
-          </button>
-        )}
+      {/* Middle Section closes cleanly without bottom profile */}
       </div>
 
     </aside>

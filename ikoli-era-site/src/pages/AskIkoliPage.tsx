@@ -49,7 +49,7 @@ const SESSIONS_STORAGE_KEY = 'ikoli_cortex_sessions_v2';
 const ACTIVE_SESSION_STORAGE_KEY = 'ikoli_cortex_active_session_v2';
 
 export const AskIkoliPage: React.FC<AskIkoliPageProps> = ({ onNavigate }) => {
-  const [theme, setTheme] = useState<'dark' | 'light'>('light');
+  const [theme, setTheme] = useState<'dark' | 'light'>('dark');
   const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
   const [deeperResearchActive, setDeeperResearchActive] = useState(true);
   const persona: ResponsePersona = 'visitor';
@@ -386,340 +386,152 @@ export const AskIkoliPage: React.FC<AskIkoliPageProps> = ({ onNavigate }) => {
   };
 
   return (
-    <div className="w-screen h-screen overflow-hidden p-2 sm:p-4 md:p-6 bg-gradient-to-tr from-[#EBE6F5] via-[#EAE5F4] to-[#E3DCF2] dark:from-[#09090C] dark:via-[#111116] dark:to-[#0D0D12] flex items-center justify-center font-sans antialiased select-none">
+    <div className="w-screen h-screen overflow-hidden bg-[#0A0A0C] text-white flex select-none font-sans antialiased">
       
-      {/* ── Outer Floating Cortex Studio Container ────────────────────────── */}
-      <div className="w-full h-full max-w-[1580px] max-h-[960px] rounded-[28px] sm:rounded-[36px] bg-white dark:bg-[#15151A] shadow-[0_24px_80px_rgba(0,0,0,0.08)] border border-black/5 dark:border-white/10 flex overflow-hidden relative">
+      {/* Hidden File Input */}
+      <input
+        type="file"
+        ref={fileInputRef}
+        onChange={handleFileUpload}
+        accept="image/*,.pdf,.doc,.docx"
+        className="hidden"
+      />
+
+      {/* ── Left Sidebar Drawer ────────────────────────────────────────── */}
+      <CortexSidebar
+        sessions={sessions}
+        activeSessionId={activeSessionId}
+        onSelectSession={handleSelectSession}
+        onNewSession={handleNewSession}
+        onDeleteSession={handleDeleteSession}
+        onNavigate={onNavigate}
+        isCollapsed={sidebarCollapsed}
+        onToggleCollapse={() => setSidebarCollapsed(!sidebarCollapsed)}
+        isDark={isDark}
+      />
+
+      {/* ── Main Right Studio Workspace (Full Width) ────────────────────── */}
+      <main className="flex-1 h-full flex flex-col justify-between overflow-hidden bg-[#0D0D11] relative">
         
-        {/* Hidden File Input */}
-        <input
-          type="file"
-          ref={fileInputRef}
-          onChange={handleFileUpload}
-          accept="image/*,.pdf,.doc,.docx"
-          className="hidden"
-        />
-
-        {/* ── Left Sidebar Drawer ────────────────────────────────────────── */}
-        <CortexSidebar
-          sessions={sessions}
-          activeSessionId={activeSessionId}
-          onSelectSession={handleSelectSession}
-          onNewSession={handleNewSession}
-          onDeleteSession={handleDeleteSession}
-          onNavigate={onNavigate}
-          isCollapsed={sidebarCollapsed}
-          onToggleCollapse={() => setSidebarCollapsed(!sidebarCollapsed)}
-          isDark={isDark}
-        />
-
-        {/* ── Main Right Studio Workspace ─────────────────────────────────── */}
-        <main className="flex-1 h-full flex flex-col justify-between overflow-hidden bg-white/60 dark:bg-[#15151A] backdrop-blur-xl relative">
+        {/* ── Top Header Toolbar ────────────────────────────────────────── */}
+        <header className="h-14 px-4 sm:px-6 border-b border-white/10 flex items-center justify-between shrink-0 select-none bg-[#0D0D11]/90 backdrop-blur-md z-20">
           
-          {/* ── Top Header Toolbar ────────────────────────────────────────── */}
-          <header className="h-14 px-4 sm:px-6 border-b border-black/5 dark:border-white/10 flex items-center justify-between shrink-0 select-none bg-white/70 dark:bg-[#15151A]/80 backdrop-blur-md z-20">
-            
-            {/* Left: Model / Mode Pill Dropdown */}
-            <div className="flex items-center gap-2">
-              <button
-                className={`px-3 py-1.5 rounded-full border text-xs font-semibold flex items-center gap-2 transition-all cursor-pointer ${
-                  isDark
-                    ? 'bg-white/5 border-white/10 text-gray-200 hover:bg-white/10'
-                    : 'bg-[#F4F4F6] border-black/5 text-[#1D1D1F] hover:bg-gray-200/70 shadow-2xs'
-                }`}
-              >
-                <div className="w-2 h-2 rounded-full bg-purple-500 animate-pulse" />
-                <span>IKOLI-AI v0.1</span>
-                <span className="text-[10px] text-gray-400 font-mono hidden sm:inline">
-                  &bull; Public Assistant
-                </span>
-              </button>
-            </div>
-
-            {/* Right: Actions (Share, Export, Theme, EDCTP3 Tag) */}
-            <div className="flex items-center gap-1.5 sm:gap-2">
-              
-              {/* Share Button */}
-              <button
-                onClick={handleShareLink}
-                className="p-2 rounded-xl text-gray-500 hover:text-black dark:hover:text-white hover:bg-black/5 dark:hover:bg-white/5 transition-colors cursor-pointer"
-                title="Copy conversation link"
-              >
-                <Share2 className="w-4 h-4" />
-              </button>
-
-              {/* Export Chat Button */}
-              <button
-                onClick={handleExportChat}
-                disabled={messages.length === 0}
-                className="px-3 py-1.5 rounded-xl border text-xs font-semibold flex items-center gap-1.5 text-gray-700 dark:text-gray-200 hover:bg-black/5 dark:hover:bg-white/5 disabled:opacity-40 disabled:cursor-not-allowed transition-all cursor-pointer border-black/5 dark:border-white/10 shadow-2xs"
-                title="Download conversation transcript (.md)"
-              >
-                <Download className="w-3.5 h-3.5" />
-                <span className="hidden sm:inline">Export chat</span>
-              </button>
-
-              {/* Theme Toggle */}
-              <button
-                onClick={() => setTheme(isDark ? 'light' : 'dark')}
-                className="p-2 rounded-xl text-gray-500 hover:text-black dark:hover:text-white hover:bg-black/5 dark:hover:bg-white/5 transition-colors cursor-pointer"
-                title={isDark ? 'Switch to Light Theme' : 'Switch to Dark Theme'}
-              >
-                {isDark ? <Sun className="w-4 h-4 text-yellow-400" /> : <Moon className="w-4 h-4" />}
-              </button>
-
-              {/* EDCTP3 Tag */}
-              <span className="hidden md:inline-flex px-3 py-1 rounded-full bg-black text-white dark:bg-white dark:text-black text-[11px] font-bold tracking-tight shadow-xs">
-                EDCTP3 Demo
+          {/* Left: Model / Mode Pill Dropdown */}
+          <div className="flex items-center gap-2">
+            <button
+              className="px-3.5 py-1.5 rounded-full border border-white/10 bg-white/5 text-gray-200 text-xs font-semibold flex items-center gap-2 hover:bg-white/10 transition-all cursor-pointer shadow-xs"
+            >
+              <div className="w-2 h-2 rounded-full bg-[#0071E3] shadow-[0_0_8px_#0071E3] animate-pulse" />
+              <span className="tracking-tight font-display font-bold text-white">IKOLI-AI v0.1</span>
+              <span className="text-[10px] text-gray-400 font-mono hidden sm:inline">
+                &bull; Public Assistant
               </span>
-            </div>
+            </button>
+          </div>
 
-          </header>
-
-          {/* Share Toast Notification */}
-          {showShareToast && (
-            <div className="absolute top-16 right-6 z-50 bg-black text-white dark:bg-white dark:text-black px-4 py-2 rounded-full text-xs font-semibold shadow-xl flex items-center gap-2 animate-bounce">
-              <Check className="w-3.5 h-3.5 text-emerald-400" />
-              <span>Link copied to clipboard!</span>
-            </div>
-          )}
-
-          {/* ── Main Chat / Empty State Container ─────────────────────────── */}
-          <div className="flex-1 overflow-y-auto px-4 sm:px-8 py-6 space-y-6 flex flex-col justify-start">
+          {/* Right: Actions (Share, Export, Theme, EDCTP3 Tag) */}
+          <div className="flex items-center gap-2">
             
-            {/* ── A. EMPTY STATE (When no messages in current session) ──────── */}
-            {messages.length === 0 && (
-              <div className="my-auto max-w-3xl w-full mx-auto space-y-7 text-center select-none py-4">
-                
-                {/* 3D Frosted Glowing Orb */}
-                <div className="flex items-center justify-center transform hover:scale-105 transition-transform duration-500 cursor-pointer">
-                  <GlowingOrb size={88} />
-                </div>
+            {/* Share Button */}
+            <button
+              onClick={handleShareLink}
+              className="p-2 rounded-xl text-gray-400 hover:text-white hover:bg-white/5 transition-colors cursor-pointer"
+              title="Copy conversation link"
+            >
+              <Share2 className="w-4 h-4" />
+            </button>
 
-                {/* Greeting & Headline */}
-                <div className="space-y-1.5">
-                  <p className="font-semibold text-sm sm:text-base text-purple-600 dark:text-purple-400 tracking-tight">
-                    Hello, Health Officer
-                  </p>
-                  <h1 className="font-display font-black text-2xl sm:text-4xl text-[#1D1D1F] dark:text-white tracking-tight leading-tight">
-                    How can I assist you today?
-                  </h1>
-                </div>
+            {/* Export Chat Button */}
+            <button
+              onClick={handleExportChat}
+              disabled={messages.length === 0}
+              className="px-3 py-1.5 rounded-xl border border-white/10 bg-white/5 text-xs font-semibold flex items-center gap-1.5 text-gray-200 hover:bg-white/10 disabled:opacity-30 disabled:cursor-not-allowed transition-all cursor-pointer shadow-xs"
+              title="Download conversation transcript (.md)"
+            >
+              <Download className="w-3.5 h-3.5" />
+              <span className="hidden sm:inline">Export chat</span>
+            </button>
 
-                {/* Demonstration Notice */}
-                <div className="max-w-xl mx-auto bg-amber-500/10 border border-amber-500/20 rounded-full px-4 py-1.5 text-[11px] text-amber-900 dark:text-amber-300 font-medium flex items-center justify-center gap-2">
-                  <span className="w-1.5 h-1.5 rounded-full bg-amber-500 shrink-0" />
-                  <span>
-                    <strong>Demonstration environment:</strong> Data are synthetic/illustrative.
-                  </span>
-                </div>
+            {/* Theme Toggle */}
+            <button
+              onClick={() => setTheme(isDark ? 'light' : 'dark')}
+              className="p-2 rounded-xl text-gray-400 hover:text-white hover:bg-white/5 transition-colors cursor-pointer"
+              title={isDark ? 'Switch to Light Theme' : 'Switch to Dark Theme'}
+            >
+              {isDark ? <Sun className="w-4 h-4 text-yellow-400" /> : <Moon className="w-4 h-4" />}
+            </button>
 
-                {/* Elevated Initial Composer Card */}
-                <div className="bg-white dark:bg-[#1C1C22] rounded-[26px] p-4 sm:p-5 border border-black/8 dark:border-white/10 shadow-[0_16px_50px_rgba(0,0,0,0.06)] space-y-3 text-left">
-                  
-                  {recognitionError && (
-                    <div className="p-2 rounded-xl bg-red-50 dark:bg-red-950/40 border border-red-200 text-xs text-red-700 dark:text-red-300">
-                      {recognitionError}
-                    </div>
-                  )}
+            {/* EDCTP3 Tag */}
+            <span className="hidden md:inline-flex px-3 py-1 rounded-full bg-white/10 border border-white/15 text-white text-[11px] font-bold tracking-tight shadow-xs">
+              EDCTP3 Demo
+            </span>
+          </div>
 
-                  {attachedFile && (
-                    <div className="p-2.5 rounded-xl bg-purple-50 dark:bg-purple-950/40 border border-purple-200 dark:border-purple-800 flex items-center justify-between text-xs">
-                      <div className="flex items-center gap-2 text-purple-900 dark:text-purple-200 truncate">
-                        <FileText className="w-4 h-4 shrink-0 text-purple-600" />
-                        <span className="truncate font-medium">{attachedFile.name}</span>
-                      </div>
-                      <button
-                        onClick={() => setAttachedFile(null)}
-                        className="p-1 hover:bg-purple-200/50 rounded-full text-purple-700 dark:text-purple-300"
-                      >
-                        <X className="w-3.5 h-3.5" />
-                      </button>
-                    </div>
-                  )}
+        </header>
 
-                  {/* Textarea Input */}
-                  <textarea
-                    value={inputQuery}
-                    onChange={(e) => setInputQuery(e.target.value)}
-                    onKeyDown={(e) => {
-                      if (e.key === 'Enter' && !e.shiftKey) {
-                        e.preventDefault();
-                        handleSend();
-                      }
-                    }}
-                    placeholder="Ask about leprosy early signs, 2025 South-East cases, or WHO protocols..."
-                    className="w-full bg-transparent text-sm sm:text-base outline-none resize-none min-h-[64px] font-sans leading-relaxed text-[#1D1D1F] dark:text-white placeholder-gray-400 dark:placeholder-gray-500"
-                  />
+        {/* Share Toast Notification */}
+        {showShareToast && (
+          <div className="absolute top-16 right-6 z-50 bg-[#1D1D1F] text-white border border-white/15 px-4 py-2 rounded-full text-xs font-semibold shadow-2xl flex items-center gap-2 animate-bounce">
+            <Check className="w-3.5 h-3.5 text-emerald-400" />
+            <span>Link copied to clipboard!</span>
+          </div>
+        )}
 
-                  {/* Inside Composer Toolbar */}
-                  <div className="flex items-center justify-between pt-2 border-t border-black/5 dark:border-white/5">
-                    
-                    {/* Left: Deeper Research Pill */}
-                    <button
-                      onClick={() => setDeeperResearchActive(!deeperResearchActive)}
-                      className={`px-3 py-1 rounded-full text-xs font-semibold flex items-center gap-1.5 transition-all cursor-pointer ${
-                        deeperResearchActive
-                          ? 'bg-purple-100 dark:bg-purple-950/60 text-purple-700 dark:text-purple-300 border border-purple-300 dark:border-purple-800'
-                          : 'bg-gray-100 dark:bg-white/5 text-gray-500 border border-transparent'
-                      }`}
-                    >
-                      <Atom className="w-3.5 h-3.5 text-purple-600 dark:text-purple-400" />
-                      <span>NTBLCP Guidelines</span>
-                    </button>
-
-                    {/* Right: Mic & Send Controls */}
-                    <div className="flex items-center gap-2">
-                      <button
-                        onClick={() => fileInputRef.current?.click()}
-                        title="Attach clinical document or lesion photo"
-                        className="p-2 rounded-xl text-gray-500 hover:text-purple-600 hover:bg-purple-50 dark:hover:bg-purple-950/30 transition-colors cursor-pointer"
-                      >
-                        <Paperclip className="w-4 h-4" />
-                      </button>
-
-                      {/* Mic Button */}
-                      <button
-                        onClick={handleToggleVoice}
-                        title={isListening ? 'Stop listening' : 'Start voice dictation'}
-                        className={`w-8 h-8 rounded-full flex items-center justify-center transition-all cursor-pointer ${
-                          isListening
-                            ? 'bg-red-500 text-white animate-pulse'
-                            : 'bg-purple-100 dark:bg-purple-950 text-purple-600 dark:text-purple-300 hover:bg-purple-200'
-                        }`}
-                      >
-                        {isListening ? <MicOff className="w-3.5 h-3.5" /> : <Mic className="w-3.5 h-3.5" />}
-                      </button>
-
-                      {/* Send Button */}
-                      <MagneticButton onClick={() => handleSend()}>
-                        <button
-                          disabled={!inputQuery.trim() && !attachedFile}
-                          className="w-8 h-8 rounded-full bg-[#1D1D1F] dark:bg-white text-white dark:text-black flex items-center justify-center transition-transform hover:scale-105 active:scale-95 disabled:opacity-30 disabled:cursor-not-allowed cursor-pointer shadow-xs"
-                        >
-                          <ArrowUp className="w-4 h-4 stroke-[2.5]" />
-                        </button>
-                      </MagneticButton>
-                    </div>
-
-                  </div>
-
-                </div>
-
-                {/* 3-Column Feature Cards */}
-                <FeatureActionCards onSelectQuery={(q) => handleSend(q)} isDark={isDark} />
-
+        {/* ── Main Chat / Empty State Container ─────────────────────────── */}
+        <div className="flex-1 overflow-y-auto px-4 sm:px-8 py-6 space-y-6 flex flex-col justify-start">
+          
+          {/* ── A. EMPTY STATE (When no messages in current session) ──────── */}
+          {messages.length === 0 && (
+            <div className="my-auto max-w-3xl w-full mx-auto space-y-8 text-center select-none py-6">
+              
+              {/* Bigger, Electric Blue 3D Artificial Orb */}
+              <div className="flex items-center justify-center transform hover:scale-105 transition-transform duration-500 cursor-pointer">
+                <GlowingOrb size={140} />
               </div>
-            )}
 
-            {/* ── B. ACTIVE CHAT CONVERSATION STREAM ───────────────────────── */}
-            {messages.length > 0 && (
-              <div className="max-w-3xl w-full mx-auto space-y-5 text-left">
-                {messages.map((msg) => (
-                  <div
-                    key={msg.id}
-                    className={`flex items-start gap-3.5 ${
-                      msg.sender === 'user' ? 'justify-end' : 'justify-start'
-                    }`}
-                  >
-                    {/* AI Avatar */}
-                    {msg.sender === 'ai' && (
-                      <div className="w-8 h-8 rounded-xl bg-gradient-to-tr from-purple-600 to-indigo-600 text-white flex items-center justify-center shrink-0 shadow-xs mt-0.5">
-                        <Sparkles className="w-4 h-4" />
-                      </div>
-                    )}
+              {/* Greeting & Headline */}
+              <div className="space-y-2">
+                <p className="font-semibold text-sm sm:text-base text-[#00D2FF] tracking-tight">
+                  Hello, Health Officer
+                </p>
+                <h1 className="font-display font-black text-3xl sm:text-5xl text-white tracking-tight leading-tight">
+                  How can I assist you today?
+                </h1>
+              </div>
 
-                    {/* Bubble Container */}
-                    <div
-                      className={`rounded-[22px] p-4 sm:p-5 text-sm sm:text-base leading-relaxed max-w-[90%] sm:max-w-[84%] border transition-all ${
-                        msg.sender === 'user'
-                          ? isDark
-                            ? 'bg-[#222228] text-white border-white/10'
-                            : 'bg-[#1D1D1F] text-white border-black/10 shadow-md'
-                          : isDark
-                          ? 'bg-[#19191F] text-gray-100 border-white/10 shadow-md'
-                          : 'bg-white text-[#1D1D1F] border-black/8 shadow-xs'
-                      }`}
-                    >
-                      {msg.attachment && (
-                        <div className="mb-3 p-2.5 rounded-xl bg-black/5 dark:bg-white/5 border border-black/5 dark:border-white/5 text-xs flex items-center gap-2 font-mono">
-                          <FileText className="w-4 h-4 text-purple-500" />
-                          <span className="truncate">{msg.attachment.name}</span>
-                        </div>
-                      )}
+              {/* Demonstration Notice */}
+              <div className="max-w-xl mx-auto bg-amber-500/10 border border-amber-500/20 rounded-full px-4 py-1.5 text-[11px] text-amber-300 font-medium flex items-center justify-center gap-2">
+                <span className="w-1.5 h-1.5 rounded-full bg-amber-500 shrink-0" />
+                <span>
+                  <strong>Demonstration environment:</strong> Data are synthetic/illustrative.
+                </span>
+              </div>
 
-                      <ClinicalMarkdown content={msg.text} />
-
-                      {/* AI Response Tools */}
-                      {msg.sender === 'ai' && (
-                        <div className="flex items-center justify-between gap-3 pt-3 mt-3 border-t border-black/5 dark:border-white/5 text-[11px] text-gray-400">
-                          <div className="flex items-center gap-3">
-                            <button
-                              onClick={() => handleCopy(msg.id, msg.text)}
-                              className="hover:text-purple-600 flex items-center gap-1 transition-colors cursor-pointer"
-                            >
-                              {copiedId === msg.id ? <Check className="w-3.5 h-3.5 text-emerald-500" /> : <Copy className="w-3.5 h-3.5" />}
-                              <span>{copiedId === msg.id ? 'Copied' : 'Copy'}</span>
-                            </button>
-
-                            <button
-                              onClick={() => handleSpeak(msg.text)}
-                              className="hover:text-purple-600 flex items-center gap-1 transition-colors cursor-pointer"
-                            >
-                              <Volume2 className="w-3.5 h-3.5" />
-                              <span>Listen</span>
-                            </button>
-                          </div>
-
-                          <span className="font-mono text-[10px] opacity-70">
-                            {msg.timestamp}
-                          </span>
-                        </div>
-                      )}
-                    </div>
-
-                    {/* User Avatar */}
-                    {msg.sender === 'user' && (
-                      <div className="w-8 h-8 rounded-full bg-purple-600 text-white flex items-center justify-center shrink-0 shadow-xs mt-0.5">
-                        <User className="w-4 h-4" />
-                      </div>
-                    )}
-                  </div>
-                ))}
-
-                {/* AI Typing Indicator */}
-                {isTyping && (
-                  <div className="flex items-start gap-3.5 justify-start">
-                    <div className="w-8 h-8 rounded-xl bg-gradient-to-tr from-purple-600 to-indigo-600 text-white flex items-center justify-center shrink-0 shadow-xs animate-pulse">
-                      <Sparkles className="w-4 h-4" />
-                    </div>
-                    <div className="p-4 rounded-2xl bg-white dark:bg-[#19191F] border border-black/8 dark:border-white/10 shadow-xs flex items-center gap-2 text-xs text-purple-600 dark:text-purple-300 font-medium">
-                      <span className="w-2 h-2 rounded-full bg-purple-500 animate-ping" />
-                      <span>Synthesizing NTBLCP &amp; WHO evidence…</span>
-                    </div>
+              {/* Elevated Initial Composer Card (Dark Cyber Theme) */}
+              <div className="bg-[#141418] rounded-[26px] p-4 sm:p-5 border border-white/10 shadow-[0_16px_50px_rgba(0,0,0,0.3)] space-y-3 text-left">
+                
+                {recognitionError && (
+                  <div className="p-2 rounded-xl bg-red-950/40 border border-red-800 text-xs text-red-300">
+                    {recognitionError}
                   </div>
                 )}
 
-                <div ref={messagesEndRef} />
-              </div>
-            )}
-
-          </div>
-
-          {/* ── Sticky Bottom Composer (When Messages Exist) ──────────────── */}
-          {messages.length > 0 && (
-            <div className="p-4 sm:p-6 border-t border-black/5 dark:border-white/10 bg-white/80 dark:bg-[#15151A]/90 backdrop-blur-xl shrink-0">
-              <div className="max-w-3xl mx-auto bg-white dark:bg-[#1C1C22] rounded-2xl p-3 border border-black/8 dark:border-white/10 shadow-md space-y-2 text-left">
-                
                 {attachedFile && (
-                  <div className="p-2 rounded-lg bg-purple-50 dark:bg-purple-950/40 text-xs flex items-center justify-between text-purple-900 dark:text-purple-200">
-                    <span className="truncate font-medium">{attachedFile.name}</span>
-                    <button onClick={() => setAttachedFile(null)} className="p-1 hover:text-red-500">
+                  <div className="p-2.5 rounded-xl bg-blue-950/40 border border-blue-800 flex items-center justify-between text-xs">
+                    <div className="flex items-center gap-2 text-blue-200 truncate">
+                      <FileText className="w-4 h-4 shrink-0 text-[#00D2FF]" />
+                      <span className="truncate font-medium">{attachedFile.name}</span>
+                    </div>
+                    <button
+                      onClick={() => setAttachedFile(null)}
+                      className="p-1 hover:bg-blue-900/50 rounded-full text-blue-300"
+                    >
                       <X className="w-3.5 h-3.5" />
                     </button>
                   </div>
                 )}
 
+                {/* Textarea Input */}
                 <textarea
                   value={inputQuery}
                   onChange={(e) => setInputQuery(e.target.value)}
@@ -729,60 +541,236 @@ export const AskIkoliPage: React.FC<AskIkoliPageProps> = ({ onNavigate }) => {
                       handleSend();
                     }
                   }}
-                  placeholder="Ask a follow-up question or query surveillance records..."
-                  className="w-full bg-transparent text-sm outline-none resize-none min-h-[44px] text-[#1D1D1F] dark:text-white placeholder-gray-400"
+                  placeholder="Ask about leprosy early signs, 2025 South-East cases, or WHO protocols..."
+                  className="w-full bg-transparent text-sm sm:text-base outline-none resize-none min-h-[64px] font-sans leading-relaxed text-white placeholder-gray-500"
                 />
 
-                <div className="flex items-center justify-between pt-1">
+                {/* Inside Composer Toolbar */}
+                <div className="flex items-center justify-between pt-2 border-t border-white/5">
+                  
+                  {/* Left: Deeper Research Pill */}
+                  <button
+                    onClick={() => setDeeperResearchActive(!deeperResearchActive)}
+                    className={`px-3 py-1 rounded-full text-xs font-semibold flex items-center gap-1.5 transition-all cursor-pointer ${
+                      deeperResearchActive
+                        ? 'bg-blue-500/15 text-[#00D2FF] border border-blue-500/30'
+                        : 'bg-white/5 text-gray-400 border border-transparent'
+                    }`}
+                  >
+                    <Atom className="w-3.5 h-3.5 text-[#00D2FF]" />
+                    <span>NTBLCP Guidelines</span>
+                  </button>
+
+                  {/* Right: Mic & Send Controls */}
                   <div className="flex items-center gap-2">
                     <button
                       onClick={() => fileInputRef.current?.click()}
-                      className="p-1.5 rounded-lg text-gray-500 hover:text-purple-600 hover:bg-purple-50 dark:hover:bg-purple-950/40"
+                      title="Attach clinical document or lesion photo"
+                      className="p-2 rounded-xl text-gray-400 hover:text-[#00D2FF] hover:bg-white/5 transition-colors cursor-pointer"
                     >
                       <Paperclip className="w-4 h-4" />
                     </button>
+
+                    {/* Mic Button */}
                     <button
                       onClick={handleToggleVoice}
-                      className={`p-1.5 rounded-lg ${isListening ? 'text-red-500 animate-pulse' : 'text-gray-500 hover:text-purple-600'}`}
+                      title={isListening ? 'Stop listening' : 'Start voice dictation'}
+                      className={`w-8 h-8 rounded-full flex items-center justify-center transition-all cursor-pointer ${
+                        isListening
+                          ? 'bg-red-500 text-white animate-pulse'
+                          : 'bg-blue-500/20 text-[#00D2FF] hover:bg-blue-500/30 border border-blue-500/30'
+                      }`}
                     >
-                      {isListening ? <MicOff className="w-4 h-4" /> : <Mic className="w-4 h-4" />}
+                      {isListening ? <MicOff className="w-3.5 h-3.5" /> : <Mic className="w-3.5 h-3.5" />}
                     </button>
+
+                    {/* Send Button */}
+                    <MagneticButton onClick={() => handleSend()}>
+                      <button
+                        disabled={!inputQuery.trim() && !attachedFile}
+                        className="w-8 h-8 rounded-full bg-[#0071E3] hover:bg-[#0077ED] text-white flex items-center justify-center transition-transform hover:scale-105 active:scale-95 disabled:opacity-30 disabled:cursor-not-allowed cursor-pointer shadow-[0_0_12px_rgba(0,113,227,0.5)]"
+                      >
+                        <ArrowUp className="w-4 h-4 stroke-[2.5]" />
+                      </button>
+                    </MagneticButton>
                   </div>
 
-                  <MagneticButton onClick={() => handleSend()}>
-                    <button
-                      disabled={!inputQuery.trim() && !attachedFile}
-                      className="px-3.5 py-1.5 rounded-xl bg-[#1D1D1F] dark:bg-white text-white dark:text-black font-semibold text-xs flex items-center gap-1.5 transition-transform hover:scale-105 active:scale-95 disabled:opacity-30 cursor-pointer"
-                    >
-                      <span>Send</span>
-                      <ArrowUp className="w-3.5 h-3.5" />
-                    </button>
-                  </MagneticButton>
                 </div>
+
               </div>
+
+              {/* 3-Column Feature Cards */}
+              <FeatureActionCards onSelectQuery={(q) => handleSend(q)} isDark={true} />
+
             </div>
           )}
 
-          {/* ── Studio Bottom Footer ──────────────────────────────────────── */}
-          <footer className="h-9 px-6 border-t border-black/5 dark:border-white/5 flex items-center justify-between text-[11px] text-gray-400 dark:text-gray-500 shrink-0 select-none bg-white/40 dark:bg-[#15151A]/40">
-            <span className="truncate">
-              IKOLI Consortium &bull; RedAid Nigeria (RAN), DAHW Germany &amp; NTBLCP
-            </span>
+          {/* ── B. ACTIVE CHAT CONVERSATION STREAM ───────────────────────── */}
+          {messages.length > 0 && (
+            <div className="max-w-3xl w-full mx-auto space-y-5 text-left">
+              {messages.map((msg) => (
+                <div
+                  key={msg.id}
+                  className={`flex items-start gap-3.5 ${
+                    msg.sender === 'user' ? 'justify-end' : 'justify-start'
+                  }`}
+                >
+                  {/* AI Avatar */}
+                  {msg.sender === 'ai' && (
+                    <div className="w-8 h-8 rounded-xl bg-gradient-to-tr from-[#0071E3] to-[#00D2FF] text-white flex items-center justify-center shrink-0 shadow-[0_0_10px_rgba(0,113,227,0.4)] mt-0.5">
+                      <Sparkles className="w-4 h-4" />
+                    </div>
+                  )}
 
-            <div className="flex items-center gap-3">
-              <button
-                onClick={() => onNavigate('protocols')}
-                className="hover:text-purple-600 flex items-center gap-1 cursor-pointer"
-              >
-                <HelpCircle className="w-3.5 h-3.5" />
-                <span className="hidden sm:inline">WHO Protocols</span>
-              </button>
+                  {/* Bubble Container */}
+                  <div
+                    className={`rounded-[22px] p-4 sm:p-5 text-sm sm:text-base leading-relaxed max-w-[90%] sm:max-w-[84%] border transition-all ${
+                      msg.sender === 'user'
+                        ? 'bg-[#1C1C22] text-white border-white/10 shadow-md'
+                        : 'bg-[#141418] text-gray-100 border-white/10 shadow-md'
+                    }`}
+                  >
+                    {msg.attachment && (
+                      <div className="mb-3 p-2.5 rounded-xl bg-white/5 border border-white/10 text-xs flex items-center gap-2 font-mono">
+                        <FileText className="w-4 h-4 text-[#00D2FF]" />
+                        <span className="truncate">{msg.attachment.name}</span>
+                      </div>
+                    )}
+
+                    <ClinicalMarkdown content={msg.text} />
+
+                    {/* AI Response Tools */}
+                    {msg.sender === 'ai' && (
+                      <div className="flex items-center justify-between gap-3 pt-3 mt-3 border-t border-white/5 text-[11px] text-gray-400">
+                        <div className="flex items-center gap-3">
+                          <button
+                            onClick={() => handleCopy(msg.id, msg.text)}
+                            className="hover:text-[#00D2FF] flex items-center gap-1 transition-colors cursor-pointer"
+                          >
+                            {copiedId === msg.id ? <Check className="w-3.5 h-3.5 text-emerald-400" /> : <Copy className="w-3.5 h-3.5" />}
+                            <span>{copiedId === msg.id ? 'Copied' : 'Copy'}</span>
+                          </button>
+
+                          <button
+                            onClick={() => handleSpeak(msg.text)}
+                            className="hover:text-[#00D2FF] flex items-center gap-1 transition-colors cursor-pointer"
+                          >
+                            <Volume2 className="w-3.5 h-3.5" />
+                            <span>Listen</span>
+                          </button>
+                        </div>
+
+                        <span className="font-mono text-[10px] opacity-70">
+                          {msg.timestamp}
+                        </span>
+                      </div>
+                    )}
+                  </div>
+
+                  {/* User Avatar */}
+                  {msg.sender === 'user' && (
+                    <div className="w-8 h-8 rounded-full bg-[#0071E3] text-white flex items-center justify-center shrink-0 shadow-xs mt-0.5">
+                      <User className="w-4 h-4" />
+                    </div>
+                  )}
+                </div>
+              ))}
+
+              {/* AI Typing / Thinking Indicator */}
+              {isTyping && (
+                <div className="flex items-start gap-3.5 justify-start">
+                  <div className="w-8 h-8 rounded-xl bg-gradient-to-tr from-[#0071E3] to-[#00D2FF] text-white flex items-center justify-center shrink-0 shadow-xs animate-pulse">
+                    <Sparkles className="w-4 h-4" />
+                  </div>
+                  <div className="p-4 rounded-2xl bg-[#141418] border border-white/10 shadow-xs flex items-center gap-2.5 text-xs text-[#00D2FF] font-medium">
+                    <span className="w-2 h-2 rounded-full bg-[#00D2FF] shadow-[0_0_8px_#00D2FF] animate-ping" />
+                    <span className="font-sans font-medium">Thinking…</span>
+                  </div>
+                </div>
+              )}
+
+              <div ref={messagesEndRef} />
             </div>
-          </footer>
+          )}
 
-        </main>
+        </div>
 
-      </div>
+        {/* ── Sticky Bottom Composer (When Messages Exist) ──────────────── */}
+        {messages.length > 0 && (
+          <div className="p-4 sm:p-6 border-t border-white/10 bg-[#0D0D11]/95 backdrop-blur-xl shrink-0">
+            <div className="max-w-3xl mx-auto bg-[#141418] rounded-2xl p-3 border border-white/10 shadow-md space-y-2 text-left">
+              
+              {attachedFile && (
+                <div className="p-2 rounded-lg bg-blue-950/40 text-xs flex items-center justify-between text-blue-200">
+                  <span className="truncate font-medium">{attachedFile.name}</span>
+                  <button onClick={() => setAttachedFile(null)} className="p-1 hover:text-red-400">
+                    <X className="w-3.5 h-3.5" />
+                  </button>
+                </div>
+              )}
+
+              <textarea
+                value={inputQuery}
+                onChange={(e) => setInputQuery(e.target.value)}
+                onKeyDown={(e) => {
+                  if (e.key === 'Enter' && !e.shiftKey) {
+                    e.preventDefault();
+                    handleSend();
+                  }
+                }}
+                placeholder="Ask a follow-up question or query surveillance records..."
+                className="w-full bg-transparent text-sm outline-none resize-none min-h-[44px] text-white placeholder-gray-500"
+              />
+
+              <div className="flex items-center justify-between pt-1">
+                <div className="flex items-center gap-2">
+                  <button
+                    onClick={() => fileInputRef.current?.click()}
+                    className="p-1.5 rounded-lg text-gray-400 hover:text-[#00D2FF] hover:bg-white/5"
+                  >
+                    <Paperclip className="w-4 h-4" />
+                  </button>
+                  <button
+                    onClick={handleToggleVoice}
+                    className={`p-1.5 rounded-lg ${isListening ? 'text-red-400 animate-pulse' : 'text-gray-400 hover:text-[#00D2FF]'}`}
+                  >
+                    {isListening ? <MicOff className="w-4 h-4" /> : <Mic className="w-4 h-4" />}
+                  </button>
+                </div>
+
+                <MagneticButton onClick={() => handleSend()}>
+                  <button
+                    disabled={!inputQuery.trim() && !attachedFile}
+                    className="px-3.5 py-1.5 rounded-xl bg-[#0071E3] hover:bg-[#0077ED] text-white font-semibold text-xs flex items-center gap-1.5 transition-transform hover:scale-105 active:scale-95 disabled:opacity-30 cursor-pointer shadow-[0_0_10px_rgba(0,113,227,0.4)]"
+                  >
+                    <span>Send</span>
+                    <ArrowUp className="w-3.5 h-3.5" />
+                  </button>
+                </MagneticButton>
+              </div>
+            </div>
+          </div>
+        )}
+
+        {/* ── Studio Bottom Footer ──────────────────────────────────────── */}
+        <footer className="h-9 px-6 border-t border-white/5 flex items-center justify-between text-[11px] text-gray-500 shrink-0 select-none bg-[#0A0A0C]">
+          <span className="truncate">
+            IKOLI Consortium &bull; RedAid Nigeria (RAN), DAHW Germany &amp; NTBLCP
+          </span>
+
+          <div className="flex items-center gap-3">
+            <button
+              onClick={() => onNavigate('protocols')}
+              className="hover:text-[#00D2FF] flex items-center gap-1 cursor-pointer transition-colors"
+            >
+              <HelpCircle className="w-3.5 h-3.5" />
+              <span className="hidden sm:inline">WHO Protocols</span>
+            </button>
+          </div>
+        </footer>
+
+      </main>
+
     </div>
   );
 };
