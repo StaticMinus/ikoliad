@@ -364,12 +364,12 @@ export const AskIkoliPage: React.FC<AskIkoliPageProps> = ({ onNavigate }) => {
 
                     {/* AI Response Header with Clean Category & Audio/Copy Actions */}
                     {msg.sender === 'ai' && (
-                      <div className={`flex items-center justify-between gap-2 mb-3 pb-2.5 border-b ${
+                      <div className={`flex items-center justify-between gap-2 mb-3 pb-2 border-b ${
                         isDark ? 'border-white/10' : 'border-black/5'
                       }`}>
                         <div className="flex items-center gap-2">
                           <span className="text-[11px] font-mono font-bold uppercase tracking-wider text-[#10B981]">
-                            {msg.category || 'Clinical Guidance'}
+                            {msg.category || 'IKOLI Intelligence'}
                           </span>
                         </div>
                         
@@ -377,7 +377,7 @@ export const AskIkoliPage: React.FC<AskIkoliPageProps> = ({ onNavigate }) => {
                           <button
                             onClick={() => handleSpeak(msg.text)}
                             className="p-1 text-gray-400 hover:text-white transition-colors cursor-pointer text-xs"
-                            title="Listen to clinical guidance"
+                            title="Listen to guidance"
                           >
                             <Volume2 className="w-3.5 h-3.5" />
                           </button>
@@ -399,31 +399,11 @@ export const AskIkoliPage: React.FC<AskIkoliPageProps> = ({ onNavigate }) => {
                       isDark={isDark} 
                     />
 
-                    {/* Structured Dimensions (Bullet Points) */}
-                    {msg.dimensions && msg.dimensions.length > 0 && (
-                      <ul className={`mt-3 space-y-2 pt-3 border-t text-xs sm:text-sm ${
-                        isDark ? 'border-white/10 text-gray-300' : 'border-black/5 text-gray-700'
-                      }`}>
-                        {msg.dimensions.map((dim, idx) => (
-                          <li key={idx} className="flex items-start gap-2">
-                            <span className="text-[#10B981] font-bold shrink-0 mt-0.5">•</span>
-                            <div className="flex-1">
-                              <ClinicalMarkdown
-                                content={dim}
-                                onSelectOption={(opt) => handleSend(opt)}
-                                isDark={isDark}
-                              />
-                            </div>
-                          </li>
-                        ))}
-                      </ul>
-                    )}
-
                     {/* Interactive Follow-up Action Chip */}
                     {msg.followUpPrompt && (
                       <button
                         onClick={() => handleSend(msg.followUpPrompt!)}
-                        className={`mt-3.5 w-full p-2.5 rounded-xl border text-xs font-medium transition-all cursor-pointer flex items-center justify-between gap-2 text-left group ${
+                        className={`mt-3 w-full p-2.5 rounded-xl border text-xs font-medium transition-all cursor-pointer flex items-center justify-between gap-2 text-left group ${
                           isDark
                             ? 'bg-[#0071E3]/10 hover:bg-[#0071E3]/20 border-[#0071E3]/30 text-[#00D2FF]'
                             : 'bg-blue-50 hover:bg-blue-100 border-blue-200 text-[#0071E3]'
@@ -431,7 +411,7 @@ export const AskIkoliPage: React.FC<AskIkoliPageProps> = ({ onNavigate }) => {
                       >
                         <div className="flex items-center gap-2">
                           <Sparkles className="w-3.5 h-3.5 shrink-0" />
-                          <span>Suggested Next Step: {msg.followUpPrompt}</span>
+                          <span>Suggested Next: {msg.followUpPrompt}</span>
                         </div>
                         <ArrowUp className="w-3.5 h-3.5 rotate-45 group-hover:translate-x-0.5 group-hover:-translate-y-0.5 transition-transform shrink-0" />
                       </button>
