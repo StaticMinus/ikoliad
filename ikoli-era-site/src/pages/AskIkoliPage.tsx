@@ -116,7 +116,17 @@ export const AskIkoliPage: React.FC<AskIkoliPageProps> = ({ onNavigate }) => {
     }
     typingTimerRef.current = setTimeout(() => {
       setIsActivelyTyping(false);
-    }, 1200);
+    }, 600);
+  };
+
+  const handleInputKeyDown = () => {
+    setIsActivelyTyping(true);
+    if (typingTimerRef.current) {
+      clearTimeout(typingTimerRef.current);
+    }
+    typingTimerRef.current = setTimeout(() => {
+      setIsActivelyTyping(false);
+    }, 600);
   };
 
   const [copiedId, setCopiedId] = useState<string | null>(null);
@@ -126,8 +136,9 @@ export const AskIkoliPage: React.FC<AskIkoliPageProps> = ({ onNavigate }) => {
   const [attachedFile, setAttachedFile] = useState<GeminiAttachment | null>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
-  // Voice Dictation State
+  // Voice & Audio State
   const [isListening, setIsListening] = useState(false);
+  const [isSpeaking, setIsSpeaking] = useState(false);
   const [recognitionError, setRecognitionError] = useState<string | null>(null);
 
   const messagesEndRef = useRef<HTMLDivElement>(null);
@@ -391,11 +402,19 @@ export const AskIkoliPage: React.FC<AskIkoliPageProps> = ({ onNavigate }) => {
 
   const handleSpeak = (text: string) => {
     if ('speechSynthesis' in window) {
+      if (isSpeaking) {
+        window.speechSynthesis.cancel();
+        setIsSpeaking(false);
+        return;
+      }
       window.speechSynthesis.cancel();
       const cleanText = text.replace(/\*\*/g, '').replace(/•/g, '').replace(/###/g, '');
       const utterance = new SpeechSynthesisUtterance(cleanText);
       utterance.rate = 1.0;
       utterance.pitch = 1.0;
+      utterance.onstart = () => setIsSpeaking(true);
+      utterance.onend = () => setIsSpeaking(false);
+      utterance.onerror = () => setIsSpeaking(false);
       window.speechSynthesis.speak(utterance);
     }
   };
@@ -524,7 +543,11 @@ export const AskIkoliPage: React.FC<AskIkoliPageProps> = ({ onNavigate }) => {
               
               {/* Bigger, Electric Blue 3D Artificial Orb */}
               <div className="flex items-center justify-center transform hover:scale-105 transition-transform duration-500 cursor-pointer">
-                <GlowingOrb size={140} isTyping={isActivelyTyping || Boolean(inputQuery.trim())} />
+                <GlowingOrb
+                  size={140}
+                  isTyping={isActivelyTyping}
+                  isAudioActive={isListening || isSpeaking}
+                />
               </div>
 
               {/* Headline */}
@@ -584,7 +607,9 @@ export const AskIkoliPage: React.FC<AskIkoliPageProps> = ({ onNavigate }) => {
                 <textarea
                   value={inputQuery}
                   onChange={(e) => handleInputChange(e.target.value)}
+                  onInput={(e) => handleInputChange((e.target as HTMLTextAreaElement).value)}
                   onKeyDown={(e) => {
+                    handleInputKeyDown();
                     if (e.key === 'Enter' && !e.shiftKey) {
                       e.preventDefault();
                       handleSend();
@@ -797,7 +822,9 @@ export const AskIkoliPage: React.FC<AskIkoliPageProps> = ({ onNavigate }) => {
               <textarea
                 value={inputQuery}
                 onChange={(e) => handleInputChange(e.target.value)}
+                onInput={(e) => handleInputChange((e.target as HTMLTextAreaElement).value)}
                 onKeyDown={(e) => {
+                  handleInputKeyDown();
                   if (e.key === 'Enter' && !e.shiftKey) {
                     e.preventDefault();
                     handleSend();

@@ -8,7 +8,8 @@ const vertexShader = `
   uniform float uDistortion;
   uniform float uFrequency;
   uniform vec2 uMouse;
-  uniform float uTypingIntensity;
+  uniform float uEnergy;       // 0.0 = completely stopped & still, 1.0 = fully active
+  uniform float uAudioEnergy;  // Audio frequency pulse
 
   varying vec3 vNormal;
   varying vec3 vPosition;
@@ -88,28 +89,31 @@ const vertexShader = `
   void main() {
     vUv = uv;
     
-    // Multi-octave organic displacement with dynamic typing agitation
+    // Multi-octave organic displacement strictly gated by uEnergy
     float time = uTime * uSpeed;
-    float freq = uFrequency + (uTypingIntensity * 0.8);
+    float freq = uFrequency + (uEnergy * 0.8) + (uAudioEnergy * 1.2);
     
     float noise1 = snoise(position * freq + vec3(time * 0.4, time * 0.5, time * 0.3));
     float noise2 = snoise(position * (freq * 2.2) - vec3(time * 0.3, time * 0.2, time * 0.4)) * 0.5;
     
     // Interactive mouse push
     float mouseDistance = length(position.xy - vec3(uMouse * 1.5, 0.0).xy);
-    float mouseWave = sin(mouseDistance * 4.0 - time * 2.0) * 0.08;
+    float mouseWave = sin(mouseDistance * 4.0 - time * 2.0) * 0.08 * uEnergy;
 
-    // Fast micro-tremor wave when user types
-    float typingTremor = sin(time * 16.0 + position.y * 12.0) * (uTypingIntensity * 0.07);
+    // Fast micro-tremor wave when active
+    float tremor = sin(time * 16.0 + position.y * 12.0) * (uEnergy * 0.06);
 
-    float displacement = (noise1 + noise2 + mouseWave + typingTremor) * uDistortion;
+    // Audio harmonic pulse waves
+    float audioRipples = sin(position.z * 10.0 + time * 6.0) * (uAudioEnergy * 0.09);
+
+    float displacement = (noise1 + noise2 + mouseWave + tremor + audioRipples) * uDistortion * uEnergy;
     vDisplacement = displacement;
 
     vec3 newPosition = position + normal * displacement;
     vPosition = newPosition;
     
     // Approximate displaced normal
-    vNormal = normalize(normalMatrix * (normal + vec3(noise1 * 0.3, noise2 * 0.3, noise1 * 0.2)));
+    vNormal = normalize(normalMatrix * (normal + vec3(noise1 * 0.3, noise2 * 0.3, noise1 * 0.2) * uEnergy));
 
     gl_Position = projectionMatrix * modelViewMatrix * vec4(newPosition, 1.0);
   }
@@ -117,7 +121,8 @@ const vertexShader = `
 
 const fragmentShader = `
   uniform float uTime;
-  uniform float uTypingIntensity;
+  uniform float uEnergy;
+  uniform float uAudioEnergy;
   uniform vec3 uColorA;     // Deep Cobalt Blue
   uniform vec3 uColorB;     // Electric Royal Blue
   uniform vec3 uColorC;     // Luminous Cyan / Azure
@@ -145,17 +150,17 @@ const fragmentShader = `
     float spec = pow(max(dot(viewDir, reflectDir), 0.0), 32.0);
 
     // Dynamic color gradient based on displacement elevation and view angle
-    float colorMix = clamp((vDisplacement * 2.8) + 0.5 + (uTypingIntensity * 0.15), 0.0, 1.0);
+    float colorMix = clamp((vDisplacement * 2.8) + 0.5 + (uEnergy * 0.15) + (uAudioEnergy * 0.2), 0.0, 1.0);
     
     vec3 baseColor = mix(uColorA, uColorB, colorMix);
     vec3 shimmerColor = mix(baseColor, uColorC, smoothstep(0.3, 0.8, colorMix + fresnel * 0.4));
     vec3 pearlColor = mix(shimmerColor, uColorD, fresnel * 0.75);
 
-    // Dynamic luminous flash when typing
-    vec3 typingBurst = uColorC * (uTypingIntensity * 0.25);
+    // Dynamic luminous flash when typing or audio is active
+    vec3 activeBurst = uColorC * ((uEnergy * 0.2) + (uAudioEnergy * 0.35));
 
     // Core volumetric radiance
-    vec3 finalColor = pearlColor + typingBurst + (uColorCore * spec * 0.9) + (uColorC * fresnel * 0.6);
+    vec3 finalColor = pearlColor + activeBurst + (uColorCore * spec * 0.9) + (uColorC * fresnel * 0.6);
 
     gl_FragColor = vec4(finalColor, 0.98);
   }
@@ -165,20 +170,28 @@ interface GlowingOrbProps {
   size?: number;
   interactive?: boolean;
   isTyping?: boolean;
+  isAudioActive?: boolean;
 }
 
 export const GlowingOrb: React.FC<GlowingOrbProps> = ({
   size = 150,
   interactive = true,
   isTyping = false,
+  isAudioActive = false,
 }) => {
   const containerRef = useRef<HTMLDivElement>(null);
   const [isHovered, setIsHovered] = useState(false);
+
   const isTypingRef = useRef(isTyping);
+  const isAudioActiveRef = useRef(isAudioActive);
 
   useEffect(() => {
     isTypingRef.current = isTyping;
   }, [isTyping]);
+
+  useEffect(() => {
+    isAudioActiveRef.current = isAudioActive;
+  }, [isAudioActive]);
 
   useEffect(() => {
     const container = containerRef.current;
@@ -198,7 +211,6 @@ export const GlowingOrb: React.FC<GlowingOrbProps> = ({
         powerPreference: 'high-performance',
       });
     } catch {
-      // Graceful fallback if WebGL fails
       return;
     }
 
@@ -215,10 +227,11 @@ export const GlowingOrb: React.FC<GlowingOrbProps> = ({
 
     const uniforms = {
       uTime: { value: 0 },
-      uSpeed: { value: 0.6 },
-      uDistortion: { value: 0.18 },
+      uSpeed: { value: 0 },
+      uDistortion: { value: 0 },
       uFrequency: { value: 1.4 },
-      uTypingIntensity: { value: 0 },
+      uEnergy: { value: 0 },
+      uAudioEnergy: { value: 0 },
       uMouse: { value: new THREE.Vector2(0, 0) },
       // Curated Palette: Pinterest/Cortex Iridescent Electric Blue Orb
       uColorA: { value: new THREE.Color('#003896') },    // Deep royal cobalt
@@ -251,8 +264,8 @@ export const GlowingOrb: React.FC<GlowingOrbProps> = ({
       const y = -(((e.clientY - rect.top) / rect.height) * 2 - 1);
 
       targetMouse.set(x, y);
-      targetRotation.y = x * 0.4;
-      targetRotation.x = -y * 0.4;
+      targetRotation.y = x * 0.35;
+      targetRotation.x = -y * 0.35;
     };
 
     const handleMouseEnter = () => setIsHovered(true);
@@ -268,48 +281,68 @@ export const GlowingOrb: React.FC<GlowingOrbProps> = ({
       container.addEventListener('mouseleave', handleMouseLeave);
     }
 
-    // ── 4. 60fps Animation Render Loop ─────────────────────────────────────
+    // ── 4. 60fps Animation Render Loop (Moves when active, Stops when idle) ─
     let animationFrameId: number;
     let clock = new THREE.Clock();
-    let currentTypingIntensity = 0;
+    let currentEnergy = 0;
+    let currentAudioEnergy = 0;
+    let accumulatedTime = 0;
 
     const animate = () => {
       animationFrameId = requestAnimationFrame(animate);
 
-      const elapsedTime = clock.getElapsedTime();
-      uniforms.uTime.value = elapsedTime;
+      const delta = clock.getDelta();
+      const isActive = isTypingRef.current || isAudioActiveRef.current;
 
-      // Smooth damping interpolation for fluid mouse reaction
-      currentMouse.lerp(targetMouse, 0.08);
-      uniforms.uMouse.value.copy(currentMouse);
+      // Target Energy: 1.0 when typing/audio, 0.0 when stopped
+      const targetEnergy = isActive ? 1.0 : isHovered ? 0.25 : 0.0;
+      currentEnergy = THREE.MathUtils.lerp(currentEnergy, targetEnergy, isActive ? 0.15 : 0.08);
+      uniforms.uEnergy.value = currentEnergy;
 
-      // Typing state interpolation
-      const targetTyping = isTypingRef.current ? 1.0 : 0.0;
-      currentTypingIntensity = THREE.MathUtils.lerp(currentTypingIntensity, targetTyping, 0.1);
-      uniforms.uTypingIntensity.value = currentTypingIntensity;
+      // Audio frequency modulation
+      const targetAudio = isAudioActiveRef.current ? 1.0 : 0.0;
+      currentAudioEnergy = THREE.MathUtils.lerp(currentAudioEnergy, targetAudio, 0.12);
+      uniforms.uAudioEnergy.value = currentAudioEnergy;
 
-      // Dynamic speed & distortion shift on typing & hover
-      const targetSpeed = isTypingRef.current ? 2.2 : isHovered ? 1.1 : 0.65;
-      const targetDistortion = isTypingRef.current ? 0.32 : isHovered ? 0.22 : 0.16;
-      const targetFrequency = isTypingRef.current ? 2.0 : 1.4;
+      // Advance shader time ONLY when energy is present
+      if (currentEnergy > 0.001) {
+        const speedMultiplier = isAudioActiveRef.current ? 2.5 : 2.0;
+        accumulatedTime += delta * speedMultiplier * currentEnergy;
+        uniforms.uTime.value = accumulatedTime;
 
-      uniforms.uSpeed.value = THREE.MathUtils.lerp(uniforms.uSpeed.value, targetSpeed, 0.08);
-      uniforms.uDistortion.value = THREE.MathUtils.lerp(uniforms.uDistortion.value, targetDistortion, 0.08);
-      uniforms.uFrequency.value = THREE.MathUtils.lerp(uniforms.uFrequency.value, targetFrequency, 0.08);
+        uniforms.uSpeed.value = 1.0;
+        uniforms.uDistortion.value = THREE.MathUtils.lerp(0.0, isAudioActiveRef.current ? 0.34 : 0.28, currentEnergy);
 
-      // Kinetic micro-shake / jitter when actively typing
-      if (currentTypingIntensity > 0.01) {
-        sphereMesh.position.x = Math.sin(elapsedTime * 32.0) * 0.035 * currentTypingIntensity;
-        sphereMesh.position.y = Math.cos(elapsedTime * 38.0) * 0.035 * currentTypingIntensity;
-        const pulseScale = 1.0 + Math.sin(elapsedTime * 20.0) * 0.04 * currentTypingIntensity;
-        sphereMesh.scale.set(pulseScale, pulseScale, pulseScale);
+        // Continuous 3D rotation while active
+        const rotSpeed = (isAudioActiveRef.current ? 0.024 : 0.016) * currentEnergy;
+        sphereMesh.rotation.y += rotSpeed;
+
+        // Kinetic micro-shake / audio pulsation
+        if (isAudioActiveRef.current) {
+          // Acoustic rhythm pulsation
+          const audioPulse = 1.0 + Math.sin(accumulatedTime * 8.0) * (0.05 * currentAudioEnergy);
+          sphereMesh.scale.set(audioPulse, audioPulse, audioPulse);
+          sphereMesh.position.x = Math.sin(accumulatedTime * 24.0) * 0.025 * currentAudioEnergy;
+          sphereMesh.position.y = Math.cos(accumulatedTime * 28.0) * 0.025 * currentAudioEnergy;
+        } else if (isTypingRef.current) {
+          // Typing tremor
+          sphereMesh.position.x = Math.sin(accumulatedTime * 32.0) * 0.035 * currentEnergy;
+          sphereMesh.position.y = Math.cos(accumulatedTime * 38.0) * 0.035 * currentEnergy;
+          const pulseScale = 1.0 + Math.sin(accumulatedTime * 20.0) * 0.03 * currentEnergy;
+          sphereMesh.scale.set(pulseScale, pulseScale, pulseScale);
+        }
       } else {
+        // Completely STOPPED and STILL
+        uniforms.uDistortion.value = 0;
+        uniforms.uSpeed.value = 0;
         sphereMesh.position.set(0, 0, 0);
         sphereMesh.scale.set(1, 1, 1);
       }
 
-      // Organic continuous 3D rotation with mouse parallax tilt
-      sphereMesh.rotation.y += isTypingRef.current ? 0.016 : 0.004;
+      // Smooth mouse parallax interpolation
+      currentMouse.lerp(targetMouse, 0.08);
+      uniforms.uMouse.value.copy(currentMouse);
+
       sphereMesh.rotation.x = THREE.MathUtils.lerp(sphereMesh.rotation.x, targetRotation.x, 0.06);
       sphereMesh.rotation.z = THREE.MathUtils.lerp(sphereMesh.rotation.z, -targetRotation.y * 0.5, 0.06);
 
@@ -333,34 +366,36 @@ export const GlowingOrb: React.FC<GlowingOrbProps> = ({
     };
   }, [size, interactive, isHovered]);
 
+  const isOrbMoving = isTyping || isAudioActive;
+
   return (
     <div
       className={`relative flex items-center justify-center select-none group cursor-grab active:cursor-grabbing transition-transform duration-300 ${
-        isTyping ? 'scale-105' : ''
+        isOrbMoving ? 'scale-105' : ''
       }`}
       style={{ width: size, height: size }}
     >
       {/* Dynamic Multi-layered Ambient Atmosphere Glow */}
       <div
-        className={`absolute -inset-4 rounded-full bg-gradient-to-tr from-[#0052CC]/40 via-[#0071E3]/35 to-[#00D2FF]/45 blur-2xl transition-all duration-300 pointer-events-none ${
-          isTyping
+        className={`absolute -inset-4 rounded-full bg-gradient-to-tr from-[#0052CC]/40 via-[#0071E3]/35 to-[#00D2FF]/45 blur-2xl transition-all duration-500 pointer-events-none ${
+          isOrbMoving
             ? 'scale-125 opacity-100 from-[#0052CC]/60 via-[#0071E3]/55 to-[#00D2FF]/70'
-            : 'group-hover:scale-110 opacity-80'
+            : 'opacity-50 group-hover:opacity-80'
         }`}
       />
       
       {/* Soft Ethereal Violet Pearl Halo */}
       <div
-        className={`absolute inset-0 rounded-full bg-gradient-to-b from-[#9333EA]/20 via-transparent to-[#00D2FF]/30 blur-xl pointer-events-none transition-all duration-300 ${
-          isTyping ? 'scale-115 opacity-90' : 'opacity-60'
+        className={`absolute inset-0 rounded-full bg-gradient-to-b from-[#9333EA]/20 via-transparent to-[#00D2FF]/30 blur-xl pointer-events-none transition-all duration-500 ${
+          isOrbMoving ? 'scale-115 opacity-90' : 'opacity-40'
         }`}
       />
 
-      {/* 3D WebGL Canvas Container with kinetic shake effect */}
+      {/* 3D WebGL Canvas Container */}
       <div
         ref={containerRef}
         className={`relative z-10 w-full h-full rounded-full overflow-visible flex items-center justify-center filter drop-shadow-[0_20px_40px_rgba(0,113,227,0.35)] transition-all ${
-          isTyping ? 'drop-shadow-[0_25px_50px_rgba(0,210,255,0.55)]' : ''
+          isOrbMoving ? 'drop-shadow-[0_25px_50px_rgba(0,210,255,0.6)]' : ''
         }`}
       />
     </div>
