@@ -51,50 +51,29 @@ export const AskIkoliPage: React.FC<AskIkoliPageProps> = ({ onNavigate }) => {
   const [copiedId, setCopiedId] = useState<string | null>(null);
 
   const getPlaceholderText = () => {
-    switch (persona) {
-      case 'visitor':
-        return "Ask any question in plain English (e.g. 'What is leprosy?', 'Is it curable and free?', 'What is Grade-2 disability?')...";
-      case 'executive':
-        return "Ask about national elimination targets, funding impact, WHO 2030 roadmap, or LGA disease hot-spots...";
-      case 'clinical':
-        return "Ask about NTBLCP clinical guidelines, sensory testing procedures, or WHO MDT blister pack protocols...";
-      case 'analyst':
-        return "Query statistical indicators, state-by-state 2024 vs 2025 deltas, or PCR confirmation splits...";
+    if (persona === 'visitor') {
+      return "Ask any public health question (e.g. 'What is leprosy?', 'Where can I get free treatment?', 'What is Grade-2 disability?')...";
     }
+    return "Query authorized programme data (e.g. '2026 elimination targets', 'Enugu 2025 case summary', 'Buruli qPCR confirmation rate')...";
   };
 
   const getSuggestedQueries = () => {
-    switch (persona) {
-      case 'visitor':
-        return [
-          { label: 'What is leprosy?', query: 'What is leprosy?' },
-          { label: 'What is Grade-2 disability?', query: 'What is Grade-2 disability?' },
-          { label: 'Is treatment completely free?', query: 'Is leprosy treatment completely free in Nigeria?' },
-          { label: 'How many cases in Enugu?', query: 'How many cases do we have in Enugu?' },
-          { label: 'What is Buruli ulcer?', query: 'What is Buruli ulcer?' },
-        ];
-      case 'executive':
-        return [
-          { label: '2026 National Targets', query: 'What are the 2026 national elimination targets?' },
-          { label: 'G2D Disability Reduction', query: 'How much did Grade-2 disability decrease in 2025?' },
-          { label: 'RedAid Strategic Roadmap', query: 'What is RedAid Nigeria strategic roadmap?' },
-          { label: 'State-by-State Overview', query: 'Give an executive summary of all 5 South-East states' },
-        ];
-      case 'clinical':
-        return [
-          { label: 'PB vs MB Blister Packs', query: 'What is the difference between PB and MB leprosy treatment?' },
-          { label: 'Sensory Testing Protocol', query: 'How do you perform sensory and motor nerve testing?' },
-          { label: 'IS2404 qPCR Buruli Protocol', query: 'What is the IS2404 qPCR procedure for Buruli ulcer?' },
-          { label: 'Single-Dose Rifampicin (SDR-PEP)', query: 'What is the dosage for SDR-PEP preventive treatment?' },
-        ];
-      case 'analyst':
-        return [
-          { label: '5-State 2024 vs 2025 Comparison', query: 'Compare 2024 vs 2025 cases across all 5 states' },
-          { label: 'Child Leprosy Rate in Ebonyi', query: 'What is the child leprosy rate in Ebonyi?' },
-          { label: 'PCR Laboratory Confirmation Splits', query: 'Show laboratory PCR confirmation breakdown' },
-          { label: 'Grade-2 Disability Percentages', query: 'What are the Grade-2 disability percentages by state?' },
-        ];
+    if (persona === 'visitor') {
+      return [
+        { label: 'What is leprosy?', query: 'What is leprosy?' },
+        { label: 'What is Grade-2 disability?', query: 'What is Grade-2 disability?' },
+        { label: 'Is treatment completely free?', query: 'Is leprosy treatment completely free in Nigeria?' },
+        { label: 'How many cases in Enugu?', query: 'How many cases do we have in Enugu?' },
+        { label: 'What is Buruli ulcer?', query: 'What is Buruli ulcer?' },
+      ];
     }
+    return [
+      { label: '2026 National Targets', query: 'What are the 2026 national elimination targets?' },
+      { label: '5-State 2024 vs 2025 Summary', query: 'Give an executive summary of all 5 South-East states' },
+      { label: 'G2D Disability Reduction', query: 'How much did Grade-2 disability decrease in 2025?' },
+      { label: 'Child Leprosy in Ebonyi', query: 'What is the child leprosy rate in Ebonyi?' },
+      { label: 'PCR Laboratory Splits', query: 'What is the PCR confirmation rate for Buruli ulcer?' },
+    ];
   };
 
   // Attachments state
@@ -386,51 +365,29 @@ export const AskIkoliPage: React.FC<AskIkoliPageProps> = ({ onNavigate }) => {
             </span>
           </div>
 
-          {/* Two Primary Operating Modes + Audience Sub-Persona Segmented Switcher */}
-          <div className="pt-1 flex flex-wrap items-center justify-center p-1 rounded-full border backdrop-blur-xl bg-black/5 dark:bg-white/5 border-black/10 dark:border-white/10 gap-1 text-xs">
+          {/* Conceptual Operating Mode Switcher (Public Mode vs Programme Mode) */}
+          <div className="pt-1 flex items-center justify-center p-1 rounded-full border backdrop-blur-xl bg-black/5 dark:bg-white/5 border-black/10 dark:border-white/10 gap-1 text-xs max-w-sm mx-auto">
             <button
               onClick={() => setPersona('visitor')}
-              className={`px-4 py-2 rounded-full transition-all flex items-center gap-1.5 font-medium cursor-pointer ${
+              className={`flex-1 px-4 py-2 rounded-full transition-all flex items-center justify-center gap-1.5 font-medium cursor-pointer ${
                 persona === 'visitor'
                   ? 'bg-white dark:bg-white/20 text-[#1D1D1F] dark:text-white shadow-xs font-bold'
                   : 'text-gray-500 hover:text-gray-900 dark:hover:text-white'
               }`}
             >
               <span>🌐</span>
-              <span>Public Mode (Approved Health Info)</span>
+              <span>Public Mode</span>
             </button>
             <button
               onClick={() => setPersona('executive')}
-              className={`px-4 py-2 rounded-full transition-all flex items-center gap-1.5 font-medium cursor-pointer ${
-                persona === 'executive'
+              className={`flex-1 px-4 py-2 rounded-full transition-all flex items-center justify-center gap-1.5 font-medium cursor-pointer ${
+                persona !== 'visitor'
                   ? 'bg-white dark:bg-white/20 text-[#1D1D1F] dark:text-white shadow-xs font-bold'
                   : 'text-gray-500 hover:text-gray-900 dark:hover:text-white'
               }`}
             >
               <span>🔐</span>
-              <span>Programme Mode (Authorised Data)</span>
-            </button>
-            <button
-              onClick={() => setPersona('clinical')}
-              className={`px-3 py-2 rounded-full transition-all flex items-center gap-1.5 font-medium cursor-pointer ${
-                persona === 'clinical'
-                  ? 'bg-white dark:bg-white/20 text-[#1D1D1F] dark:text-white shadow-xs font-bold'
-                  : 'text-gray-500 hover:text-gray-900 dark:hover:text-white'
-              }`}
-            >
-              <span>🩺</span>
-              <span>Guidelines &amp; Protocols</span>
-            </button>
-            <button
-              onClick={() => setPersona('analyst')}
-              className={`px-3 py-2 rounded-full transition-all flex items-center gap-1.5 font-medium cursor-pointer ${
-                persona === 'analyst'
-                  ? 'bg-white dark:bg-white/20 text-[#1D1D1F] dark:text-white shadow-xs font-bold'
-                  : 'text-gray-500 hover:text-gray-900 dark:hover:text-white'
-              }`}
-            >
-              <span>📈</span>
-              <span>Data Analyst</span>
+              <span>Programme Mode</span>
             </button>
           </div>
 
