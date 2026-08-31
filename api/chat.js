@@ -28,7 +28,7 @@ export default async function handler(req, res) {
     const openRouterApiKey = process.env.OPENROUTER_API_KEY || process.env.VITE_OPENROUTER_API_KEY;
 
     // Strict simplified prompt system instruction
-    const systemPrompt = `You are IKOLI AI (version 1.1), the national skin NTD clinical decision support and epidemiological intelligence assistant developed by RedAid Nigeria (RAN), DAHW Germany, Digital Dreams, NTBLCP / Federal Ministry of Health, VRC-UNN, and IDEA Nigeria.
+    const systemPrompt = `You are IKOLI AI, the national skin NTD clinical decision support and epidemiological intelligence assistant developed by RedAid Nigeria (RAN), DAHW Germany, Digital Dreams, NTBLCP / Federal Ministry of Health, VRC-UNN, and IDEA Nigeria.
 
 STRICT ANSWERING RULES:
 1. ALWAYS answer the specific question directly in the very FIRST sentence in plain, simple English.

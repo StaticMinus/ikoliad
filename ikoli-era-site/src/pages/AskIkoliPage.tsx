@@ -271,7 +271,7 @@ export const AskIkoliPage: React.FC<AskIkoliPageProps> = ({ onNavigate }) => {
                 isDark ? 'bg-white/5 border-white/10 text-gray-200' : 'bg-white border-black/10 text-gray-800 shadow-xs'
               }`}>
                 <span className="w-2 h-2 rounded-full bg-[#10B981] shadow-[0_0_8px_#10B981]" />
-                <span className="font-bold tracking-tight">IKOLI version 1.1 • Clinical Diagnostic Workspace</span>
+                <span className="font-bold tracking-tight">IKOLI • Clinical Diagnostic Workspace</span>
               </div>
             </div>
 
