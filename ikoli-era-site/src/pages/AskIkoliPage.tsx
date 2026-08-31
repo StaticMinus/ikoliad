@@ -1,6 +1,4 @@
 import React, { useState, useRef, useEffect } from 'react';
-import { Navbar } from '../components/Navbar';
-import { Footer } from '../components/Footer';
 import {
   queryGeminiClinicalAI,
   type GeminiAttachment,
@@ -8,9 +6,12 @@ import {
 } from '../services/geminiService';
 import { ClinicalMarkdown } from '../components/ui/ClinicalMarkdown';
 import { MagneticButton } from '../components/ui/MagneticButton';
+import { GlowingOrb } from '../components/cortex/GlowingOrb';
+import { FeatureActionCards } from '../components/cortex/FeatureActionCards';
+import { CortexSidebar, type ChatSession } from '../components/cortex/CortexSidebar';
 import {
   Sparkles,
-  Plus,
+  Paperclip,
   Mic,
   MicOff,
   ArrowUp,
@@ -22,11 +23,14 @@ import {
   Sun,
   Moon,
   Volume2,
-  RotateCcw,
+  Share2,
+  Download,
+  Atom,
+  HelpCircle,
 } from 'lucide-react';
 
 interface AskIkoliPageProps {
-  onNavigate: (page: 'home' | 'dashboard' | 'diseases' | 'ask' | 'about' | 'styles' | 'api') => void;
+  onNavigate: (page: 'home' | 'dashboard' | 'diseases' | 'ask' | 'about' | 'styles' | 'api' | 'protocols') => void;
 }
 
 interface ChatMessage {
@@ -41,17 +45,19 @@ interface ChatMessage {
   source?: 'omniroute-live' | 'gemini-live' | 'openrouter-live' | 'clinical-knowledge-base';
 }
 
-const CHAT_STORAGE_KEY = 'ikoli_chat_messages_v1';
+const SESSIONS_STORAGE_KEY = 'ikoli_cortex_sessions_v2';
+const ACTIVE_SESSION_STORAGE_KEY = 'ikoli_cortex_active_session_v2';
 
 export const AskIkoliPage: React.FC<AskIkoliPageProps> = ({ onNavigate }) => {
   const [theme, setTheme] = useState<'dark' | 'light'>('light');
-  // Audience Response Persona (Default: Public / Plain English)
+  const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
+  const [deeperResearchActive, setDeeperResearchActive] = useState(true);
   const persona: ResponsePersona = 'visitor';
-  
-  // Persistent Multi-turn Session Messages State
-  const [messages, setMessages] = useState<ChatMessage[]>(() => {
+
+  // ── 1. Multi-Session Persistent Storage ───────────────────────────
+  const [sessions, setSessions] = useState<ChatSession[]>(() => {
     try {
-      const saved = localStorage.getItem(CHAT_STORAGE_KEY);
+      const saved = localStorage.getItem(SESSIONS_STORAGE_KEY);
       if (saved) {
         const parsed = JSON.parse(saved);
         if (Array.isArray(parsed) && parsed.length > 0) {
@@ -59,79 +65,153 @@ export const AskIkoliPage: React.FC<AskIkoliPageProps> = ({ onNavigate }) => {
         }
       }
     } catch (err) {
-      console.warn('Failed to restore chat session:', err);
+      console.warn('Failed to load chat sessions:', err);
     }
-    return [];
+    const initialSession: ChatSession = {
+      id: 'session-' + Date.now(),
+      title: 'New Consultation',
+      createdAt: Date.now(),
+      updatedAt: Date.now(),
+      messages: [],
+    };
+    return [initialSession];
   });
 
+  const [activeSessionId, setActiveSessionId] = useState<string>(() => {
+    try {
+      const savedId = localStorage.getItem(ACTIVE_SESSION_STORAGE_KEY);
+      if (savedId) return savedId;
+    } catch {
+      // fallback
+    }
+    return sessions[0]?.id || 'session-' + Date.now();
+  });
+
+  // Active Session Helper
+  const currentSession = sessions.find((s) => s.id === activeSessionId) || sessions[0];
+  const messages: ChatMessage[] = currentSession?.messages || [];
+
+  // Sync sessions to localStorage
+  useEffect(() => {
+    try {
+      localStorage.setItem(SESSIONS_STORAGE_KEY, JSON.stringify(sessions));
+      if (activeSessionId) {
+        localStorage.setItem(ACTIVE_SESSION_STORAGE_KEY, activeSessionId);
+      }
+    } catch (err) {
+      console.warn('Failed to persist sessions:', err);
+    }
+  }, [sessions, activeSessionId]);
+
+  // Input & Messaging States
   const [inputQuery, setInputQuery] = useState('');
   const [isTyping, setIsTyping] = useState(false);
   const [copiedId, setCopiedId] = useState<string | null>(null);
+  const [showShareToast, setShowShareToast] = useState(false);
 
-  // Sync messages to localStorage whenever messages change
-  useEffect(() => {
-    try {
-      if (messages.length > 0) {
-        localStorage.setItem(CHAT_STORAGE_KEY, JSON.stringify(messages));
-      } else {
-        localStorage.removeItem(CHAT_STORAGE_KEY);
-      }
-    } catch (err) {
-      console.warn('Failed to persist chat session:', err);
-    }
-  }, [messages]);
-
-  const getPlaceholderText = () => {
-    if (persona === 'visitor') {
-      return "Ask any public health question (e.g. 'What is leprosy?', 'Where can I get free treatment?', 'What is Grade-2 disability?')...";
-    }
-    return "Query authorized programme data (e.g. '2026 elimination targets', 'Enugu 2025 case summary', 'Buruli qPCR confirmation rate')...";
-  };
-
-  const getSuggestedQueries = () => {
-    if (persona === 'visitor') {
-      return [
-        { label: 'What is leprosy?', query: 'What is leprosy?' },
-        { label: 'What is Grade-2 disability?', query: 'What is Grade-2 disability?' },
-        { label: 'Is treatment completely free?', query: 'Is leprosy treatment completely free in Nigeria?' },
-        { label: 'How many cases in Enugu?', query: 'How many cases do we have in Enugu?' },
-        { label: 'What is Buruli ulcer?', query: 'What is Buruli ulcer?' },
-      ];
-    }
-    return [
-      { label: '2026 National Targets', query: 'What are the 2026 national elimination targets?' },
-      { label: '5-State 2024 vs 2025 Summary', query: 'Give an executive summary of all 5 South-East states' },
-      { label: 'G2D Disability Reduction', query: 'How much did Grade-2 disability decrease in 2025?' },
-      { label: 'Child Leprosy in Ebonyi', query: 'What is the child leprosy rate in Ebonyi?' },
-      { label: 'PCR Laboratory Splits', query: 'What is the PCR confirmation rate for Buruli ulcer?' },
-    ];
-  };
-
-  // Attachments state
+  // Attachments State
   const [attachedFile, setAttachedFile] = useState<GeminiAttachment | null>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
-  // Voice recording state
+  // Voice Dictation State
   const [isListening, setIsListening] = useState(false);
   const [recognitionError, setRecognitionError] = useState<string | null>(null);
 
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const isDark = theme === 'dark';
 
-  // Smoothly scroll only message feed container when messages change
+  // Smooth scroll feed when messages change
   useEffect(() => {
     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
   }, [messages, isTyping]);
 
-  // Voice Recognition Handler using Web Speech API
+  // ── 2. Session Management Actions ─────────────────────────────────
+  const handleNewSession = () => {
+    const newSession: ChatSession = {
+      id: 'session-' + Date.now(),
+      title: 'New Consultation',
+      createdAt: Date.now(),
+      updatedAt: Date.now(),
+      messages: [],
+    };
+    setSessions((prev) => [newSession, ...prev]);
+    setActiveSessionId(newSession.id);
+    setInputQuery('');
+    setAttachedFile(null);
+  };
+
+  const handleSelectSession = (id: string) => {
+    setActiveSessionId(id);
+    setInputQuery('');
+    setAttachedFile(null);
+  };
+
+  const handleDeleteSession = (id: string, e: React.MouseEvent) => {
+    e.stopPropagation();
+    setSessions((prev) => {
+      const filtered = prev.filter((s) => s.id !== id);
+      if (filtered.length === 0) {
+        const fresh: ChatSession = {
+          id: 'session-' + Date.now(),
+          title: 'New Consultation',
+          createdAt: Date.now(),
+          updatedAt: Date.now(),
+          messages: [],
+        };
+        setActiveSessionId(fresh.id);
+        return [fresh];
+      }
+      if (activeSessionId === id) {
+        setActiveSessionId(filtered[0].id);
+      }
+      return filtered;
+    });
+  };
+
+  // Export Active Conversation to Markdown
+  const handleExportChat = () => {
+    if (!currentSession || currentSession.messages.length === 0) return;
+
+    let content = `# IKOLI AI — Conversation Transcript\n`;
+    content += `**Topic:** ${currentSession.title}\n`;
+    content += `**Date:** ${new Date(currentSession.createdAt).toLocaleString()}\n`;
+    content += `**Demonstrator:** IKOLI-AI Demonstrator v0.1\n\n---\n\n`;
+
+    currentSession.messages.forEach((msg) => {
+      const senderName = msg.sender === 'user' ? '👤 User / Sentinel Officer' : '✨ Ask Ikoli Assistant';
+      content += `### ${senderName} (${msg.timestamp})\n\n${msg.text}\n\n`;
+      if (msg.attachment) {
+        content += `*Attachment:* ${msg.attachment.name} (${msg.attachment.type})\n\n`;
+      }
+      content += `---\n\n`;
+    });
+
+    const blob = new Blob([content], { type: 'text/markdown;charset=utf-8' });
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement('a');
+    link.href = url;
+    link.download = `ikoli-consultation-${currentSession.id}.md`;
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+    URL.revokeObjectURL(url);
+  };
+
+  const handleShareLink = () => {
+    navigator.clipboard.writeText(window.location.href);
+    setShowShareToast(true);
+    setTimeout(() => setShowShareToast(false), 2500);
+  };
+
+  // ── 3. Voice Recognition Handler ──────────────────────────────────
   const handleToggleVoice = () => {
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const windowObj = window as any;
     const SpeechRecognition = windowObj.SpeechRecognition || windowObj.webkitSpeechRecognition;
 
     if (!SpeechRecognition) {
-      setRecognitionError('Speech recognition is not supported in this browser. Please type your query.');
-      setTimeout(() => setRecognitionError(null), 3500);
+      setRecognitionError('Speech recognition is not supported in this browser.');
+      setTimeout(() => setRecognitionError(null), 4000);
       return;
     }
 
@@ -143,8 +223,8 @@ export const AskIkoliPage: React.FC<AskIkoliPageProps> = ({ onNavigate }) => {
     try {
       const recognition = new SpeechRecognition();
       recognition.continuous = false;
-      recognition.interimResults = true;
-      recognition.lang = 'en-US';
+      recognition.interimResults = false;
+      recognition.lang = 'en-NG'; // Nigerian English standard
 
       recognition.onstart = () => {
         setIsListening(true);
@@ -153,20 +233,16 @@ export const AskIkoliPage: React.FC<AskIkoliPageProps> = ({ onNavigate }) => {
 
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
       recognition.onresult = (event: any) => {
-        const transcript = Array.from(event.results as ArrayLike<any>)
-          .map((result: any) => result[0].transcript)
-          .join('');
-        setInputQuery(transcript);
+        const transcript = event.results[0][0].transcript;
+        setInputQuery((prev) => (prev ? `${prev} ${transcript}` : transcript));
+        setIsListening(false);
       };
 
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
       recognition.onerror = (event: any) => {
-        console.warn('Speech recognition error:', event.error);
         setIsListening(false);
-        if (event.error !== 'no-speech') {
-          setRecognitionError(`Microphone error: ${event.error}`);
-          setTimeout(() => setRecognitionError(null), 3000);
-        }
+        setRecognitionError(`Voice error: ${event.error}`);
+        setTimeout(() => setRecognitionError(null), 4000);
       };
 
       recognition.onend = () => {
@@ -177,87 +253,115 @@ export const AskIkoliPage: React.FC<AskIkoliPageProps> = ({ onNavigate }) => {
     } catch (err) {
       console.error('Speech recognition exception:', err);
       setIsListening(false);
+      setRecognitionError('Failed to initialize speech recognition.');
     }
   };
 
-  // File Upload Handler (Images, PDFs, documents)
+  // ── 4. File Attachment Handler ────────────────────────────────────
   const handleFileUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (!file) return;
 
+    if (file.size > 8 * 1024 * 1024) {
+      alert('File size exceeds 8MB limit for clinical uploads.');
+      return;
+    }
+
     const reader = new FileReader();
     reader.onload = (event) => {
       const base64 = event.target?.result as string;
-      const isImg = file.type.startsWith('image/');
-
       setAttachedFile({
         name: file.name,
-        type: file.type || 'application/octet-stream',
+        type: file.type,
         size: file.size,
         base64: base64,
-        previewUrl: isImg ? base64 : undefined,
+        previewUrl: file.type.startsWith('image/') ? base64 : undefined,
       });
     };
-
     reader.readAsDataURL(file);
   };
 
-  const handleRemoveAttachment = () => {
-    setAttachedFile(null);
-    if (fileInputRef.current) {
-      fileInputRef.current.value = '';
-    }
-  };
+  // ── 5. Sending Messages & Streaming Responses ─────────────────────
+  const handleSend = async (queryText?: string) => {
+    const textToSend = queryText || inputQuery;
+    if (!textToSend.trim() && !attachedFile) return;
 
-  // Main Query Submission Handler with Live AI Model & Web Search
-  const handleSend = async (textToSend: string) => {
-    const query = textToSend.trim();
-    if (!query && !attachedFile) return;
-
-    const currentAttachment = attachedFile;
+    const userMsgId = 'msg-' + Date.now();
     const userMsg: ChatMessage = {
-      id: `usr-${Date.now()}`,
+      id: userMsgId,
       sender: 'user',
-      text: query || `[Uploaded file: ${currentAttachment?.name}]`,
+      text: textToSend.trim(),
       timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
-      attachment: currentAttachment || undefined,
+      attachment: attachedFile || undefined,
     };
 
-    setMessages((prev) => [...prev, userMsg]);
-    setInputQuery('');
-    setAttachedFile(null);
-    const historyPayload = messages.map((m) => ({
-      role: m.sender === 'user' ? ('user' as const) : ('assistant' as const),
-      content: m.text,
-    }));
+    // Auto-generate Title if this is the first message in this session
+    let updatedTitle = currentSession.title;
+    if (currentSession.messages.length === 0) {
+      const cleanPrompt = textToSend.trim();
+      updatedTitle = cleanPrompt.length > 38 ? cleanPrompt.substring(0, 36) + '…' : cleanPrompt;
+    }
 
-    if (fileInputRef.current) fileInputRef.current.value = '';
+    const updatedMessages = [...messages, userMsg];
+
+    // Update active session in state
+    setSessions((prev) =>
+      prev.map((s) =>
+        s.id === currentSession.id
+          ? {
+              ...s,
+              title: updatedTitle,
+              updatedAt: Date.now(),
+              messages: updatedMessages,
+            }
+          : s
+      )
+    );
+
+    setInputQuery('');
+    const currentAttachment = attachedFile;
+    setAttachedFile(null);
     setIsTyping(true);
 
     try {
-      const result = await queryGeminiClinicalAI(
-        query || 'Analyze this attached skin NTD file/image according to national guidelines.',
-        currentAttachment,
-        undefined,
-        undefined,
-        historyPayload,
+      const history = updatedMessages.map((m) => ({
+        role: (m.sender === 'user' ? 'user' : 'assistant') as 'user' | 'assistant',
+        content: m.text,
+      }));
+
+      const res = await queryGeminiClinicalAI(
+        textToSend,
+        currentAttachment || undefined,
+        'openai/gpt-4o-mini',
+        false,
+        history,
         persona
       );
 
-      setIsTyping(false);
-
       const aiMsg: ChatMessage = {
-        id: `ai-${Date.now()}`,
+        id: 'ai-' + Date.now(),
         sender: 'ai',
-        text: result.text,
+        text: res.text,
         timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
-        category: result.category,
-        dimensions: result.dimensions,
-        followUpPrompt: result.followUpPrompt,
-        source: result.source,
+        category: res.category,
+        dimensions: res.dimensions,
+        followUpPrompt: res.followUpPrompt,
+        source: res.source,
       };
 
-      setMessages((prev) => [...prev, aiMsg]);
+      setSessions((prev) =>
+        prev.map((s) =>
+          s.id === currentSession.id
+            ? {
+                ...s,
+                updatedAt: Date.now(),
+                messages: [...s.messages, aiMsg],
+              }
+            : s
+        )
+      );
+
+      setIsTyping(false);
     } catch (err) {
       console.error('Send error:', err);
       setIsTyping(false);
@@ -270,11 +374,10 @@ export const AskIkoliPage: React.FC<AskIkoliPageProps> = ({ onNavigate }) => {
     setTimeout(() => setCopiedId(null), 2000);
   };
 
-  // Text to Speech
   const handleSpeak = (text: string) => {
     if ('speechSynthesis' in window) {
       window.speechSynthesis.cancel();
-      const cleanText = text.replace(/\*\*/g, '').replace(/•/g, '');
+      const cleanText = text.replace(/\*\*/g, '').replace(/•/g, '').replace(/###/g, '');
       const utterance = new SpeechSynthesisUtterance(cleanText);
       utterance.rate = 1.0;
       utterance.pitch = 1.0;
@@ -282,412 +385,404 @@ export const AskIkoliPage: React.FC<AskIkoliPageProps> = ({ onNavigate }) => {
     }
   };
 
-  const handleResetConsultation = () => {
-    setMessages([]);
-    setInputQuery('');
-    setAttachedFile(null);
-    try {
-      localStorage.removeItem(CHAT_STORAGE_KEY);
-    } catch (err) {
-      console.warn('Failed to clear storage:', err);
-    }
-  };
-
   return (
-    <main
-      className={`w-full min-h-screen font-sans selection:bg-[#0071E3] selection:text-white flex flex-col transition-colors duration-300 ${
-        isDark ? 'bg-[#0C0C0C] text-white' : 'bg-[#FBFBFD] text-[#1D1D1F]'
-      }`}
-    >
-      {/* ── Fixed Centered Capsule Navbar ─────────────────────────────────── */}
-      <Navbar currentPage="ask" onNavigate={onNavigate} />
-
-      {/* Hidden File Input */}
-      <input
-        type="file"
-        ref={fileInputRef}
-        onChange={handleFileUpload}
-        accept="image/*,.pdf,.doc,.docx"
-        className="hidden"
-      />
-
-      {/* ══════════════════════════════════════════════════════════════════════
-          MAIN REFINED CLINICAL INTELLIGENCE WORKSPACE (CLEAN & MINIMAL)
-      ══════════════════════════════════════════════════════════════════════ */}
-      <section className={`relative w-full pt-28 sm:pt-32 pb-16 px-4 sm:px-6 md:px-8 overflow-hidden transition-colors duration-300 flex-1 flex flex-col items-center ${
-        isDark ? 'bg-[#0C0C0C]' : 'bg-[#FBFBFD]'
-      }`}>
+    <div className="w-screen h-screen overflow-hidden p-2 sm:p-4 md:p-6 bg-gradient-to-tr from-[#EBE6F5] via-[#EAE5F4] to-[#E3DCF2] dark:from-[#09090C] dark:via-[#111116] dark:to-[#0D0D12] flex items-center justify-center font-sans antialiased select-none">
+      
+      {/* ── Outer Floating Cortex Studio Container ────────────────────────── */}
+      <div className="w-full h-full max-w-[1580px] max-h-[960px] rounded-[28px] sm:rounded-[36px] bg-white dark:bg-[#15151A] shadow-[0_24px_80px_rgba(0,0,0,0.08)] border border-black/5 dark:border-white/10 flex overflow-hidden relative">
         
-        {/* Subtle Ambient Lighting Glow */}
-        <div className={`absolute top-1/4 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[780px] h-[520px] blur-3xl pointer-events-none ${
-          isDark
-            ? 'bg-gradient-to-b from-[#0071E3]/15 via-[#10B981]/10 to-transparent'
-            : 'bg-gradient-to-b from-[#0071E3]/10 via-[#10B981]/8 to-transparent'
-        }`} />
+        {/* Hidden File Input */}
+        <input
+          type="file"
+          ref={fileInputRef}
+          onChange={handleFileUpload}
+          accept="image/*,.pdf,.doc,.docx"
+          className="hidden"
+        />
 
-        <div className="w-full max-w-4xl mx-auto flex flex-col items-center text-center relative z-10 space-y-6">
+        {/* ── Left Sidebar Drawer ────────────────────────────────────────── */}
+        <CortexSidebar
+          sessions={sessions}
+          activeSessionId={activeSessionId}
+          onSelectSession={handleSelectSession}
+          onNewSession={handleNewSession}
+          onDeleteSession={handleDeleteSession}
+          onNavigate={onNavigate}
+          isCollapsed={sidebarCollapsed}
+          onToggleCollapse={() => setSidebarCollapsed(!sidebarCollapsed)}
+          isDark={isDark}
+        />
+
+        {/* ── Main Right Studio Workspace ─────────────────────────────────── */}
+        <main className="flex-1 h-full flex flex-col justify-between overflow-hidden bg-white/60 dark:bg-[#15151A] backdrop-blur-xl relative">
           
-          {/* Top Status Header Bar (Right-aligned controls) */}
-          <div className="w-full flex items-center justify-end gap-3 pb-2 pt-1">
+          {/* ── Top Header Toolbar ────────────────────────────────────────── */}
+          <header className="h-14 px-4 sm:px-6 border-b border-black/5 dark:border-white/10 flex items-center justify-between shrink-0 select-none bg-white/70 dark:bg-[#15151A]/80 backdrop-blur-md z-20">
             
-            {/* Right: Reset Consultation & Theme Toggle */}
+            {/* Left: Model / Mode Pill Dropdown */}
             <div className="flex items-center gap-2">
-              {messages.length > 0 && (
-                <button
-                  onClick={handleResetConsultation}
-                  className={`px-3.5 py-1.5 rounded-full border text-xs font-medium transition-all cursor-pointer flex items-center gap-1.5 ${
-                    isDark ? 'bg-white/5 border-white/10 text-gray-300 hover:bg-white/10 hover:text-white' : 'bg-white border-black/10 text-gray-700 hover:bg-gray-100 shadow-xs'
-                  }`}
-                  title="Start fresh conversation"
-                >
-                  <RotateCcw className="w-3 h-3" />
-                  <span className="hidden sm:inline">New Session</span>
-                </button>
-              )}
-
-              {/* Theme Switcher Button */}
               <button
-                onClick={() => setTheme(isDark ? 'light' : 'dark')}
-                className={`p-1.5 px-3 rounded-full border transition-all cursor-pointer flex items-center gap-1.5 text-xs ${
+                className={`px-3 py-1.5 rounded-full border text-xs font-semibold flex items-center gap-2 transition-all cursor-pointer ${
                   isDark
-                    ? 'bg-white/5 border-white/10 text-yellow-300 hover:bg-white/10'
-                    : 'bg-white border-black/10 text-gray-700 hover:bg-black/5 shadow-xs'
+                    ? 'bg-white/5 border-white/10 text-gray-200 hover:bg-white/10'
+                    : 'bg-[#F4F4F6] border-black/5 text-[#1D1D1F] hover:bg-gray-200/70 shadow-2xs'
                 }`}
-                title={isDark ? 'Switch to Light Theme' : 'Switch to Dark Theme'}
               >
-                {isDark ? <Sun className="w-3.5 h-3.5" /> : <Moon className="w-3.5 h-3.5" />}
-                <span className="text-[11px] font-sans font-medium">
-                  {isDark ? 'Light' : 'Dark'}
+                <div className="w-2 h-2 rounded-full bg-purple-500 animate-pulse" />
+                <span>IKOLI-AI v0.1</span>
+                <span className="text-[10px] text-gray-400 font-mono hidden sm:inline">
+                  &bull; Public Assistant
                 </span>
               </button>
             </div>
 
-          </div>
-
-          {/* Masked Hero Headline */}
-          <div className="space-y-2.5 text-center">
-            <h1 className={`font-display font-black text-3xl sm:text-5xl md:text-6xl tracking-tight leading-[1.06] ${
-              isDark ? 'text-white' : 'text-[#1D1D1F]'
-            }`}>
-              Ask Ikoli
-            </h1>
-            <p className="text-sm sm:text-lg font-semibold text-[#0071E3] tracking-tight">
-              Conversational Health &amp; Programme Information Assistant
-            </p>
-            <p className={`text-xs sm:text-sm max-w-xl mx-auto leading-relaxed font-medium ${
-              isDark ? 'text-gray-400' : 'text-gray-500'
-            }`}>
-              Explains approved leprosy &amp; Buruli ulcer information, national programme indicators, and service navigation. Does not provide clinical diagnoses, prescriptions, or SDR-PEP eligibility determinations.
-            </p>
-          </div>
-
-          {/* Persistent Demonstration Environment Notice */}
-          <div className={`p-3 rounded-2xl border text-xs text-left max-w-2xl mx-auto flex items-start sm:items-center gap-2.5 ${
-            isDark ? 'bg-amber-500/10 border-amber-500/25 text-amber-300' : 'bg-amber-500/10 border-amber-500/30 text-amber-900'
-          }`}>
-            <span className="w-2 h-2 rounded-full bg-amber-500 shrink-0 mt-1 sm:mt-0 shadow-[0_0_8px_rgba(245,158,11,0.6)]" />
-            <span className="font-medium leading-relaxed">
-              <strong>Demonstration environment.</strong> Data displayed are synthetic/illustrative and do not represent live patient or official national programme data.
-            </span>
-          </div>
-
-          {/* ══════════════════════════════════════════════════════════════════
-              CONVERSATION & CLINICAL REASONING STREAM (ONLY WHEN MESSAGES EXIST)
-          ══════════════════════════════════════════════════════════════════ */}
-          {messages.length > 0 && (
-            <div className="w-full space-y-5 pt-2 text-left">
+            {/* Right: Actions (Share, Export, Theme, EDCTP3 Tag) */}
+            <div className="flex items-center gap-1.5 sm:gap-2">
               
-              {messages.map((msg) => (
-                <div
-                  key={msg.id}
-                  className={`flex items-start gap-3.5 ${
-                    msg.sender === 'user' ? 'justify-end' : 'justify-start'
-                  }`}
-                >
-                  {/* Clean Apple-style Clinical AI Avatar */}
-                  {msg.sender === 'ai' && (
-                    <div className={`w-9 h-9 rounded-full flex items-center justify-center shrink-0 border shadow-sm ${
-                      isDark ? 'bg-[#181818] border-white/15 text-[#00D2FF]' : 'bg-white border-black/10 text-[#0071E3]'
-                    }`}>
-                      <Sparkles className="w-4 h-4" />
-                    </div>
-                  )}
+              {/* Share Button */}
+              <button
+                onClick={handleShareLink}
+                className="p-2 rounded-xl text-gray-500 hover:text-black dark:hover:text-white hover:bg-black/5 dark:hover:bg-white/5 transition-colors cursor-pointer"
+                title="Copy conversation link"
+              >
+                <Share2 className="w-4 h-4" />
+              </button>
 
-                  {/* Message Card Container */}
-                  <div
-                    className={`rounded-[22px] p-5 sm:p-6 text-sm sm:text-base leading-relaxed max-w-[92%] sm:max-w-[85%] border shadow-xl transition-all ${
-                      msg.sender === 'user'
-                        ? isDark ? 'bg-[#1C1C1C] text-[#EFEFEF] border-white/10' : 'bg-white text-[#1D1D1F] border-black/10 shadow-sm'
-                        : isDark ? 'bg-[#141414] text-[#EFEFEF] border-white/15' : 'bg-white text-[#1D1D1F] border-black/10 shadow-md'
-                    }`}
-                  >
-                    {/* Attached media preview in bubble */}
-                    {msg.attachment && (
-                      <div className={`mb-3 p-2.5 rounded-xl border flex items-center gap-3 ${
-                        isDark ? 'bg-black/40 border-white/10' : 'bg-gray-50 border-gray-200'
-                      }`}>
-                        {msg.attachment.previewUrl ? (
-                          <img src={msg.attachment.previewUrl} alt="Attached" className="w-12 h-12 rounded-lg object-cover" />
-                        ) : (
-                          <FileText className="w-6 h-6 text-[#0071E3]" />
-                        )}
-                        <div className="truncate text-xs">
-                          <p className="font-bold truncate">{msg.attachment.name}</p>
-                          <p className="text-[10px] text-gray-400">Attached clinical evidence file</p>
-                        </div>
-                      </div>
-                    )}
+              {/* Export Chat Button */}
+              <button
+                onClick={handleExportChat}
+                disabled={messages.length === 0}
+                className="px-3 py-1.5 rounded-xl border text-xs font-semibold flex items-center gap-1.5 text-gray-700 dark:text-gray-200 hover:bg-black/5 dark:hover:bg-white/5 disabled:opacity-40 disabled:cursor-not-allowed transition-all cursor-pointer border-black/5 dark:border-white/10 shadow-2xs"
+                title="Download conversation transcript (.md)"
+              >
+                <Download className="w-3.5 h-3.5" />
+                <span className="hidden sm:inline">Export chat</span>
+              </button>
 
-                    {/* AI Response Header with Clean Category & Audio/Copy Actions */}
-                    {msg.sender === 'ai' && (
-                      <div className={`flex items-center justify-between gap-2 mb-3 pb-2 border-b ${
-                        isDark ? 'border-white/10' : 'border-black/5'
-                      }`}>
-                        <div className="flex items-center gap-2">
-                          <span className="text-[11px] font-mono font-bold uppercase tracking-wider text-[#10B981]">
-                            IKOLI AI
-                          </span>
-                        </div>
-                        
-                        <div className="flex items-center gap-2">
-                          <button
-                            onClick={() => handleSpeak(msg.text)}
-                            className="p-1 text-gray-400 hover:text-white transition-colors cursor-pointer text-xs"
-                            title="Listen to guidance"
-                          >
-                            <Volume2 className="w-3.5 h-3.5" />
-                          </button>
-                          <button
-                            onClick={() => handleCopy(msg.id, msg.text)}
-                            className="p-1 text-gray-400 hover:text-white transition-colors cursor-pointer text-xs"
-                            title="Copy response"
-                          >
-                            {copiedId === msg.id ? <Check className="w-3.5 h-3.5 text-emerald-400" /> : <Copy className="w-3.5 h-3.5" />}
-                          </button>
-                        </div>
-                      </div>
-                    )}
+              {/* Theme Toggle */}
+              <button
+                onClick={() => setTheme(isDark ? 'light' : 'dark')}
+                className="p-2 rounded-xl text-gray-500 hover:text-black dark:hover:text-white hover:bg-black/5 dark:hover:bg-white/5 transition-colors cursor-pointer"
+                title={isDark ? 'Switch to Light Theme' : 'Switch to Dark Theme'}
+              >
+                {isDark ? <Sun className="w-4 h-4 text-yellow-400" /> : <Moon className="w-4 h-4" />}
+              </button>
 
-                    {/* Formatted Markdown Content with Clickable Interactive Options */}
-                    <ClinicalMarkdown 
-                      content={msg.text} 
-                      onSelectOption={(optionText) => handleSend(optionText)}
-                      isDark={isDark} 
-                    />
+              {/* EDCTP3 Tag */}
+              <span className="hidden md:inline-flex px-3 py-1 rounded-full bg-black text-white dark:bg-white dark:text-black text-[11px] font-bold tracking-tight shadow-xs">
+                EDCTP3 Demo
+              </span>
+            </div>
 
-                    {/* Interactive Follow-up Action Chip */}
-                    {msg.followUpPrompt && (
-                      <button
-                        onClick={() => handleSend(msg.followUpPrompt!)}
-                        className={`mt-3 w-full p-2.5 rounded-xl border text-xs font-medium transition-all cursor-pointer flex items-center justify-between gap-2 text-left group ${
-                          isDark
-                            ? 'bg-[#0071E3]/10 hover:bg-[#0071E3]/20 border-[#0071E3]/30 text-[#00D2FF]'
-                            : 'bg-blue-50 hover:bg-blue-100 border-blue-200 text-[#0071E3]'
-                        }`}
-                      >
-                        <div className="flex items-center gap-2">
-                          <Sparkles className="w-3.5 h-3.5 shrink-0" />
-                          <span>Suggested Next: {msg.followUpPrompt}</span>
-                        </div>
-                        <ArrowUp className="w-3.5 h-3.5 rotate-45 group-hover:translate-x-0.5 group-hover:-translate-y-0.5 transition-transform shrink-0" />
-                      </button>
-                    )}
-                  </div>
+          </header>
 
-                  {/* User Avatar */}
-                  {msg.sender === 'user' && (
-                    <div className={`w-9 h-9 rounded-full border flex items-center justify-center shrink-0 shadow-sm ${
-                      isDark ? 'bg-[#222222] border-white/10 text-gray-300' : 'bg-gray-200 border-black/10 text-gray-700'
-                    }`}>
-                      <User className="w-4 h-4" />
-                    </div>
-                  )}
-                </div>
-              ))}
-
-              {/* Live Typing State */}
-              {isTyping && (
-                <div className="flex items-center gap-3.5">
-                  <div className={`w-9 h-9 rounded-full flex items-center justify-center shrink-0 border shadow-sm ${
-                    isDark ? 'bg-[#181818] border-white/15 text-[#00D2FF]' : 'bg-white border-black/10 text-[#0071E3]'
-                  }`}>
-                    <Sparkles className="w-4 h-4 animate-spin" />
-                  </div>
-                  <div className={`rounded-2xl px-4 py-2.5 text-xs flex items-center gap-2 border shadow-sm ${
-                    isDark ? 'bg-[#141414] border-white/10 text-gray-300' : 'bg-white border-black/10 text-gray-700'
-                  }`}>
-                    <span className="w-2 h-2 rounded-full bg-[#10B981] animate-ping" />
-                    <span>Ikoli is thinking…</span>
-                  </div>
-                </div>
-              )}
-
-              <div ref={messagesEndRef} />
+          {/* Share Toast Notification */}
+          {showShareToast && (
+            <div className="absolute top-16 right-6 z-50 bg-black text-white dark:bg-white dark:text-black px-4 py-2 rounded-full text-xs font-semibold shadow-xl flex items-center gap-2 animate-bounce">
+              <Check className="w-3.5 h-3.5 text-emerald-400" />
+              <span>Link copied to clipboard!</span>
             </div>
           )}
 
-          {/* ══════════════════════════════════════════════════════════════════
-              PRIMARY CLINICAL COMPOSER CARD
-          ══════════════════════════════════════════════════════════════════ */}
-          <div className="w-full relative group text-left pt-2">
+          {/* ── Main Chat / Empty State Container ─────────────────────────── */}
+          <div className="flex-1 overflow-y-auto px-4 sm:px-8 py-6 space-y-6 flex flex-col justify-start">
             
-            {/* Elegant Ambient Elevation Glow */}
-            <div 
-              className="absolute -inset-0.5 rounded-[24px] opacity-80 blur-[2px] transition-all group-hover:opacity-100 -z-10"
-              style={{
-                background: isDark
-                  ? 'linear-gradient(90deg, #0071E3 0%, #10B981 50%, #00D2FF 100%)'
-                  : 'linear-gradient(90deg, #0071E3 0%, #10B981 50%, #0082FF 100%)',
-              }}
-            />
+            {/* ── A. EMPTY STATE (When no messages in current session) ──────── */}
+            {messages.length === 0 && (
+              <div className="my-auto max-w-3xl w-full mx-auto space-y-7 text-center select-none py-4">
+                
+                {/* 3D Frosted Glowing Orb */}
+                <div className="flex items-center justify-center transform hover:scale-105 transition-transform duration-500 cursor-pointer">
+                  <GlowingOrb size={88} />
+                </div>
 
-            {/* Composer Card Body */}
-            <div className={`w-full rounded-[22px] p-4 sm:p-6 shadow-2xl flex flex-col justify-between min-h-[160px] border transition-colors duration-300 ${
-              isDark
-                ? 'bg-[#111111] border-white/10 text-white'
-                : 'bg-white border-black/10 text-[#1D1D1F]'
-            }`}>
-              
-              {/* Attachment Preview Banner if File Selected */}
-              {attachedFile && (
-                <div className={`mb-3 p-2.5 rounded-xl border flex items-center justify-between gap-3 ${
-                  isDark ? 'bg-white/5 border-white/10' : 'bg-gray-50 border-gray-200'
-                }`}>
-                  <div className="flex items-center gap-3 overflow-hidden">
-                    {attachedFile.previewUrl ? (
-                      <img
-                        src={attachedFile.previewUrl}
-                        alt="Attachment preview"
-                        className="w-10 h-10 rounded-lg object-cover border border-white/10 shrink-0"
-                      />
-                    ) : (
-                      <div className="w-10 h-10 rounded-lg bg-[#0071E3]/20 flex items-center justify-center text-[#0071E3] shrink-0">
-                        <FileText className="w-5 h-5" />
+                {/* Greeting & Headline */}
+                <div className="space-y-1.5">
+                  <p className="font-semibold text-sm sm:text-base text-purple-600 dark:text-purple-400 tracking-tight">
+                    Hello, Health Officer
+                  </p>
+                  <h1 className="font-display font-black text-2xl sm:text-4xl text-[#1D1D1F] dark:text-white tracking-tight leading-tight">
+                    How can I assist you today?
+                  </h1>
+                </div>
+
+                {/* Demonstration Notice */}
+                <div className="max-w-xl mx-auto bg-amber-500/10 border border-amber-500/20 rounded-full px-4 py-1.5 text-[11px] text-amber-900 dark:text-amber-300 font-medium flex items-center justify-center gap-2">
+                  <span className="w-1.5 h-1.5 rounded-full bg-amber-500 shrink-0" />
+                  <span>
+                    <strong>Demonstration environment:</strong> Data are synthetic/illustrative.
+                  </span>
+                </div>
+
+                {/* Elevated Initial Composer Card */}
+                <div className="bg-white dark:bg-[#1C1C22] rounded-[26px] p-4 sm:p-5 border border-black/8 dark:border-white/10 shadow-[0_16px_50px_rgba(0,0,0,0.06)] space-y-3 text-left">
+                  
+                  {recognitionError && (
+                    <div className="p-2 rounded-xl bg-red-50 dark:bg-red-950/40 border border-red-200 text-xs text-red-700 dark:text-red-300">
+                      {recognitionError}
+                    </div>
+                  )}
+
+                  {attachedFile && (
+                    <div className="p-2.5 rounded-xl bg-purple-50 dark:bg-purple-950/40 border border-purple-200 dark:border-purple-800 flex items-center justify-between text-xs">
+                      <div className="flex items-center gap-2 text-purple-900 dark:text-purple-200 truncate">
+                        <FileText className="w-4 h-4 shrink-0 text-purple-600" />
+                        <span className="truncate font-medium">{attachedFile.name}</span>
+                      </div>
+                      <button
+                        onClick={() => setAttachedFile(null)}
+                        className="p-1 hover:bg-purple-200/50 rounded-full text-purple-700 dark:text-purple-300"
+                      >
+                        <X className="w-3.5 h-3.5" />
+                      </button>
+                    </div>
+                  )}
+
+                  {/* Textarea Input */}
+                  <textarea
+                    value={inputQuery}
+                    onChange={(e) => setInputQuery(e.target.value)}
+                    onKeyDown={(e) => {
+                      if (e.key === 'Enter' && !e.shiftKey) {
+                        e.preventDefault();
+                        handleSend();
+                      }
+                    }}
+                    placeholder="Ask about leprosy early signs, 2025 South-East cases, or WHO protocols..."
+                    className="w-full bg-transparent text-sm sm:text-base outline-none resize-none min-h-[64px] font-sans leading-relaxed text-[#1D1D1F] dark:text-white placeholder-gray-400 dark:placeholder-gray-500"
+                  />
+
+                  {/* Inside Composer Toolbar */}
+                  <div className="flex items-center justify-between pt-2 border-t border-black/5 dark:border-white/5">
+                    
+                    {/* Left: Deeper Research Pill */}
+                    <button
+                      onClick={() => setDeeperResearchActive(!deeperResearchActive)}
+                      className={`px-3 py-1 rounded-full text-xs font-semibold flex items-center gap-1.5 transition-all cursor-pointer ${
+                        deeperResearchActive
+                          ? 'bg-purple-100 dark:bg-purple-950/60 text-purple-700 dark:text-purple-300 border border-purple-300 dark:border-purple-800'
+                          : 'bg-gray-100 dark:bg-white/5 text-gray-500 border border-transparent'
+                      }`}
+                    >
+                      <Atom className="w-3.5 h-3.5 text-purple-600 dark:text-purple-400" />
+                      <span>NTBLCP Guidelines</span>
+                    </button>
+
+                    {/* Right: Mic & Send Controls */}
+                    <div className="flex items-center gap-2">
+                      <button
+                        onClick={() => fileInputRef.current?.click()}
+                        title="Attach clinical document or lesion photo"
+                        className="p-2 rounded-xl text-gray-500 hover:text-purple-600 hover:bg-purple-50 dark:hover:bg-purple-950/30 transition-colors cursor-pointer"
+                      >
+                        <Paperclip className="w-4 h-4" />
+                      </button>
+
+                      {/* Mic Button */}
+                      <button
+                        onClick={handleToggleVoice}
+                        title={isListening ? 'Stop listening' : 'Start voice dictation'}
+                        className={`w-8 h-8 rounded-full flex items-center justify-center transition-all cursor-pointer ${
+                          isListening
+                            ? 'bg-red-500 text-white animate-pulse'
+                            : 'bg-purple-100 dark:bg-purple-950 text-purple-600 dark:text-purple-300 hover:bg-purple-200'
+                        }`}
+                      >
+                        {isListening ? <MicOff className="w-3.5 h-3.5" /> : <Mic className="w-3.5 h-3.5" />}
+                      </button>
+
+                      {/* Send Button */}
+                      <MagneticButton onClick={() => handleSend()}>
+                        <button
+                          disabled={!inputQuery.trim() && !attachedFile}
+                          className="w-8 h-8 rounded-full bg-[#1D1D1F] dark:bg-white text-white dark:text-black flex items-center justify-center transition-transform hover:scale-105 active:scale-95 disabled:opacity-30 disabled:cursor-not-allowed cursor-pointer shadow-xs"
+                        >
+                          <ArrowUp className="w-4 h-4 stroke-[2.5]" />
+                        </button>
+                      </MagneticButton>
+                    </div>
+
+                  </div>
+
+                </div>
+
+                {/* 3-Column Feature Cards */}
+                <FeatureActionCards onSelectQuery={(q) => handleSend(q)} isDark={isDark} />
+
+              </div>
+            )}
+
+            {/* ── B. ACTIVE CHAT CONVERSATION STREAM ───────────────────────── */}
+            {messages.length > 0 && (
+              <div className="max-w-3xl w-full mx-auto space-y-5 text-left">
+                {messages.map((msg) => (
+                  <div
+                    key={msg.id}
+                    className={`flex items-start gap-3.5 ${
+                      msg.sender === 'user' ? 'justify-end' : 'justify-start'
+                    }`}
+                  >
+                    {/* AI Avatar */}
+                    {msg.sender === 'ai' && (
+                      <div className="w-8 h-8 rounded-xl bg-gradient-to-tr from-purple-600 to-indigo-600 text-white flex items-center justify-center shrink-0 shadow-xs mt-0.5">
+                        <Sparkles className="w-4 h-4" />
                       </div>
                     )}
-                    <div className="truncate">
-                      <p className="text-xs font-bold truncate">{attachedFile.name}</p>
-                      <p className="text-[10px] text-gray-400">{(attachedFile.size / 1024).toFixed(1)} KB • Attached Evidence</p>
+
+                    {/* Bubble Container */}
+                    <div
+                      className={`rounded-[22px] p-4 sm:p-5 text-sm sm:text-base leading-relaxed max-w-[90%] sm:max-w-[84%] border transition-all ${
+                        msg.sender === 'user'
+                          ? isDark
+                            ? 'bg-[#222228] text-white border-white/10'
+                            : 'bg-[#1D1D1F] text-white border-black/10 shadow-md'
+                          : isDark
+                          ? 'bg-[#19191F] text-gray-100 border-white/10 shadow-md'
+                          : 'bg-white text-[#1D1D1F] border-black/8 shadow-xs'
+                      }`}
+                    >
+                      {msg.attachment && (
+                        <div className="mb-3 p-2.5 rounded-xl bg-black/5 dark:bg-white/5 border border-black/5 dark:border-white/5 text-xs flex items-center gap-2 font-mono">
+                          <FileText className="w-4 h-4 text-purple-500" />
+                          <span className="truncate">{msg.attachment.name}</span>
+                        </div>
+                      )}
+
+                      <ClinicalMarkdown content={msg.text} />
+
+                      {/* AI Response Tools */}
+                      {msg.sender === 'ai' && (
+                        <div className="flex items-center justify-between gap-3 pt-3 mt-3 border-t border-black/5 dark:border-white/5 text-[11px] text-gray-400">
+                          <div className="flex items-center gap-3">
+                            <button
+                              onClick={() => handleCopy(msg.id, msg.text)}
+                              className="hover:text-purple-600 flex items-center gap-1 transition-colors cursor-pointer"
+                            >
+                              {copiedId === msg.id ? <Check className="w-3.5 h-3.5 text-emerald-500" /> : <Copy className="w-3.5 h-3.5" />}
+                              <span>{copiedId === msg.id ? 'Copied' : 'Copy'}</span>
+                            </button>
+
+                            <button
+                              onClick={() => handleSpeak(msg.text)}
+                              className="hover:text-purple-600 flex items-center gap-1 transition-colors cursor-pointer"
+                            >
+                              <Volume2 className="w-3.5 h-3.5" />
+                              <span>Listen</span>
+                            </button>
+                          </div>
+
+                          <span className="font-mono text-[10px] opacity-70">
+                            {msg.timestamp}
+                          </span>
+                        </div>
+                      )}
+                    </div>
+
+                    {/* User Avatar */}
+                    {msg.sender === 'user' && (
+                      <div className="w-8 h-8 rounded-full bg-purple-600 text-white flex items-center justify-center shrink-0 shadow-xs mt-0.5">
+                        <User className="w-4 h-4" />
+                      </div>
+                    )}
+                  </div>
+                ))}
+
+                {/* AI Typing Indicator */}
+                {isTyping && (
+                  <div className="flex items-start gap-3.5 justify-start">
+                    <div className="w-8 h-8 rounded-xl bg-gradient-to-tr from-purple-600 to-indigo-600 text-white flex items-center justify-center shrink-0 shadow-xs animate-pulse">
+                      <Sparkles className="w-4 h-4" />
+                    </div>
+                    <div className="p-4 rounded-2xl bg-white dark:bg-[#19191F] border border-black/8 dark:border-white/10 shadow-xs flex items-center gap-2 text-xs text-purple-600 dark:text-purple-300 font-medium">
+                      <span className="w-2 h-2 rounded-full bg-purple-500 animate-ping" />
+                      <span>Synthesizing NTBLCP &amp; WHO evidence…</span>
                     </div>
                   </div>
-                  <button
-                    onClick={handleRemoveAttachment}
-                    className="p-1 rounded-full text-gray-400 hover:text-red-400 transition-colors cursor-pointer"
-                  >
-                    <X className="w-4 h-4" />
-                  </button>
-                </div>
-              )}
+                )}
 
-              {/* Voice Listening Feedback Alert */}
-              {isListening && (
-                <div className="mb-2 p-2 rounded-xl bg-red-500/10 border border-red-500/20 text-red-400 flex items-center gap-2 text-xs font-mono animate-pulse">
-                  <span className="w-2 h-2 rounded-full bg-red-500" />
-                  <span>Listening for clinical voice dictation… speak now</span>
-                </div>
-              )}
+                <div ref={messagesEndRef} />
+              </div>
+            )}
 
-              {recognitionError && (
-                <div className="mb-2 p-2 rounded-xl bg-amber-500/10 border border-amber-500/20 text-amber-400 text-xs font-mono">
-                  {recognitionError}
-                </div>
-              )}
+          </div>
 
-              {/* Interactive Input Area */}
-              <div className="w-full">
+          {/* ── Sticky Bottom Composer (When Messages Exist) ──────────────── */}
+          {messages.length > 0 && (
+            <div className="p-4 sm:p-6 border-t border-black/5 dark:border-white/10 bg-white/80 dark:bg-[#15151A]/90 backdrop-blur-xl shrink-0">
+              <div className="max-w-3xl mx-auto bg-white dark:bg-[#1C1C22] rounded-2xl p-3 border border-black/8 dark:border-white/10 shadow-md space-y-2 text-left">
+                
+                {attachedFile && (
+                  <div className="p-2 rounded-lg bg-purple-50 dark:bg-purple-950/40 text-xs flex items-center justify-between text-purple-900 dark:text-purple-200">
+                    <span className="truncate font-medium">{attachedFile.name}</span>
+                    <button onClick={() => setAttachedFile(null)} className="p-1 hover:text-red-500">
+                      <X className="w-3.5 h-3.5" />
+                    </button>
+                  </div>
+                )}
+
                 <textarea
                   value={inputQuery}
                   onChange={(e) => setInputQuery(e.target.value)}
                   onKeyDown={(e) => {
                     if (e.key === 'Enter' && !e.shiftKey) {
                       e.preventDefault();
-                      handleSend(inputQuery);
+                      handleSend();
                     }
                   }}
-                  placeholder={getPlaceholderText()}
-                  className={`w-full bg-transparent text-sm sm:text-base outline-none resize-none min-h-[75px] font-sans leading-relaxed ${
-                    isDark ? 'text-white placeholder-gray-500' : 'text-[#1D1D1F] placeholder-gray-400'
-                  }`}
+                  placeholder="Ask a follow-up question or query surveillance records..."
+                  className="w-full bg-transparent text-sm outline-none resize-none min-h-[44px] text-[#1D1D1F] dark:text-white placeholder-gray-400"
                 />
-              </div>
 
-              {/* Controls Row */}
-              <div className={`flex items-center justify-between gap-3 pt-3 border-t ${
-                isDark ? 'border-white/5' : 'border-black/5'
-              }`}>
-                
-                <div className="flex items-center gap-2">
-                  {/* Round + Attachment Button */}
-                  <button
-                    onClick={() => fileInputRef.current?.click()}
-                    title="Upload skin lesion photo, PDF, or document"
-                    className={`h-9 px-3.5 rounded-full border flex items-center gap-1.5 text-xs font-medium transition-all active:scale-95 cursor-pointer ${
-                      isDark
-                        ? 'bg-white/5 hover:bg-white/10 border-white/15 text-gray-200'
-                        : 'bg-gray-100 hover:bg-gray-200 border-black/10 text-gray-800'
-                    }`}
-                  >
-                    <Plus className="w-3.5 h-3.5" />
-                    <span>Attach File</span>
-                  </button>
-                </div>
+                <div className="flex items-center justify-between pt-1">
+                  <div className="flex items-center gap-2">
+                    <button
+                      onClick={() => fileInputRef.current?.click()}
+                      className="p-1.5 rounded-lg text-gray-500 hover:text-purple-600 hover:bg-purple-50 dark:hover:bg-purple-950/40"
+                    >
+                      <Paperclip className="w-4 h-4" />
+                    </button>
+                    <button
+                      onClick={handleToggleVoice}
+                      className={`p-1.5 rounded-lg ${isListening ? 'text-red-500 animate-pulse' : 'text-gray-500 hover:text-purple-600'}`}
+                    >
+                      {isListening ? <MicOff className="w-4 h-4" /> : <Mic className="w-4 h-4" />}
+                    </button>
+                  </div>
 
-                <div className="flex items-center gap-2.5">
-                  {/* Voice Dictation Mic Button */}
-                  <button 
-                    onClick={handleToggleVoice}
-                    title={isListening ? 'Stop listening' : 'Start voice dictation'}
-                    className={`p-2 transition-all cursor-pointer rounded-full ${
-                      isListening
-                        ? 'bg-red-500 text-white animate-pulse'
-                        : isDark ? 'text-gray-400 hover:text-white' : 'text-gray-500 hover:text-black'
-                    }`}
-                  >
-                    {isListening ? <MicOff className="w-4 h-4" /> : <Mic className="w-4 h-4" />}
-                  </button>
-
-                  {/* Send Button */}
-                  <MagneticButton onClick={() => handleSend(inputQuery)}>
+                  <MagneticButton onClick={() => handleSend()}>
                     <button
                       disabled={!inputQuery.trim() && !attachedFile}
-                      className="w-9 h-9 rounded-full bg-[#0071E3] hover:bg-[#0077ED] text-white flex items-center justify-center transition-transform hover:scale-105 active:scale-95 disabled:opacity-30 disabled:cursor-not-allowed cursor-pointer shadow-md shadow-[#0071E3]/20"
+                      className="px-3.5 py-1.5 rounded-xl bg-[#1D1D1F] dark:bg-white text-white dark:text-black font-semibold text-xs flex items-center gap-1.5 transition-transform hover:scale-105 active:scale-95 disabled:opacity-30 cursor-pointer"
                     >
-                      <ArrowUp className="w-4 h-4 stroke-[2.5]" />
+                      <span>Send</span>
+                      <ArrowUp className="w-3.5 h-3.5" />
                     </button>
                   </MagneticButton>
                 </div>
-
               </div>
-
             </div>
+          )}
 
-          </div>
+          {/* ── Studio Bottom Footer ──────────────────────────────────────── */}
+          <footer className="h-9 px-6 border-t border-black/5 dark:border-white/5 flex items-center justify-between text-[11px] text-gray-400 dark:text-gray-500 shrink-0 select-none bg-white/40 dark:bg-[#15151A]/40">
+            <span className="truncate">
+              IKOLI Consortium &bull; RedAid Nigeria (RAN), DAHW Germany &amp; NTBLCP
+            </span>
 
-          {/* Quick Preset Diagnostic Suggestions with Magnetic Buttons */}
-          <div className="flex flex-wrap items-center justify-center gap-2 pt-1 text-xs">
-            <span className={isDark ? 'text-gray-500' : 'text-gray-400'}>Suggested queries:</span>
-            {getSuggestedQueries().map((item, idx) => (
-              <MagneticButton key={idx} onClick={() => handleSend(item.query)}>
-                <button
-                  className={`px-3 py-1 rounded-full border transition-all cursor-pointer ${
-                    isDark
-                      ? 'bg-white/5 border-white/10 text-gray-300 hover:bg-white/10 hover:text-white'
-                      : 'bg-white border-black/10 text-gray-700 hover:bg-gray-100 hover:text-black shadow-xs'
-                  }`}
-                >
-                  {item.label}
-                </button>
-              </MagneticButton>
-            ))}
-          </div>
+            <div className="flex items-center gap-3">
+              <button
+                onClick={() => onNavigate('protocols')}
+                className="hover:text-purple-600 flex items-center gap-1 cursor-pointer"
+              >
+                <HelpCircle className="w-3.5 h-3.5" />
+                <span className="hidden sm:inline">WHO Protocols</span>
+              </button>
+            </div>
+          </footer>
 
-        </div>
+        </main>
 
-      </section>
-
-      {/* ── Completely Static, Non-Moving Footer ── */}
-      <Footer onNavigate={onNavigate} isStatic={true} />
-
-    </main>
+      </div>
+    </div>
   );
 };
