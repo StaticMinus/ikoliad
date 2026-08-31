@@ -22,6 +22,7 @@ import {
   Sun,
   Moon,
   Volume2,
+  Square,
   Share2,
   Download,
   Atom,
@@ -139,7 +140,35 @@ export const AskIkoliPage: React.FC<AskIkoliPageProps> = ({ onNavigate }) => {
   // Voice & Audio State
   const [isListening, setIsListening] = useState(false);
   const [isSpeaking, setIsSpeaking] = useState(false);
+  const [speakingMessageId, setSpeakingMessageId] = useState<string | null>(null);
+  const utteranceRef = useRef<SpeechSynthesisUtterance | null>(null);
+  const [availableVoices, setAvailableVoices] = useState<SpeechSynthesisVoice[]>([]);
   const [recognitionError, setRecognitionError] = useState<string | null>(null);
+
+  // Preload and keep voices refreshed
+  useEffect(() => {
+    if (typeof window !== 'undefined' && 'speechSynthesis' in window) {
+      const updateVoices = () => {
+        try {
+          const voices = window.speechSynthesis.getVoices();
+          if (voices && voices.length > 0) {
+            setAvailableVoices(voices);
+          }
+        } catch {
+          // ignore
+        }
+      };
+      updateVoices();
+      window.speechSynthesis.onvoiceschanged = updateVoices;
+      return () => {
+        try {
+          window.speechSynthesis.cancel();
+        } catch {
+          // ignore
+        }
+      };
+    }
+  }, []);
 
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const isDark = theme === 'dark';
@@ -400,22 +429,88 @@ export const AskIkoliPage: React.FC<AskIkoliPageProps> = ({ onNavigate }) => {
     setTimeout(() => setCopiedId(null), 2000);
   };
 
-  const handleSpeak = (text: string) => {
-    if ('speechSynthesis' in window) {
-      if (isSpeaking) {
+  const handleSpeak = (id: string, text: string) => {
+    if (typeof window === 'undefined' || !('speechSynthesis' in window)) {
+      alert('Text-to-speech is not supported on this browser.');
+      return;
+    }
+
+    // If currently speaking this message, stop it immediately
+    if (speakingMessageId === id) {
+      try {
         window.speechSynthesis.cancel();
-        setIsSpeaking(false);
-        return;
+      } catch {
+        // ignore
       }
+      setSpeakingMessageId(null);
+      setIsSpeaking(false);
+      return;
+    }
+
+    try {
+      // Chromium pause/resume fix: unfreeze synthesis engine
       window.speechSynthesis.cancel();
-      const cleanText = text.replace(/\*\*/g, '').replace(/•/g, '').replace(/###/g, '');
+      window.speechSynthesis.resume();
+
+      // Clean text of markdown characters, citations, bullets
+      const cleanText = text
+        .replace(/\[\^?\d+\]/g, '')
+        .replace(/[*_#`~>]/g, '')
+        .replace(/•/g, '')
+        .replace(/\n+/g, '. ')
+        .trim();
+
+      if (!cleanText) return;
+
       const utterance = new SpeechSynthesisUtterance(cleanText);
+      utteranceRef.current = utterance;
+
+      // Pick best natural English voice available
+      const voices = availableVoices.length > 0 ? availableVoices : window.speechSynthesis.getVoices();
+      const naturalVoice = voices.find(
+        (v) =>
+          (v.name.includes('Natural') ||
+            v.name.includes('Google') ||
+            v.name.includes('Samantha') ||
+            v.name.includes('Daniel') ||
+            v.name.includes('English') ||
+            v.name.includes('Jenny')) &&
+          v.lang.startsWith('en')
+      ) || voices.find((v) => v.lang.startsWith('en')) || voices[0];
+
+      if (naturalVoice) {
+        utterance.voice = naturalVoice;
+      }
+
       utterance.rate = 1.0;
       utterance.pitch = 1.0;
-      utterance.onstart = () => setIsSpeaking(true);
-      utterance.onend = () => setIsSpeaking(false);
-      utterance.onerror = () => setIsSpeaking(false);
+      utterance.volume = 1.0;
+
+      utterance.onstart = () => {
+        setSpeakingMessageId(id);
+        setIsSpeaking(true);
+      };
+
+      utterance.onend = () => {
+        setSpeakingMessageId(null);
+        setIsSpeaking(false);
+        utteranceRef.current = null;
+      };
+
+      utterance.onerror = (e) => {
+        console.warn('Speech synthesis cancelled or encountered error:', e);
+        setSpeakingMessageId(null);
+        setIsSpeaking(false);
+        utteranceRef.current = null;
+      };
+
       window.speechSynthesis.speak(utterance);
+      // Double resume for Chromium audio engine unlock
+      window.speechSynthesis.resume();
+    } catch (err) {
+      console.error('Speech synthesis exception:', err);
+      setSpeakingMessageId(null);
+      setIsSpeaking(false);
     }
   };
 
@@ -750,13 +845,27 @@ export const AskIkoliPage: React.FC<AskIkoliPageProps> = ({ onNavigate }) => {
                           </button>
 
                           <button
-                            onClick={() => handleSpeak(msg.text)}
-                            className={`flex items-center gap-1 transition-colors cursor-pointer ${
-                              isDark ? 'hover:text-[#00D2FF]' : 'hover:text-[#0071E3]'
+                            onClick={() => handleSpeak(msg.id, msg.text)}
+                            className={`flex items-center gap-1.5 transition-colors cursor-pointer ${
+                              speakingMessageId === msg.id
+                                ? 'text-red-400 font-semibold'
+                                : isDark
+                                ? 'hover:text-[#00D2FF] text-gray-400'
+                                : 'hover:text-[#0071E3] text-gray-500'
                             }`}
+                            title={speakingMessageId === msg.id ? 'Stop listening' : 'Listen to response'}
                           >
-                            <Volume2 className="w-3.5 h-3.5" />
-                            <span>Listen</span>
+                            {speakingMessageId === msg.id ? (
+                              <>
+                                <Square className="w-3 h-3 fill-red-400 text-red-400 animate-pulse" />
+                                <span>Stop</span>
+                              </>
+                            ) : (
+                              <>
+                                <Volume2 className="w-3.5 h-3.5" />
+                                <span>Listen</span>
+                              </>
+                            )}
                           </button>
                         </div>
 
