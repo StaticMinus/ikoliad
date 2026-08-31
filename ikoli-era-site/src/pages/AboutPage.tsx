@@ -163,11 +163,11 @@ export const AboutPage: React.FC<AboutPageProps> = ({ onNavigate }) => {
             <span className="text-[#0071E3]">&bull;</span>
             <span className="text-gray-400 font-mono text-[10px]">1905 &ndash; 1977</span>
           </div>
-          <div className="hidden sm:flex items-center gap-6 text-[11px] font-mono tracking-widest text-white/70 uppercase">
-            <a href="#biography" className="hover:text-white transition-colors cursor-pointer">BIOGRAPHY</a>
-            <a href="#music" className="hover:text-white transition-colors cursor-pointer">CHORAL SUITE</a>
-            <a href="#uzuakoli" className="hover:text-white transition-colors cursor-pointer">UZUAKOLI SANCTUARY</a>
-            <a href="#consortium" className="hover:text-white transition-colors cursor-pointer">CONSORTIUM</a>
+          <div className="hidden sm:flex items-center gap-6 text-[11px] font-mono tracking-widest text-white/70 uppercase select-none">
+            <span>BIOGRAPHY</span>
+            <span>CHORAL SUITE</span>
+            <span>UZUAKOLI SANCTUARY</span>
+            <span>CONSORTIUM</span>
           </div>
         </div>
 
