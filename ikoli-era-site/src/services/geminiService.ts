@@ -577,6 +577,13 @@ function simulateSmartClinicalResponse(
     return { text, category: 'IKOLI AI', followUpPrompt: followUp, source: 'clinical-knowledge-base', modelUsed: 'Grounded Synthesizer' };
   }
 
+  // 0. AUTONOMOUS DATASET EXPORT TOOL TRIGGER (.EXCEL / .CSV)
+  if (lower.includes('export') || lower.includes('excel') || lower.includes('csv') || lower.includes('spreadsheet') || lower.includes('download data') || lower.includes('download chart') || lower.includes('download table')) {
+    text = `I have autonomously generated and exported the **2025 South-East Skin NTD Surveillance & SDR-PEP Dataset** for you [DHIS2-NTD-2025] [NTBLCP-SOP-2024].\n\n\`\`\`genui:export\n\`\`\`\n\n### 📊 Surveillance Dataset Preview\n\n| State | Priority LGA | Leprosy (MB) | Leprosy (PB) | Child Cases | Grade-2 Disability | SDR-PEP Coverage | MDT Cure Rate |\n| :--- | :--- | :--- | :--- | :--- | :--- | :--- | :--- |\n| **Ebonyi** | Izzi / Ivo | 44 | 15 | 3 (5.1%) | 15 (25.4%) | 94.2% | 87.5% |\n| **Enugu** | Oji River / Udi | 26 | 12 | 2 (5.3%) | 12 (31.6%) | 91.4% | 91.4% |\n| **Abia** | Uzuakoli / Bende | 35 | 8 | 0 (0.0%) | 8 (18.6%) | 88.4% | 88.4% |\n| **Anambra** | Awka South / Oyi | 10 | 3 | 0 (0.0%) | 0 (0.0%) | 92.5% | 100.0% |\n| **Imo** | Oguta / Owerri | 7 | 2 | 0 (0.0%) | 0 (0.0%) | 96.0% | 100.0% |\n\n*The file download has been initiated autonomously. You can also click the download badge above anytime to re-download the CSV file.*`;
+    followUp = 'Which LGA has the highest SDR-PEP coverage?';
+    return { text, category: 'Data Export', followUpPrompt: followUp, source: 'clinical-knowledge-base', modelUsed: 'Autonomous Tool Executor' };
+  }
+
   // 0. GENERATIVE UI & SURVEILLANCE CHART / MAP PROMPTS
   if (lower.includes('chart') || lower.includes('trend') || lower.includes('graph') || (lower.includes('sdr') && lower.includes('coverage'))) {
     text = `Here is the comprehensive epidemiological breakdown of **SDR-PEP Chemoprophylaxis and Case Detections (2021–2025)** across South-East Nigeria [DHIS2-NTD-2025] [NTBLCP-SOP-2024]:\n\n\`\`\`genui:chart\n\`\`\`\n\n### 📌 Clinical Key Takeaways [WHO-PEP-2024]:\n- **Accelerated Decline:** Annual new case detections dropped by **63.4%** across sentinel clusters following the rollout of household contact chemoprophylaxis.\n- **Pediatric Protection:** Zero new child cases were detected in high-coverage SDR-PEP zones across Anambra and Abia.\n- **Recommended Action:** Continue active community contact screening in priority LGAs before the start of the dry season.`;

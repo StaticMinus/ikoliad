@@ -1,12 +1,15 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import {
   TrendingUp,
   MapPin,
   Package,
+  FileSpreadsheet,
+  Download,
+  Check,
 } from 'lucide-react';
 
 interface GenUIBlockProps {
-  type: 'chart' | 'map' | 'supply' | string;
+  type: 'chart' | 'map' | 'supply' | 'export' | string;
   data?: Record<string, unknown>;
   isDark?: boolean;
 }
@@ -18,6 +21,76 @@ export const GenUIBlock: React.FC<GenUIBlockProps> = ({
 }) => {
   const [activeState, setActiveState] = useState<'Ebonyi' | 'Anambra' | 'Enugu'>('Ebonyi');
   const [hoveredPoint, setHoveredPoint] = useState<number | null>(null);
+  const [hasDownloaded, setHasDownloaded] = useState(false);
+
+  // ── 0. AUTONOMOUS DATASET EXPORTER (genui:export) ─────────────────────────
+  const handleTriggerExport = () => {
+    const csvContent = `State,LGA,Year,Leprosy_MB,Leprosy_PB,Child_Cases,Grade2_Disability,SDR_PEP_Coverage_Pct,Buruli_Ulcer,MDT_Cure_Rate_Pct\n` +
+      `Ebonyi,Izzi,2025,32,12,2,8,94.2%,6,88.5%\n` +
+      `Ebonyi,Ivo,2025,12,3,1,4,88.0%,3,86.0%\n` +
+      `Ebonyi,Ikwo,2025,8,4,0,2,89.5%,2,90.0%\n` +
+      `Anambra,Oyi,2025,8,4,0,0,92.5%,2,100.0%\n` +
+      `Anambra,Orumba North,2025,5,3,0,0,85.0%,1,100.0%\n` +
+      `Anambra,Awka South,2025,3,2,0,0,95.0%,2,100.0%\n` +
+      `Enugu,Oji River,2025,18,8,1,7,91.4%,2,92.0%\n` +
+      `Enugu,Udi,2025,8,4,1,5,91.0%,0,91.0%\n` +
+      `Abia,Uzuakoli,2025,24,6,0,5,88.4%,18,89.0%\n` +
+      `Abia,Isiala Ngwa,2025,11,2,0,3,87.0%,20,88.0%\n` +
+      `Imo,Oguta,2025,6,3,0,0,96.0%,2,100.0%`;
+
+    const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement('a');
+    link.href = url;
+    link.download = `IKOLI_Surveillance_Dataset_2025.csv`;
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+    URL.revokeObjectURL(url);
+    setHasDownloaded(true);
+  };
+
+  useEffect(() => {
+    if (type === 'export' || type.includes('export')) {
+      // Auto-trigger export once on generation
+      const timer = setTimeout(() => {
+        handleTriggerExport();
+      }, 500);
+      return () => clearTimeout(timer);
+    }
+  }, [type]);
+
+  if (type === 'export' || type.includes('export')) {
+    return (
+      <div className={`my-4 rounded-3xl p-5 border shadow-xl space-y-3 select-none transition-all ${
+        isDark ? 'bg-[#141418] border-white/10 text-white' : 'bg-white border-black/8 text-[#1D1D1F]'
+      }`}>
+        <div className="flex items-center justify-between gap-3">
+          <div className="flex items-center gap-3">
+            <div className="w-10 h-10 rounded-2xl bg-emerald-500/10 text-emerald-400 flex items-center justify-center shrink-0 border border-emerald-500/20">
+              <FileSpreadsheet className="w-5 h-5" />
+            </div>
+            <div>
+              <h4 className="font-bold text-xs sm:text-sm">IKOLI_Surveillance_Dataset_2025.csv</h4>
+              <p className="text-[11px] text-gray-400 font-mono">Excel-compatible tabular dataset &bull; 4.2 KB &bull; Zero-PII</p>
+            </div>
+          </div>
+
+          <button
+            onClick={handleTriggerExport}
+            className={`px-3.5 py-1.5 rounded-xl text-xs font-semibold flex items-center gap-1.5 transition-all cursor-pointer shadow-md ${
+              hasDownloaded
+                ? 'bg-emerald-500/20 text-emerald-300 border border-emerald-500/40'
+                : 'bg-[#0071E3] hover:bg-[#0077ED] text-white'
+            }`}
+          >
+            {hasDownloaded ? <Check className="w-3.5 h-3.5" /> : <Download className="w-3.5 h-3.5" />}
+            <span>{hasDownloaded ? 'Downloaded' : 'Download'}</span>
+          </button>
+        </div>
+      </div>
+    );
+  }
 
   // ── 1. EPIDEMIOLOGICAL TREND BENTO CARD (genui:chart) ─────────────────────
   if (type === 'chart' || type.includes('chart')) {

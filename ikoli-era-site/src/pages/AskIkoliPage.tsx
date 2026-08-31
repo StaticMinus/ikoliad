@@ -293,17 +293,8 @@ export const AskIkoliPage: React.FC<AskIkoliPageProps> = ({ onNavigate }) => {
     setIsTyping(true);
     setIsStreaming(true);
 
-    const aiMessageId = 'msg-' + (Date.now() + 1);
-    const initialAiMessage: ChatMessage = {
-      id: aiMessageId,
-      sender: 'ai',
-      text: '',
-      timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
-      source: 'clinical-knowledge-base',
-    };
-
-    // Optimistically update session with User Message + Initial AI placeholder
-    const baseMessages = [...messages, userMessage, initialAiMessage];
+    // Optimistically update session with User Message only (no empty AI placeholder)
+    const baseMessages = [...messages, userMessage];
     setSessions((prev) =>
       prev.map((s) =>
         s.id === activeSessionId
@@ -321,9 +312,9 @@ export const AskIkoliPage: React.FC<AskIkoliPageProps> = ({ onNavigate }) => {
     const abortController = new AbortController();
     abortControllerRef.current = abortController;
 
-    try {
-      let latestAiMessage = initialAiMessage;
+    const aiMessageId = 'msg-' + (Date.now() + 1);
 
+    try {
       for await (const chunk of streamClinicalAI(
         queryToSend,
         currentAttachment || undefined,
@@ -331,9 +322,12 @@ export const AskIkoliPage: React.FC<AskIkoliPageProps> = ({ onNavigate }) => {
         abortController.signal
       )) {
         setIsTyping(false); // First token arrived!
-        latestAiMessage = {
-          ...initialAiMessage,
+
+        const currentAiMsg: ChatMessage = {
+          id: aiMessageId,
+          sender: 'ai',
           text: chunk.fullText,
+          timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
           source: chunk.response.source,
           category: chunk.response.category,
           dimensions: chunk.response.dimensions,
@@ -346,7 +340,7 @@ export const AskIkoliPage: React.FC<AskIkoliPageProps> = ({ onNavigate }) => {
               ? {
                   ...s,
                   updatedAt: Date.now(),
-                  messages: [...messages, userMessage, latestAiMessage],
+                  messages: [...baseMessages, currentAiMsg],
                 }
               : s
           )
@@ -841,6 +835,7 @@ export const AskIkoliPage: React.FC<AskIkoliPageProps> = ({ onNavigate }) => {
           {messages.length > 0 && (
             <div className="max-w-3xl w-full mx-auto space-y-6 pb-4">
               {messages.map((msg, idx) => {
+                if (msg.sender === 'ai' && !msg.text) return null;
                 const userQuery = idx > 0 ? messages[idx - 1]?.text : '';
                 return (
                   <div
