@@ -504,8 +504,8 @@ export const SurveillanceHubConsole: React.FC<SurveillanceHubConsoleProps> = ({
         
         {/* Left: Geometric Three-Petal Logo Badge + Official Title */}
         <div className="flex items-center gap-3">
-          <div className="w-10 h-10 rounded-2xl bg-[#1D1D1F] flex items-center justify-center text-white shadow-xs shrink-0">
-            <svg className="w-5 h-5" viewBox="0 0 24 24" fill="currentColor">
+          <div className="w-9 h-9 rounded-2xl bg-[#1D1D1F] flex items-center justify-center text-white shadow-xs shrink-0">
+            <svg className="w-4.5 h-4.5" viewBox="0 0 24 24" fill="currentColor">
               <circle cx="12" cy="7" r="4" opacity="0.9" />
               <circle cx="7" cy="15" r="4" opacity="0.9" />
               <circle cx="17" cy="15" r="4" opacity="0.9" />
@@ -513,15 +513,15 @@ export const SurveillanceHubConsole: React.FC<SurveillanceHubConsoleProps> = ({
           </div>
           <div>
             <div className="flex items-center gap-2">
-              <h2 className="font-extrabold text-base tracking-tight text-[#1D1D1F]">
-                IKOLI-AI Demonstrator v0.1
+              <h2 className="font-extrabold text-sm sm:text-base tracking-tight text-[#1D1D1F]">
+                IKOLI AI
               </h2>
               <span className="text-gray-300">/</span>
               <span className="text-xs font-semibold text-gray-600">
                 Surveillance Console
               </span>
-              <span className="hidden sm:inline-flex items-center gap-1.5 text-[10px] font-mono font-bold text-emerald-700 bg-emerald-100/80 px-2 py-0.5 rounded-full border border-emerald-300/40">
-                <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" />
+              <span className="hidden sm:inline-flex items-center gap-1.5 text-[10px] font-mono font-medium text-emerald-700 bg-emerald-500/10 px-2.5 py-0.5 rounded-full border border-emerald-500/20">
+                <span className="w-1.5 h-1.5 rounded-full bg-emerald-500" />
                 2025 Baseline
               </span>
             </div>
@@ -531,35 +531,35 @@ export const SurveillanceHubConsole: React.FC<SurveillanceHubConsoleProps> = ({
           </div>
         </div>
 
-        {/* Center: Apple-style Segmented Glass Capsule Switcher (No awkward wrapping) */}
-        <div className="w-full lg:w-auto overflow-x-auto scrollbar-none py-0.5">
-          <div className="bg-[#E5E5EA] p-1 rounded-full flex items-center gap-1 shrink-0 w-max mx-auto shadow-inner border border-black/5">
+        {/* Center: Apple-style Segmented Glass Capsule Switcher */}
+        <div className="w-full lg:w-auto overflow-x-auto [scrollbar-width:none] [-ms-overflow-style:none] [&::-webkit-scrollbar]:hidden py-0.5">
+          <div className="bg-[#F0F0F2] dark:bg-[#1C1C1E] p-1 rounded-full flex items-center gap-1 shrink-0 w-max mx-auto border border-black/5 dark:border-white/5">
             <button
               onClick={() => setActiveTab('overview')}
-              className={`px-4 py-1.5 rounded-full text-xs font-semibold transition-all duration-200 cursor-pointer whitespace-nowrap ${
+              className={`px-3.5 py-1 rounded-full text-xs font-medium transition-all duration-200 cursor-pointer whitespace-nowrap ${
                 activeTab === 'overview'
-                  ? 'bg-white text-[#1D1D1F] shadow-[0_2px_8px_rgba(0,0,0,0.08)]'
-                  : 'text-[#86868B] hover:text-[#1D1D1F]'
+                  ? 'bg-white dark:bg-[#2C2C2E] text-[#1D1D1F] dark:text-white shadow-[0_1px_4px_rgba(0,0,0,0.08)]'
+                  : 'text-gray-500 hover:text-[#1D1D1F]'
               }`}
             >
               Overview
             </button>
             <button
               onClick={() => setActiveTab('analytics')}
-              className={`px-4 py-1.5 rounded-full text-xs font-semibold transition-all duration-200 cursor-pointer whitespace-nowrap ${
+              className={`px-3.5 py-1 rounded-full text-xs font-medium transition-all duration-200 cursor-pointer whitespace-nowrap ${
                 activeTab === 'analytics'
-                  ? 'bg-white text-[#1D1D1F] shadow-[0_2px_8px_rgba(0,0,0,0.08)]'
-                  : 'text-[#86868B] hover:text-[#1D1D1F]'
+                  ? 'bg-white dark:bg-[#2C2C2E] text-[#1D1D1F] dark:text-white shadow-[0_1px_4px_rgba(0,0,0,0.08)]'
+                  : 'text-gray-500 hover:text-[#1D1D1F]'
               }`}
             >
               Trends
             </button>
             <button
               onClick={() => setActiveTab('pcr')}
-              className={`px-4 py-1.5 rounded-full text-xs font-semibold transition-all duration-200 cursor-pointer whitespace-nowrap flex items-center gap-1.5 ${
+              className={`px-3.5 py-1 rounded-full text-xs font-medium transition-all duration-200 cursor-pointer whitespace-nowrap flex items-center gap-1.5 ${
                 activeTab === 'pcr'
-                  ? 'bg-white text-purple-700 shadow-[0_2px_8px_rgba(0,0,0,0.08)]'
-                  : 'text-[#86868B] hover:text-[#1D1D1F]'
+                  ? 'bg-white dark:bg-[#2C2C2E] text-purple-700 dark:text-purple-400 shadow-[0_1px_4px_rgba(0,0,0,0.08)]'
+                  : 'text-gray-500 hover:text-[#1D1D1F]'
               }`}
             >
               <FlaskConical className="w-3 h-3" />
@@ -567,10 +567,10 @@ export const SurveillanceHubConsole: React.FC<SurveillanceHubConsoleProps> = ({
             </button>
             <button
               onClick={() => setActiveTab('meal')}
-              className={`px-4 py-1.5 rounded-full text-xs font-semibold transition-all duration-200 cursor-pointer whitespace-nowrap flex items-center gap-1.5 ${
+              className={`px-3.5 py-1 rounded-full text-xs font-medium transition-all duration-200 cursor-pointer whitespace-nowrap flex items-center gap-1.5 ${
                 activeTab === 'meal'
-                  ? 'bg-white text-[#0071E3] shadow-[0_2px_8px_rgba(0,0,0,0.08)]'
-                  : 'text-[#86868B] hover:text-[#1D1D1F]'
+                  ? 'bg-white dark:bg-[#2C2C2E] text-[#0071E3] shadow-[0_1px_4px_rgba(0,0,0,0.08)]'
+                  : 'text-gray-500 hover:text-[#1D1D1F]'
               }`}
             >
               <ShieldCheck className="w-3 h-3" />
@@ -578,10 +578,10 @@ export const SurveillanceHubConsole: React.FC<SurveillanceHubConsoleProps> = ({
             </button>
             <button
               onClick={() => setActiveTab('monitoring')}
-              className={`px-4 py-1.5 rounded-full text-xs font-semibold transition-all duration-200 cursor-pointer whitespace-nowrap ${
+              className={`px-3.5 py-1 rounded-full text-xs font-medium transition-all duration-200 cursor-pointer whitespace-nowrap ${
                 activeTab === 'monitoring'
-                  ? 'bg-white text-[#1D1D1F] shadow-[0_2px_8px_rgba(0,0,0,0.08)]'
-                  : 'text-[#86868B] hover:text-[#1D1D1F]'
+                  ? 'bg-white dark:bg-[#2C2C2E] text-[#1D1D1F] dark:text-white shadow-[0_1px_4px_rgba(0,0,0,0.08)]'
+                  : 'text-gray-500 hover:text-[#1D1D1F]'
               }`}
             >
               Facilities
@@ -593,7 +593,7 @@ export const SurveillanceHubConsole: React.FC<SurveillanceHubConsoleProps> = ({
         <div className="flex items-center gap-2 shrink-0 self-end lg:self-auto">
           <button
             onClick={handleExportExcel}
-            className="bg-white hover:bg-[#F5F5F7] text-[#1D1D1F] border border-black/10 px-4 py-1.5 rounded-full text-xs font-semibold shadow-xs flex items-center gap-2 transition-all hover:scale-102 active:scale-98 cursor-pointer group"
+            className="bg-white hover:bg-[#F5F5F7] text-[#1D1D1F] border border-black/8 px-3.5 py-1.5 rounded-full text-xs font-medium shadow-xs flex items-center gap-2 transition-all hover:scale-102 active:scale-98 cursor-pointer group"
             title="Download full dataset in NTBLCP/RedAid MEAL CSV format"
           >
             <FileSpreadsheet className="w-3.5 h-3.5 text-emerald-600 group-hover:scale-110 transition-transform" />
